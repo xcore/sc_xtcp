@@ -1,0 +1,34 @@
+BRIEF INSTRUCTIONS:
+
+1. Plug power into XC-2 
+2. Plug XC-2 into the network
+3. An LED pattern will flash. X1LEDA will light to show application is
+running. X2LEDB will light to show that it has successfully connected
+to the network.
+4. Go to your web browser and type in http://xc2.local.
+
+TROUBLESHOOTING:
+
+* I get no leds at all 
+        - check power.
+
+* X2LEDB does not light up.
+        - check network connection. 
+        - If there is no DHCP server on network then it may take up 
+          to a minute to obtain an IP address
+
+* X2LEDB lights up but my web browser cannot load http://xc2.local
+        - Linux: try installing either avahi or libhowl for mdns name
+        lookup
+        - Windows: try installing Bonjour for Windows available from
+        Apple
+        - You can start the device up to a static IP address by
+          holding down button A - this defaults to 192.168.0.100. 
+          Configure your PC to be able to connect to this address and
+          got to http://192.168.0.100. In the configuration screen
+          you can change the static ip and change the default boot
+          method to go to static ip without holding button A down.
+
+
+        
+  

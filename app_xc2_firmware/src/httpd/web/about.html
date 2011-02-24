@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>XMOS XC-2 Demo Webserver</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link href="xmos_style.css" rel="stylesheet" type="text/css" />
+				<!--[if lt IE 7]>
+		<link href="/sites/all/themes/jason_xmos/css/fix-ie.css" rel="stylesheet" type="text/css" />
+		<![endif]-->
+		<!--[if IE 7]>
+		<link href="/sites/all/themes/jason_xmos/css/fix-ie7.css" rel="stylesheet" type="text/css" />
+		<![endif]-->
+		
+	</head>
+	<body>
+		<div id="container">		
+			
+			<div id="regLoginBar">
+			</div>
+			
+				<div id="pageBody">
+					
+					<div id="leftSubNav">
+
+			<div id="titleBar">
+				<a href="/" title="XMOS Home"><img src="img/xmos_logo.png" alt="XMOS logo" class="left" /></a>
+
+				
+
+			</div>
+						<div class="applications">
+<ul class="menu">
+<li class="leaf"><a href="flash_leds.html" title="Flash LEDs">Flash my LEDs!</a></li>
+<li class="leaf"><a href="info.html" title="Board Info">Board Info</a></li>
+<li class="leaf"><a href="config.html" title="Configuration">Configuration</a></li>
+<li class="leaf"><a href="about.html" title="About this demo">About this demo</a></li>
+
+</ul>
+</div>						<h2>Web Links</h2>
+						<ul class="company">
+							<li><a href="http://xmos.com/">XMOS</a></li>
+						</ul>
+						<ul class="black">
+							<li><a href="http://xlinkers.org">Xlinkers Community</a></li>
+							<li><a href="http://xmos.com/contact">Contact Us</a></li>
+						</ul>
+											</div>
+					
+								<div id="titleLineTech"></div>
+					<div id="content">
+
+						<div id='page_content' title='Main Content'></div>
+						<h1>About this demo</h1>																														<div class="node">
+        <div class="content">
+
+<p>
+The web server demonstrates the abilities of the XS1-G4 chip to implement a combination of hardware and software tasks all written in software.
+<p>
+
+<ul>
+<li/> The hardware part is an ethernet MAC and MII
+interface which talks to the ethernet phy. 
+<li/> The MAC connects to a protocol stack which then connects
+to a webserver serving pages from onboard memory.
+<li/> There is some persisent configuration state to the
+server (IP address configuration) which survives if the device is turned on and
+off. This state is stored in flash memory for which the hardware
+interface is again implemented on the chip in software.
+</ul>
+
+
+<p>
+The protocol stack is implemented with a port of the <a href="http://www.sics.se/~adam/uip/">uIP</a> TCP/IP
+stack. It implements the following protocols:
+</p>
+
+<ul>
+<li/> Ethernet L2 Transport
+<li/> IP
+<li/> ICMP
+<li/> IGMP
+<li/> DHCP
+<li/> IPv4LL Auto-IP allocation
+<li/> Netbios naming service
+<li/> MDNS (partial)
+<li/> UDP
+<li/> TCP/IP
+<li/> HTTP
+</ul>
+
+<!--<form name="input" action="html_form_submit.asp"
+method="get">
+Username: 
+<input type="text" name="user">
+<input type="submit" value="Submit">
+</form>-->
+
+</div>
+</div>
+											</div>
+<div class="right" >
+
+<img src="img/xc2.jpg" alt="XC-2" />
+</div>
+
+								
+			</div>
+			<div id="footer">
+				
+																<ul class="menu">
+					<li class="leaf"><a href="http://xmos.com/company" title="About XMOS">About XMOS</a></li>
+					<li class="leaf"><a href="http://xmos.com/legal/terms" title="Legal">Legal</a></li>
+				</ul>
+				
+				<p class="left clear">Copyright &copy; 2009 XMOS Ltd.</p>
+				
+			</div>
+		</div>
+
+				
+			</body>
+</html>

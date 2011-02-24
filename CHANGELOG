@@ -1,0 +1,20 @@
+XMOS TCP/IP STACK CHANGLOG
+----------------------------
+1v3 (18th February 2009)
+   * Moved to new build/packaging system
+
+1V2 (15th December 2009)
+   * Various small bug fixes
+   * Added server/client field to connection structure
+
+1V1 (3rd December 2009)
+   * Various bug fixes
+   * Updated MDNS implementation with more features (still not fully Bonjour compliant)
+   * Added gigabit webserver demo for XC-2G
+
+1V0 (17th October 2009)
+   * Port of uIP stack (previous apps have used lwIP)
+   * Major implementation change for XC-2 firmware
+   * Added new xtcp client layer
+   * New makefile structure 
+

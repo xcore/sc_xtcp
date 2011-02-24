@@ -1,0 +1,30 @@
+This application contains the implementation of the demo webserver on
+the XC-2.
+
+The web server demonstrates the abilities of the XS1-G4 chip to
+implement a combination of hardware and software tasks all written in software.
+
+  * The hardware part is an ethernet MAC and MII
+    interface which talks to the ethernet phy. 
+  * The MAC connects to a protocol stack which then connects
+    to a webserver serving pages from onboard memory.
+  * There is some persisent configuration state to the
+    server (IP address configuration) which survives if the device 
+    is turned on and off. This state is stored in flash memory for
+    which the hardware interface is again implemented on the chip in software.
+
+The protocol stack is implemented with a port of the uIP TCP/IP
+stack. It implements the following protocols:
+
+  * Ethernet L2 Transport
+  * IP
+  * ICMP
+  * IGMP
+  * DHCP
+  * IPv4LL Auto-IP allocation
+  * Netbios naming service
+  * MDNS (partial)
+  * UDP
+  * TCP/IP
+  * HTTP
+

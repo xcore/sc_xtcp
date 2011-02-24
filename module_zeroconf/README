@@ -1,0 +1,2 @@
+This module provides multicast DNS and DNS-SD protocol implementations
+to enable zero configuration networking.

@@ -1,0 +1,68 @@
+PACKAGE: xmos_tcpip
+
+VERSION: 2v0 (build b6507ec70f32302fb1dcbe6b899e60b031947058)
+
+DESCRIPTION:
+
+This package provides modules and sample applications that use tcp/ip
+protocols over ethernet.
+
+REQUIRED TOOLS:
+
+Xmos Desktop Development Tools 9.9.2 or above.
+
+INCLUDED MODULES AND APPLICATIONS:
+
+The following modules are provided in this package, these can be
+used in your applications:
+
+   module_zeroconf.
+
+   module_xtcp.
+
+   module_telnet_console.
+
+In addition the follow example applications are provided:
+
+   app_simple_webserver.
+
+   app_xtcp_tests.
+
+   app_xc2_firmware.
+
+   app_simple_client.
+   
+   app_buffered_protocol_demo.
+
+INSTALLATION (XDE):
+
+To install, open the XDE Eclipse IDE and perform the following steps:
+
+   * Select the "Import" item from the "File" menu
+   * Select "General" -> "Existing Projects into Workspace" and click "Next"
+   * Click on "Browse" next to "Select archive file" and select the
+     xmos_tcpip.zip file.
+   * Make sure the projects you want to import are ticked in the
+     "Projects:" list. Import all the components and whichever
+     applications you are interested in. 
+   * Click on "Finish"
+
+To build, select the application you wish to build in the Project
+Explorer window and click on build icon. To run an application: select
+the .xe file in the bin/ directory of that application project, right
+click and select "Run As..."
+
+INSTALLATION (COMMAND LINE):
+
+To install, unzip the package zip. To build an application change into
+that application directory and execute the command:
+
+   xmake all
+
+The generated executable will be placed in the bin/ sub-directory. To
+run execture the command:
+
+   xrun bin/[binary file].xe
+
+
+
