@@ -28,7 +28,7 @@ void xhttpd(chanend tcp_svr,
           xtcp_ipconfig_t ipconfig;
           xtcp_get_ipconfig(tcp_svr, ipconfig);
 
-
+          printstr("Registering mdns name\n");
           mdns_register_canonical_name("xc2");
           mdns_register_name("www.xc2");
           mdns_register_service("XC-2 Demo Webserver", "_http._tcp.local", 80, "");
