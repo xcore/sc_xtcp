@@ -1336,7 +1336,6 @@ void mdns_handle_event(chanend tcp_svr,
   if (conn->remote_port == MDNS_SERVER_PORT &&
       conn->event == XTCP_NEW_CONNECTION)
     {
-	  printstr("mdns new incoming\n");
       xtcp_set_poll_interval(tcp_svr, conn, 125);
       xtcp_bind_local(tcp_svr, conn, MDNS_SERVER_PORT);
     }
@@ -1359,12 +1358,10 @@ void mdns_handle_event(chanend tcp_svr,
       switch (conn->event) 
         {
         case XTCP_POLL:
-        	printstr("mdns poll\n");
           mdns_periodic(tcp_svr, conn, t);
           break;
         case XTCP_RECV_DATA:
           if (conn->local_port == MDNS_SERVER_PORT) {
-        	  printstr("mdns recv\n");
             mdns_recv(tcp_svr, conn);
           }
 #if MDNS_NETBIOS
@@ -1376,7 +1373,6 @@ void mdns_handle_event(chanend tcp_svr,
         case XTCP_REQUEST_DATA:
         case XTCP_SENT_DATA:
         case XTCP_RESEND_DATA:
-        	printstr("mdns send\n");
           mdns_send(tcp_svr, conn, t);
           break;
         default:
