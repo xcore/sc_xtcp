@@ -1,0 +1,237 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>TCP/IP Stack System Description &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2v0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
+    <link rel="next" title="Programming Guide" href="programming.html" />
+    <link rel="prev" title="H/W Development Platforms" href="hw.html" /> 
+
+<script>
+function setheight() {
+h1 = document.getElementById('d1').style.height;
+h2 = document.getElementById('d2').style.height;
+
+if (parseInt(h1) > parseInt(h2)) {
+document.getElementById('d2').style.height=h1 + "px";
+}
+else {
+document.getElementById('d1').style.height=h2 + "px";
+}
+
+}
+</script>
+</head>
+
+<body onload="setheight();">
+
+  
+
+    <div class="document" id='d1'>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+<div style="float: right">
+<a href="hw.html"
+                        title="previous chapter"> &lt&lt </a>
+<a href="programming.html"
+                        title="next chapter"> &gt&gt </a></p>
+</div>
+
+            
+  <div class="section" id="tcp-ip-stack-system-description">
+<h1>TCP/IP Stack System Description<a class="headerlink" href="#tcp-ip-stack-system-description" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="software-architecture">
+<h2>Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this headline">¶</a></h2>
+<p>The following Figure shows the architecture of the TCP/IP stack:</p>
+<div class="figure align-center">
+<img alt="_images/xtcp_arch-crop.png" src="_images/xtcp_arch-crop.png" />
+<p class="caption">XTCP software architecture</p>
+</div>
+<p>The server runs in a single thread and connects to the XMOS eThernet
+MAC component (see <a class="reference internal" href="references.html#xeth10">[XEth10]</a>). It can then connect to several client
+threads over XC channels.</p>
+</div>
+<div class="section" id="ip-configuration">
+<h2>IP Configuration<a class="headerlink" href="#ip-configuration" title="Permalink to this headline">¶</a></h2>
+<p>The server will determine its IP configuration based on the arguments
+passed into the <a class="reference internal" href="api.html#uip_server" title="uip_server"><tt class="xref c c-func docutils literal"><span class="pre">uip_server()</span></tt></a> function. If an address is
+supplied then that address will be used (a static IP address
+configuration). If no address is supplied then the server will first
+try to find a DHCP server on the network to obtain an address
+automatically. If this fails it will determine a link local address
+(in the range 169.254/16) automatically using the Zeroconf IPV4LL protocol.</p>
+</div>
+<div class="section" id="events-and-connections">
+<h2>Events and Connections<a class="headerlink" href="#events-and-connections" title="Permalink to this headline">¶</a></h2>
+<p>The TCP/IP stack client interface is a low-level event based
+interface. This is to allow applications to manage buffering and
+connection management in the most efficient way possible for the
+application.</p>
+<div class="figure align-center">
+<img alt="_images/events-crop.png" src="_images/events-crop.png" />
+<p class="caption">Example event sequence</p>
+</div>
+<p>Each clients will receive <em>events</em> from the server. These events
+usually have an associated <em>connection</em>. In addition to receiving
+these events the client can send <em>commands</em> to the server to initiate
+new connections and so on.</p>
+<p>The preceding figure shows an example event/command sequence of a
+client making a connection, sending some data, receiving some data and
+then closing the connection. Note that sending and receiving may be
+split into several events/commands since the server itself performs no
+buffering.</p>
+<p>If the client is handling multiple connections then the server may
+interleave events for each connection so the client has to hold a
+persistent state for each connection.</p>
+<p>The connection and event model is the same from both TCP connections
+and UDP connections. Full details of both the possible events and
+possible commands can be found in Section <a class="reference internal" href="api.html#sec-api"><em>API</em></a>.</p>
+</div>
+<div class="section" id="tcp-and-udp">
+<h2>TCP and UDP<a class="headerlink" href="#tcp-and-udp" title="Permalink to this headline">¶</a></h2>
+<p>The XTCP API treats UDP and TCP connections in the same way. The only
+difference is when the protocol is specified on initializing
+connections with <a class="reference internal" href="api.html#xtcp_connect" title="xtcp_connect"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_connect()</span></tt></a> or <a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_listen()</span></tt></a>.</p>
+</div>
+<div class="section" id="new-connections">
+<h2>New Connections<a class="headerlink" href="#new-connections" title="Permalink to this headline">¶</a></h2>
+<p>New connections are made in two different ways. Either the
+<a class="reference internal" href="api.html#xtcp_connect" title="xtcp_connect"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_connect()</span></tt></a> function is used to initiate a connection with
+a remote host as a client or the <a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_listen()</span></tt></a> function is
+used to listen on a port for other hosts to connect to the application
+. In either
+case once a connection is established then the
+<tt class="xref c c-member docutils literal"><span class="pre">XTCP_NEW_CONNECTION</span></tt> event is triggered.</p>
+</div>
+<div class="section" id="receiving-data">
+<h2>Receiving Data<a class="headerlink" href="#receiving-data" title="Permalink to this headline">¶</a></h2>
+<p>When data is received by a connection, the <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RECV_DATA</span></tt>
+event is triggered and communicated to the client. At this point the
+client <strong>must</strong> call the <a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_recv()</span></tt></a> function to receive the
+data.</p>
+<p>Data is sent from host to client as the UDP or TCP packets come
+in. There is no buffering in the server so it will wait for the client
+to handle the event before processing new incoming packets.</p>
+</div>
+<div class="section" id="sending-data">
+<h2>Sending Data<a class="headerlink" href="#sending-data" title="Permalink to this headline">¶</a></h2>
+<p>When sending data, the client is responsible for dividing the data
+into chunks for the server and re-transmitting the previous chunk if a
+transmission error occurs.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that re-transmission may be needed on
+both TCP and UDP connections. On UDP connections, the
+transmission may fail if the server has not yet established
+a connection between the destination IP address and layer 2
+MAC address.</p>
+</div>
+<p>The client can initiate a send transaction with the
+<a class="reference internal" href="api.html#xtcp_init_send" title="xtcp_init_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_init_send()</span></tt></a> function. At this point no sending has been
+done but the server is notified of a wish to send. The client must
+then wait for a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_REQUEST_DATA</span></tt> event at which point it
+must respond with a call to <a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The maximum buffer size that can be sent in one call to
+<a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a> is contained in the <tt class="xref c c-member docutils literal"><span class="pre">mss</span></tt>
+field of the connection structure relating to the event.</p>
+</div>
+<p>After this data is sent to the server, two things can happen: Either
+the server will respond with an <tt class="xref c c-member docutils literal"><span class="pre">XTCP_SENT_DATA</span></tt> event, in
+which case the next chunk of data can be sent or with an
+<tt class="xref c c-member docutils literal"><span class="pre">XTCP_RESEND_DATA</span></tt> event in which case the client must
+re-transmit the previous chunk of data.</p>
+<p>The command/event exchange continues until the client calls the
+<a class="reference internal" href="api.html#xtcp_complete_send" title="xtcp_complete_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_complete_send()</span></tt></a> function to finish the send
+transaction. After this the server will not trigger any more
+<tt class="xref c c-member docutils literal"><span class="pre">XTCP_SENT_DATA</span></tt> events.</p>
+</div>
+<div class="section" id="link-status-events">
+<h2>Link Status Events<a class="headerlink" href="#link-status-events" title="Permalink to this headline">¶</a></h2>
+<p>As well as events related to connections. The server may also send
+link status events to the client. The events <tt class="xref c c-member docutils literal"><span class="pre">XTCP_IFUP</span></tt> and
+<tt class="xref c c-member docutils literal"><span class="pre">XTCP_IFDOWN</span></tt> indicate to a client when the link goes up or down.</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>The server is configured via arguments passed to the
+<a class="reference internal" href="api.html#uip_server" title="uip_server"><tt class="xref c c-func docutils literal"><span class="pre">uip_server()</span></tt></a> function and the defines described in Section
+<a class="reference internal" href="api.html#sec-config-defines"><em>Configuration Defines</em></a>.</p>
+<p>Client connections are configured via the client API described in
+Section <a class="reference internal" href="api.html#sec-config-defines"><em>Configuration Defines</em></a>.</p>
+</div>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" id='d2'>
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">TCP/IP Stack System Description</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-architecture">Software Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ip-configuration">IP Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#events-and-connections">Events and Connections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tcp-and-udp">TCP and UDP</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#new-connections">New Connections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#receiving-data">Receiving Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sending-data">Sending Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#link-status-events">Link Status Events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+
+    <div class="footer">
+    </div>
+  </body>
+</html>
+
+
+

@@ -1,0 +1,165 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Overview &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2v0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
+    <link rel="next" title="H/W Development Platforms" href="hw.html" />
+    <link rel="prev" title="XMOS TCP/IP STACK" href="index.html" /> 
+
+<script>
+function setheight() {
+h1 = document.getElementById('d1').style.height;
+h2 = document.getElementById('d2').style.height;
+
+if (parseInt(h1) > parseInt(h2)) {
+document.getElementById('d2').style.height=h1 + "px";
+}
+else {
+document.getElementById('d1').style.height=h2 + "px";
+}
+
+}
+</script>
+</head>
+
+<body onload="setheight();">
+
+  
+
+    <div class="document" id='d1'>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+<div style="float: right">
+<a href="index.html"
+                        title="previous chapter"> &lt&lt </a>
+<a href="hw.html"
+                        title="next chapter"> &gt&gt </a></p>
+</div>
+
+            
+  <div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>The XMOS TCP/IP component provides a IP/UDP/TCP stack that connects to
+the XMOS ethernet component. It enables several
+clients to connect to it and send and receive on multiple TCP or UDP
+connections. The stack has been designed for a low memory
+embedded programming environment and despite its low memory footprint
+provides a complete stack including ARP, IP, UDP, TCP, DHCP, IPv4LL,
+ICMP and IGMP protocols.</p>
+<p>The stack is based on the open-source stack uIP with modifications to
+work efficiently on XMOS architecture and communicate between threads
+using XC channels.</p>
+<div class="section" id="component-summary">
+<h2>Component Summary<a class="headerlink" href="#component-summary" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="45%" />
+<col width="55%" />
+</colgroup>
+<tbody valign="top">
+<tr><td colspan="2"><strong>Functionality</strong></td>
+</tr>
+<tr><td colspan="2">Provides a lightweight IP/UDP/TCP stack</td>
+</tr>
+<tr><td colspan="2"><strong>Supported Standards</strong></td>
+</tr>
+<tr><td colspan="2">IP, UDP, TCP, DHCP, IPv4LL, ICMP, IGMP</td>
+</tr>
+<tr><td colspan="2"><strong>Supported Devices</strong></td>
+</tr>
+<tr><td><div class="first last line-block">
+<div class="line">XMOS Devices</div>
+</div>
+</td>
+<td><div class="first last line-block">
+<div class="line">XS1-G4</div>
+<div class="line">XS1-L2</div>
+<div class="line">XS1-L1</div>
+</div>
+</td>
+</tr>
+<tr><td colspan="2"><strong>Requirements</strong></td>
+</tr>
+<tr><td>XMOS Desktop Tools</td>
+<td>v10.4 or later</td>
+</tr>
+<tr><td>XMOS Ethernet Component</td>
+<td>2v0</td>
+</tr>
+<tr><td colspan="2"><strong>Licensing and Support</strong></td>
+</tr>
+<tr><td colspan="2">Component code provided without charge from XMOS.
+Component code is maintained by XMOS.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" id='d2'>
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#component-summary">Component Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+
+    <div class="footer">
+    </div>
+  </body>
+</html>
+
+
+

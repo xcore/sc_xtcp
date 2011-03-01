@@ -1,0 +1,500 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>An XMOS AVB application (tutorial) &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2v0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
+    <link rel="up" title="Programming Guide" href="programming.html" />
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Source code structure" href="structure.html" /> 
+
+<script>
+function setheight() {
+h1 = document.getElementById('d1').style.height;
+h2 = document.getElementById('d2').style.height;
+
+if (parseInt(h1) > parseInt(h2)) {
+document.getElementById('d2').style.height=h1 + "px";
+}
+else {
+document.getElementById('d1').style.height=h2 + "px";
+}
+
+}
+</script>
+</head>
+
+<body onload="setheight();">
+
+  
+
+    <div class="document" id='d1'>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+<div style="float: right">
+<a href="structure.html"
+                        title="previous chapter"> &lt&lt </a>
+<a href="api.html"
+                        title="next chapter"> &gt&gt </a></p>
+</div>
+
+            
+  <div class="section" id="an-xmos-avb-application-tutorial">
+<h1>An XMOS AVB application (tutorial)<a class="headerlink" href="#an-xmos-avb-application-tutorial" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial walks through the a simple webserver application that
+uses the XMOS TCP/IP component. This can be found in the
+<tt class="docutils literal"><span class="pre">app_simple_webserver</span></tt> directory.</p>
+<div class="section" id="the-toplevel-main">
+<h2>The toplevel main<a class="headerlink" href="#the-toplevel-main" title="Permalink to this headline">¶</a></h2>
+<p>The toplevel main of the application sets up the different components
+running on different threads on the device. It can be found in the
+file <tt class="docutils literal"><span class="pre">main.xc</span></tt>.</p>
+<p>First the ethernet MAC is run on core 2. Details of the ethernet
+component can be found in <a class="reference internal" href="references.html#xeth10">[XEth10]</a>.</p>
+<div class="highlight-none"><div class="highlight"><pre>		on stdcore[2]:
+		{
+			int mac_address[2];
+
+			ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl,
+					(mac_address, char[]));
+
+			phy_init(clk_smi,
+#ifdef PORT_ETH_RST_N
+					p_mii_resetn,
+#else
+					null,
+#endif
+					smi, mii);
+
+			ethernet_server(mii, mac_address,
+					mac_rx, 1, mac_tx, 1, smi,
+					connect_status);
+		}
+</pre></div>
+</div>
+<p>The TCP/IP server is run using the <a class="reference internal" href="api.html#uip_server" title="uip_server"><tt class="xref c c-func docutils literal"><span class="pre">uip_server()</span></tt></a> function.</p>
+<div class="highlight-none"><div class="highlight"><pre>		on stdcore[3]: uip_server(mac_rx[0], mac_tx[0],
+				xtcp, 1, ipconfig,
+				connect_status);
+</pre></div>
+</div>
+<p>Finally, the client to the TCP/IP server is run on a separate thread
+and connected to the TCP/IP server via the first element <tt class="docutils literal"><span class="pre">xtcp</span></tt>
+channel array. The function <tt class="docutils literal"><span class="pre">xhttpd</span></tt> implements the web server.</p>
+<div class="highlight-none"><div class="highlight"><pre>		on stdcore[0]: xhttpd(xtcp[0]);
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-webserver-mainloop">
+<h2>The webserver mainloop<a class="headerlink" href="#the-webserver-mainloop" title="Permalink to this headline">¶</a></h2>
+<p>The webserver is implemented in the <tt class="docutils literal"><span class="pre">xhttpd</span></tt> function in
+<tt class="docutils literal"><span class="pre">xhttpd.xc</span></tt>. This function implements a simple loop that just
+responds to events from the TCP/IP server. When an event occurs it is
+passed onto the <tt class="docutils literal"><span class="pre">httpd_handle_event</span></tt> handler.</p>
+<div class="highlight-none"><div class="highlight"><pre>void xhttpd(chanend tcp_svr)
+{
+  xtcp_connection_t conn;
+  
+  // Initiate the HTTP state
+  httpd_init(tcp_svr);
+   
+  // Loop forever processing TCP events
+  while(1)
+    {
+      select
+        {
+        case xtcp_event(tcp_svr, conn):
+          httpd_handle_event(tcp_svr, conn);
+          break;
+        }
+    }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-webserver-event-handler">
+<h2>The webserver event handler<a class="headerlink" href="#the-webserver-event-handler" title="Permalink to this headline">¶</a></h2>
+<p>The event handler is implemented in <tt class="docutils literal"><span class="pre">httpd.c</span></tt> and contains the main
+logic of the web server. The server can handle several connections at
+once. However, events for each connection may be interleaved so the
+handler needs to store separate state for each one. The
+<tt class="docutils literal"><span class="pre">httpd_state_t</span></tt> structures holds this state:</p>
+<div class="highlight-none"><div class="highlight"><pre>typedef struct httpd_state_t {
+  int active;      //&lt; Whether this state structure is being used
+                   //  for a connection
+  int conn_id;     //&lt; The connection id 
+  char *dptr;      //&lt; Pointer to the remaining data to send
+  int dlen;        //&lt; The length of remaining data to send
+  char *prev_dptr; //&lt; Pointer to the previously sent item of data
+} httpd_state_t;
+
+httpd_state_t connection_states[NUM_HTTPD_CONNECTIONS];
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">http_init</span></tt> function is called at the start of the
+application. It initializes the connection state array and makes a
+request to accept incoming new TCP connections on port 80 (using the
+<a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_listen()</span></tt></a> function):</p>
+<div class="highlight-none"><div class="highlight"><pre>void httpd_init(chanend tcp_svr)
+{
+  int i;
+  // Listen on the http port
+  xtcp_listen(tcp_svr, 80, XTCP_PROTOCOL_TCP);
+  
+  for ( i = 0; i &lt; NUM_HTTPD_CONNECTIONS; i++ )
+    {
+      connection_states[i].active = 0;
+      connection_states[i].dptr = NULL;
+    }
+}
+</pre></div>
+</div>
+<p>When an event occurs the <tt class="docutils literal"><span class="pre">httpd_handle_event</span></tt> function is
+called. The behaviour of this function depends on the event
+type. Firstly, link status events are ignored:</p>
+<div class="highlight-none"><div class="highlight"><pre>void httpd_handle_event(chanend tcp_svr, xtcp_connection_t *conn)
+{
+  // We have received an event from the TCP stack, so respond 
+  // appropriately
+
+  // Ignore events that are not directly relevant to http
+  switch (conn-&gt;event) 
+    {
+    case XTCP_IFUP:
+    case XTCP_IFDOWN:
+    case XTCP_ALREADY_HANDLED:
+      return;
+    default:
+      break;
+    }
+</pre></div>
+</div>
+<p>For other events, we first check that the connection is definitely a
+http connection (is directed at port 80) and then call one of several
+event handlers for each type of event. The is a separate function for
+new connections, receiving data, sending data and closing connections:</p>
+<div class="highlight-none"><div class="highlight"><pre>  if (conn-&gt;local_port == 80) {
+    switch (conn-&gt;event)
+      {
+      case XTCP_NEW_CONNECTION:
+        httpd_init_state(tcp_svr, conn);
+        break;          
+      case XTCP_RECV_DATA:
+        httpd_recv(tcp_svr, conn);
+        break;        
+      case XTCP_SENT_DATA:        
+      case XTCP_REQUEST_DATA:
+      case XTCP_RESEND_DATA:
+          httpd_send(tcp_svr, conn);
+          break;         
+      case XTCP_TIMED_OUT:
+      case XTCP_ABORTED:
+      case XTCP_CLOSED:
+          httpd_free_state(conn);
+          break;
+      default:
+        // Ignore anything else
+        break;
+      }
+    conn-&gt;event = XTCP_ALREADY_HANDLED;
+  }
+</pre></div>
+</div>
+<p>The following sections describe the four handler functions.</p>
+<div class="section" id="handling-connections">
+<h3>Handling Connections<a class="headerlink" href="#handling-connections" title="Permalink to this headline">¶</a></h3>
+<p>When a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_NEW_CONNECTION</span></tt> event occurs we need to
+associate some state with the connection. So the <tt class="docutils literal"><span class="pre">connection_states</span></tt>
+array is searched for a free state structure.</p>
+<div class="highlight-none"><div class="highlight"><pre>void httpd_init_state(chanend tcp_svr, xtcp_connection_t *conn)
+{
+  int i;
+  
+  // Try and find an empty connection slot
+  for (i=0;i&lt;NUM_HTTPD_CONNECTIONS;i++)
+    {
+      if (!connection_states[i].active)
+        break;
+    }
+  
+</pre></div>
+</div>
+<p>If we don&#8217;t find a free state we cannot handle the connection so
+<tt class="xref c c-func docutils literal"><span class="pre">xtcp_abort`()</span></tt> is called to abort the connection.</p>
+<div class="highlight-none"><div class="highlight"><pre>  if ( i == NUM_HTTPD_CONNECTIONS )
+    {
+      xtcp_abort(tcp_svr, conn);
+    }
+</pre></div>
+</div>
+<p>If we can allocate the state structure then the elements of the
+structure are initalizes. The function
+<a class="reference internal" href="api.html#xtcp_set_connection_appstate" title="xtcp_set_connection_appstate"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_set_connection_appstate()</span></tt></a> is then called to associate the
+state with the connection. This means when a subsequent event is
+signalled on this connection the state can be recovered.</p>
+<div class="highlight-none"><div class="highlight"><pre>  else
+    {
+      connection_states[i].active = 1;
+      connection_states[i].conn_id = conn-&gt;id;
+      connection_states[i].dptr = NULL;
+      xtcp_set_connection_appstate(
+           tcp_svr, 
+           conn, 
+           (xtcp_appstate_t) &amp;connection_states[i]);
+</pre></div>
+</div>
+<p>When a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_TIMED_OUT</span></tt>, <tt class="xref c c-member docutils literal"><span class="pre">XTCP_ABORTED</span></tt> or
+<tt class="xref c c-member docutils literal"><span class="pre">XTCP_CLOSED</span></tt> event is received then the state associated
+with the connection can be freed up. This is done in the
+<tt class="docutils literal"><span class="pre">httpd_free_state</span></tt> function:</p>
+<div class="highlight-none"><div class="highlight"><pre>void httpd_free_state(xtcp_connection_t *conn)
+{
+  int i;
+  
+  for ( i = 0; i &lt; NUM_HTTPD_CONNECTIONS; i++ )
+    {
+      if (connection_states[i].conn_id == conn-&gt;id)
+        {
+          connection_states[i].active = 0;
+        }
+    }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="receiving-data">
+<h3>Receiving Data<a class="headerlink" href="#receiving-data" title="Permalink to this headline">¶</a></h3>
+<p>When a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RECV_DATA</span></tt> event occurs the <tt class="docutils literal"><span class="pre">httpd_recv</span></tt>
+function is called. The first thing this function does is call the
+<a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_recv()</span></tt></a> function to place the received data in the
+<tt class="docutils literal"><span class="pre">data</span></tt> array. (Note that all TCP/IP clients <em>must</em> call
+<a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_recv()</span></tt></a> directly after receiving this kind of event).</p>
+<div class="highlight-none"><div class="highlight"><pre>void httpd_recv(chanend tcp_svr, xtcp_connection_t *conn)
+{
+  struct httpd_state_t *hs = (struct httpd_state_t *) conn-&gt;appstate;
+  char data[XTCP_CLIENT_BUF_SIZE];
+  int len;
+  
+  // Receive the data from the TCP stack
+  len = xtcp_recv(tcp_svr, data);
+  
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">hs</span></tt> variable points to the connection state. This was recovered
+from the <tt class="xref c c-member docutils literal"><span class="pre">appstate</span></tt> member of the connection structure which
+was previously associated with application state when the connection
+was set up. As a safety check we only proceed if this state has been
+set up and the <tt class="docutils literal"><span class="pre">hs</span></tt> variable is non-null.</p>
+<div class="highlight-none"><div class="highlight"><pre>  if ( hs == NULL || hs-&gt;dptr != NULL)
+    {
+      return;
+    }
+  
+</pre></div>
+</div>
+<p>Now we are in a position where we have known connection state and the
+incoming data buffer filled. To keep things simple, this server makes
+the assumption that a single tcp packet gives us enough information to
+parse the http request. However, many applications will need to
+concatenate each tcp packet to a different buffer and handle data after
+several tcp packets have come in. The next step in the code is to call
+the <tt class="docutils literal"><span class="pre">parse_http_request</span></tt> function:</p>
+<div class="highlight-none"><div class="highlight"><pre>  parse_http_request(hs, &amp;data[0], len);
+  
+</pre></div>
+</div>
+<p>This function examines the incoming packet and checks if it is a
+<tt class="docutils literal"><span class="pre">GET</span></tt> request. If so, then it always serves the same page. We signal
+that a page is ready to the callee by setting the data pointer
+(<tt class="docutils literal"><span class="pre">dptr</span></tt>) and data length (<tt class="docutils literal"><span class="pre">dlen</span></tt>) members of the connection state.</p>
+<div class="highlight-none"><div class="highlight"><pre>void parse_http_request(httpd_state_t *hs, char *data, int len)
+{
+  // Return if we have data already
+  if (hs-&gt;dptr != NULL)
+    {
+      return;
+    }
+  
+  // Test if we received a HTTP GET request
+  if (strncmp(data, &quot;GET &quot;, 4) == 0)
+    {
+      // Assign the default page character array as the data to send
+      hs-&gt;dptr = &amp;page[0];
+      hs-&gt;dlen = strlen(&amp;page[0]);
+    }
+  else
+    {
+      // We did not receive a get request, so do nothing
+    }
+}
+</pre></div>
+</div>
+<p>The final part of the receive handler checks if the
+<tt class="docutils literal"><span class="pre">parse_http_request</span></tt> function set the <tt class="docutils literal"><span class="pre">dptr</span></tt> data pointer. If so,
+then it signals to the tcp/ip server that we wish to send some data on
+this connection. The actual sending of data is handled when an
+<tt class="xref c c-member docutils literal"><span class="pre">XTCP_REQUEST_DATA</span></tt> event is signalled by the tcp/ip server.</p>
+<div class="highlight-none"><div class="highlight"><pre>  if (hs-&gt;dptr != NULL)
+    {
+      // Initate a send request with the TCP stack.
+      // It will then reply with event XTCP_REQUEST_DATA 
+      // when it&#39;s ready to send
+      xtcp_init_send(tcp_svr, conn);
+    }
+</pre></div>
+</div>
+</div>
+<div class="section" id="sending-data">
+<h3>Sending Data<a class="headerlink" href="#sending-data" title="Permalink to this headline">¶</a></h3>
+<p>To send data the connection state keeps track of three variables:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">dptr</span></tt></td>
+<td>A pointer to the next piece of data to send</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">dlen</span></tt></td>
+<td>The amount of data left to send</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">prev_dptr</span></tt></td>
+<td>The previous value of <tt class="docutils literal"><span class="pre">dptr</span></tt> before the last send</td>
+</tr>
+</tbody>
+</table>
+<p>We keep the previous value of <tt class="docutils literal"><span class="pre">dptr</span></tt> in case the tcp/ip server asks
+for a resend.</p>
+<p>On receiving a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_REQUEST_DATA</span></tt>,
+<tt class="xref c c-member docutils literal"><span class="pre">XTCP_SENT_DATA</span></tt> or <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RESEND_DATA</span></tt> event the
+function <tt class="docutils literal"><span class="pre">httpd_send</span></tt> is called.</p>
+<p>The first thing the function does is check whether we have been asked
+to resend data. In this case it sends the previous amount of data
+using the <tt class="docutils literal"><span class="pre">prev_dptr</span></tt> pointer.</p>
+<div class="highlight-none"><div class="highlight"><pre>  if (conn-&gt;event == XTCP_RESEND_DATA) {
+    xtcp_send(tcp_svr, hs-&gt;prev_dptr, (hs-&gt;dptr - hs-&gt;prev_dptr));
+    return;
+  }
+</pre></div>
+</div>
+<p>If the request is for the next piece of data, then the function first
+checks that we have data left to send. If not, the function
+<a class="reference internal" href="api.html#xtcp_complete_send" title="xtcp_complete_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_complete_send()</span></tt></a> is called to finish the send transaction
+and then the connection is closed down with <a class="reference internal" href="api.html#xtcp_close" title="xtcp_close"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_close()</span></tt></a>
+(since HTTP only does one transfer per connection).</p>
+<div class="highlight-none"><div class="highlight"><pre>  if (hs-&gt;dlen == 0 || hs-&gt;dptr == NULL)
+    {
+      // Terminates the send process
+      xtcp_complete_send(tcp_svr);
+      // Close the connection
+      xtcp_close(tcp_svr, conn);
+    }
+</pre></div>
+</div>
+<p>If we have data to send, then first the amount of data to send is
+calculated. This is based on the amount of data we have left
+(<tt class="docutils literal"><span class="pre">hs-&gt;dlen</span></tt>) and the maximum we can send (<tt class="docutils literal"><span class="pre">conn-&gt;mss</span></tt>). Having
+calculated this length, the data is sent using the <a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a>
+function.</p>
+<p>Once the data is sent, all that is left to do is update the <tt class="docutils literal"><span class="pre">dptr</span></tt>,
+<tt class="docutils literal"><span class="pre">dlen</span></tt> and <tt class="docutils literal"><span class="pre">prev_dptr</span></tt> variables in the connection state.</p>
+<div class="highlight-none"><div class="highlight"><pre>  else {
+    int len = hs-&gt;dlen;
+    
+    if (len &gt; conn-&gt;mss)
+      len = conn-&gt;mss;
+
+    xtcp_send(tcp_svr, hs-&gt;dptr, len);
+    
+    hs-&gt;prev_dptr = hs-&gt;dptr;
+    hs-&gt;dptr += len;
+    hs-&gt;dlen -= len;    
+  }
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" id='d2'>
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="programming.html">Programming Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structure.html">Source code structure</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">An XMOS AVB application (tutorial)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-toplevel-main">The toplevel main</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-webserver-mainloop">The webserver mainloop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-webserver-event-handler">The webserver event handler</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#handling-connections">Handling Connections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#receiving-data">Receiving Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sending-data">Sending Data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+<div id="searchbox" style="display: none">
+  <h3>Search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+
+    <div class="footer">
+    </div>
+  </body>
+</html>
+
+
+
