@@ -19,7 +19,9 @@ Key Features
 Firmware Overview
 =================
 
-Multiple threads are used to process IP packets and forward them through a channel to upper layer handlers
+Multiple threads are used to process IP packets and forward them through a channel to upper layer handlers.
+
+Documentation can be found at http://github.xcore.com/sc_xtcp/index.html
 
 Known Issues
 ============
