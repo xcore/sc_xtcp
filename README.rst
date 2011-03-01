@@ -1,14 +1,11 @@
 XCORE.com xTcp SOFTWARE COMPONENT
 .................................
 
-:Version:
- 2v0
+:Stable release: 2v0
 
-:Status:
-  Ongoing development
+:Status:  Ongoing development
 
-:Maintainer:
-  David Norman, davidn@xmos.com
+:Maintainer:  David Norman, davidn@xmos.com
 
 Key Features
 ============
