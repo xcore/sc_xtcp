@@ -1,3 +1,8 @@
+// Copyright (c) 2011, XMOS Ltd, All rights reserved
+// This software is freely distributable under a derivative of the
+// University of Illinois/NCSA Open Source License posted in
+// LICENSE.txt and at <http://github.xcore.com/>
+
 extern const char http_http[8];
 extern const char http_200[5];
 extern const char http_301[5];
