@@ -5,9 +5,9 @@ XCORE.com xTcp SOFTWARE COMPONENT
 
 :Status: Ongoing development
 
-:Brief description: The micro TCP/IP stack
-
 :Maintainer: https://github.com/DavidNorman
+
+:Description: The micro TCP/IP stack
 
 Key Features
 ============
@@ -39,5 +39,5 @@ sc_ethernet
 Support
 =======
 
-Issues may be submitted via the Issues tab in this github repo. Response to any issues submitted as at the discretion of the manitainer for this line.
+Issues may be submitted via the Issues tab in this github repo. Response to any issues submitted as at the discretion of the maintainer for this line.
 
