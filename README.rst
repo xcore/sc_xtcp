@@ -1,11 +1,13 @@
 XCORE.com xTcp SOFTWARE COMPONENT
 .................................
 
-:Stable release: 2v0
+:Stable release: 2.0.0
 
-:Status:  Ongoing development
+:Status: Ongoing development
 
-:Maintainer:  David Norman, davidn@xmos.com
+:Brief description: The micro TCP/IP stack
+
+:Maintainer: https://github.com/DavidNorman
 
 Key Features
 ============
