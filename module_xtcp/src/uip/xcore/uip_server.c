@@ -23,14 +23,17 @@ int uip_conn_needs_poll(struct uip_conn *uip_conn);
 int uip_udp_conn_needs_poll(struct uip_udp_conn *uip_udp_conn);
 
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
+#define TCPBUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 /* Make sure that the uip_buf is word aligned */
 unsigned int uip_buf32[(UIP_BUFSIZE + 5) >> 2];
 u8_t *uip_buf = (u8_t *) &uip_buf32[0];
 
 static void send(chanend mac_tx) {
-	uip_split_output(mac_tx);
-	uip_len = 0;
+	if (TCPBUF->srcipaddr != 0) {
+		uip_split_output(mac_tx);
+		uip_len = 0;
+	}
 }
 
 static void printip4(const uip_ipaddr_t ip4) {
