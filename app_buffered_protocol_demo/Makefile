@@ -18,7 +18,7 @@ APP_NAME =
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to 
 # xcc for the final link (mapping) stage.
 
-XCC_FLAGS = -g
+XCC_FLAGS = -g -O3
 
 ifeq ($(TARGET),XR-AVB-LC-BRD)
 XCC_FLAGS += -DETHERNET_CORE=1
