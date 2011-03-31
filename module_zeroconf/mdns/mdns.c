@@ -6,7 +6,6 @@
 
 #include "xtcp_client.h"
 #include "mdns.h"
-#include <print.h>
 #include <string.h>
 
 typedef enum mdns_entry_type_t {
@@ -417,13 +416,14 @@ static int mdns_answer_conflict(struct mdns_answer *ans,
   return 0;
 }
 
-static void handle_mdns_response(chanend tcp_svr,
+static mdns_event handle_mdns_response(chanend tcp_svr,
                                  xtcp_connection_t *conn,
                                  char *query_name,
                                  struct mdns_answer *ans,
                                  char *msg)
 {
   int i;
+  mdns_event result = 0;
 
   // detect any conflict with out proposed unique records
   for (i=0;i<MDNS_NUM_TABLE_ENTRIES;i++) {
@@ -445,6 +445,7 @@ static void handle_mdns_response(chanend tcp_svr,
               mdns_table[i].state == PROBE_SENT) {
             mdns_table[i].counter++;
             update_name(&mdns_table[i]);
+            result |= mdns_entry_lost;
           }
           mdns_table[i].state = PROBE_WAIT;
           mdns_table[i].num_sent = 0;              
@@ -460,7 +461,7 @@ static void handle_mdns_response(chanend tcp_svr,
     }    
   }
   
-  return;
+  return result;
 }
 
 static int answer_is_lower(struct mdns_answer *ans1,
@@ -551,13 +552,14 @@ static int loses_tie_break(struct mdns_table_entry *e,
   return 0;
 }
  
- static void handle_mdns_auth(chanend tcp_svr, 
+ static mdns_event handle_mdns_auth(chanend tcp_svr,
                               xtcp_connection_t *conn,
                               char *auth,
                               int n,
                               char *eom,
                               char *msg)
 {
+  mdns_event result = 0;
   int i;
   for (i=0;i<MDNS_NUM_TABLE_ENTRIES;i++) {
     if (mdns_table[i].state == PROBE_WAIT ||
@@ -573,14 +575,17 @@ static int loses_tie_break(struct mdns_table_entry *e,
           mdns_table[i].counter++;
           update_name(&mdns_table[i]);
           mdns_table[i].state = PROBE_WAIT;
-          mdns_table[i].num_sent = 0;                         
+          mdns_table[i].num_sent = 0;
+          result |= mdns_entry_lost;
         }
     }
-  }   
+  }
+  return result;
 }
    
-static void mdns_recv(chanend tcp_svr, xtcp_connection_t *conn)
+static mdns_event mdns_recv(chanend tcp_svr, xtcp_connection_t *conn)
 {
+  mdns_event result = 0;
   char data[XTCP_CLIENT_BUF_SIZE];
   int len;
   struct mdns_hdr *hdr = (struct mdns_hdr *) &data[0];
@@ -662,16 +667,16 @@ static void mdns_recv(chanend tcp_svr, xtcp_connection_t *conn)
       if (ans==NULL)
         break;
 
-      handle_mdns_response(tcp_svr, conn, dptr, ans, msg);
+      result |= handle_mdns_response(tcp_svr, conn, dptr, ans, msg);
 
       dptr = ((char *) ans) + sizeof(struct mdns_answer) + (NTOHS(ans->len));
     }
 
-    handle_mdns_auth(tcp_svr, conn, dptr, nauth, eom, msg);
+    result |= handle_mdns_auth(tcp_svr, conn, dptr, nauth, eom, msg);
 
   }
 
-  return;
+  return result;
 }
 
 #if MDNS_NETBIOS
@@ -778,7 +783,7 @@ static int encode_netbios_name(char *name_enc, char *name_dec, int len)
 }
 #endif
 
-static void netbios_recv(chanend tcp_svr, xtcp_connection_t *conn)
+static mdns_event netbios_recv(chanend tcp_svr, xtcp_connection_t *conn)
 {
   char data[XTCP_CLIENT_BUF_SIZE];
   int len;
@@ -798,7 +803,7 @@ static void netbios_recv(chanend tcp_svr, xtcp_connection_t *conn)
                                (char*)(netbios_name_hdr->encname));        
     
     if (err)
-      return;
+      return mdns_name_error;
     
     convert_to_lower_case(decoded_name, NETBIOS_NAME_LEN+1);
 
@@ -817,7 +822,7 @@ static void netbios_recv(chanend tcp_svr, xtcp_connection_t *conn)
             }        
         }                                           
   }
-  return; 
+  return 0;
 }
 
 static void mdns_send_netbios_response(chanend tcp_svr, 
@@ -1271,8 +1276,9 @@ void mdns_send(chanend tcp_svr, xtcp_connection_t *conn, unsigned int t)
 
 }
 
-void mdns_periodic(chanend tcp_svr, xtcp_connection_t *conn, unsigned int t)
+static mdns_event mdns_periodic(chanend tcp_svr, xtcp_connection_t *conn, unsigned int t)
 {
+  mdns_event result = 0;
   int i;
 
   if (mdns_started == 1)
@@ -1308,19 +1314,23 @@ void mdns_periodic(chanend tcp_svr, xtcp_connection_t *conn, unsigned int t)
           }
           else {
             mdns_table[i].state = ACTIVE;
+            result |= mdns_entry_active;
           }
         }
         break;        
       default:
         break;
       }  
-  return;
+  return result;
 }
 
 
-void mdns_handle_event(chanend tcp_svr, 
+mdns_event mdns_handle_event(chanend tcp_svr,
                        xtcp_connection_t *conn,
                        unsigned int t) {
+
+  mdns_event result = 0;
+
   switch (conn->event) 
     {
     case XTCP_IFUP: 
@@ -1330,10 +1340,11 @@ void mdns_handle_event(chanend tcp_svr,
         
         mdns_start(tcp_svr, ipconfig.ipaddr);
       }
-      return;
+      return mdns_ifup;
     case XTCP_IFDOWN:
+    	return mdns_ifdown;
     case XTCP_ALREADY_HANDLED:
-      return;
+      return 0;
     default:
       break;
   }
@@ -1363,15 +1374,15 @@ void mdns_handle_event(chanend tcp_svr,
       switch (conn->event) 
         {
         case XTCP_POLL:
-          mdns_periodic(tcp_svr, conn, t);
+          result |= mdns_periodic(tcp_svr, conn, t);
           break;
         case XTCP_RECV_DATA:
           if (conn->local_port == MDNS_SERVER_PORT) {
-            mdns_recv(tcp_svr, conn);
+            result |= mdns_recv(tcp_svr, conn);
           }
 #if MDNS_NETBIOS
           else if (conn->local_port == NETBIOS_PORT) {
-            netbios_recv(tcp_svr, conn);
+            result |= netbios_recv(tcp_svr, conn);
           }
 #endif
           break;
@@ -1385,7 +1396,7 @@ void mdns_handle_event(chanend tcp_svr,
         }
       conn->event = XTCP_ALREADY_HANDLED;
     }
-  return;
+  return result;
 }
 
 
