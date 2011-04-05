@@ -103,4 +103,23 @@ Other General Client Functions
 .. doxygenfunction:: xtcp_get_mac_address
 .. doxygenfunction:: xtcp_get_ipconfig
 
+High-level blocking client API
+++++++++++++++++++++++++++++++
+
+.. doxygenfunction:: xtcp_wait_for_ifup
+.. doxygenfunction:: xtcp_wait_for_connection
+.. doxygenfunction:: xtcp_write
+.. doxygenfunction:: xtcp_read
+
+High-level buffered client API
+++++++++++++++++++++++++++++++
+
+.. doxygenfunction:: xtcp_buffered_set_rx_buffer
+.. doxygenfunction:: xtcp_buffered_set_tx_buffer
+.. doxygenfunction:: xtcp_buffered_recv
+.. doxygenfunction:: xtcp_buffered_recv_upto
+.. doxygenfunction:: xtcp_buffered_send
+.. doxygenfunction:: xtcp_buffered_send_handler
+.. doxygenfunction:: xtcp_buffered_send_buffer_remaining
+
 

@@ -10,10 +10,18 @@
  *  \brief Contains the write and read functions for a blocking TCP client
  */
 
+/** \function xtcp_wait_for_ifup
+ *  \brief block until the xtcp interface has come up
+ *
+ *  This means, amongst other things, that it has acquired an
+ *  IP address using whatever scheme was necessary
+ */
 void xtcp_wait_for_ifup(chanend tcp_svr);
 
-xtcp_connection_t 
-xtcp_wait_for_connection(chanend tcp_svr);
+/** \function xtcp_wait_for_connection
+ *  \brief Block until a connection attempt to is made
+ */
+xtcp_connection_t xtcp_wait_for_connection(chanend tcp_svr);
 
 //!@{
 //! \name Blocking client API
