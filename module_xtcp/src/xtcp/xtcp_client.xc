@@ -28,162 +28,182 @@ void xtcp_listen(chanend tcp_svr, int port_number, xtcp_protocol_t p) {
   }
 }
 
-void xtcp_unlisten(chanend tcp_svr, int port_number) {
-  send_cmd(tcp_svr, XTCP_CMD_UNLISTEN, 0);
+void xtcp_unlisten(chanend c_xtcp, int port_number) {
+  send_cmd(c_xtcp, XTCP_CMD_UNLISTEN, 0);
   master {
-    tcp_svr <: port_number;
+    c_xtcp <: port_number;
   }
 }
 
-void xtcp_connect(chanend tcp_svr, 
+void xtcp_connect(chanend c_xtcp,
                   int port_number, 
                   xtcp_ipaddr_t ipaddr,
                   xtcp_protocol_t p)
 {
-  send_cmd(tcp_svr, XTCP_CMD_CONNECT, 0);
+  send_cmd(c_xtcp, XTCP_CMD_CONNECT, 0);
   master {
-    tcp_svr <: port_number;
+	  c_xtcp <: port_number;
     for(int i=0;i<4;i++) 
-      tcp_svr <: ipaddr[i];
-    tcp_svr <: p;
+    	c_xtcp <: ipaddr[i];
+    c_xtcp <: p;
   }
 }
 
-void xtcp_bind_local(chanend tcp_svr, xtcp_connection_t &conn, 
+void xtcp_bind_local(chanend c_xtcp, xtcp_connection_t &conn,
                      int port_number)
 {
-  send_cmd(tcp_svr, XTCP_CMD_BIND_LOCAL, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_BIND_LOCAL, conn.id);
   master {
-    tcp_svr <: port_number;
+	  c_xtcp <: port_number;
   }
 }
 
-void xtcp_bind_remote(chanend tcp_svr, xtcp_connection_t &conn, 
+void xtcp_bind_remote(chanend c_xtcp, xtcp_connection_t &conn,
                       xtcp_ipaddr_t addr, int port_number)
 {
-  send_cmd(tcp_svr, XTCP_CMD_BIND_REMOTE, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_BIND_REMOTE, conn.id);
   master {
     for (int i=0;i<4;i++)
-      tcp_svr <: addr[i];
-    tcp_svr <: port_number;
+    	c_xtcp <: addr[i];
+    c_xtcp <: port_number;
   }
 }
 
 #pragma unsafe arrays
-transaction xtcp_event(chanend tcp_svr, xtcp_connection_t &conn)
+transaction xtcp_event(chanend c_xtcp, xtcp_connection_t &conn)
 {
   for(int i=0;i<sizeof(conn)>>2;i++) {
-    tcp_svr :> (conn,unsigned int[])[i];  
+	  c_xtcp :> (conn,unsigned int[])[i];
   }
 }
 
-void do_xtcp_event(chanend tcp_svr, xtcp_connection_t &conn) {
-  slave xtcp_event(tcp_svr, conn);
+void do_xtcp_event(chanend c_xtcp, xtcp_connection_t &conn) {
+  slave xtcp_event(c_xtcp, conn);
 }
 
-void xtcp_init_send(chanend tcp_svr,                    
+void xtcp_init_send(chanend c_xtcp,
                     REFERENCE_PARAM(xtcp_connection_t, conn))
 {
-  send_cmd(tcp_svr, XTCP_CMD_INIT_SEND, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_INIT_SEND, conn.id);
 }
 
-void xtcp_set_connection_appstate(chanend tcp_svr, 
+void xtcp_set_connection_appstate(chanend c_xtcp,
                                   REFERENCE_PARAM(xtcp_connection_t, conn), 
                                   xtcp_appstate_t appstate)
 {
-  send_cmd(tcp_svr, XTCP_CMD_SET_APPSTATE, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_SET_APPSTATE, conn.id);
   master {
-    tcp_svr <: appstate;
+	  c_xtcp <: appstate;
   }
 }
 
-void xtcp_close(chanend tcp_svr,
+void xtcp_close(chanend c_xtcp,
                 REFERENCE_PARAM(xtcp_connection_t,conn)) 
 {
-  send_cmd(tcp_svr, XTCP_CMD_CLOSE, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_CLOSE, conn.id);
 }
 
-void xtcp_ack_recv(chanend tcp_svr,
+void xtcp_ack_recv(chanend c_xtcp,
                    REFERENCE_PARAM(xtcp_connection_t,conn)) 
 {
-  send_cmd(tcp_svr, XTCP_CMD_ACK_RECV, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_ACK_RECV, conn.id);
 }
 
-void xtcp_ack_recv_mode(chanend tcp_svr,
+void xtcp_ack_recv_mode(chanend c_xtcp,
                         REFERENCE_PARAM(xtcp_connection_t,conn)) 
 {
-  send_cmd(tcp_svr, XTCP_CMD_ACK_RECV_MODE, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_ACK_RECV_MODE, conn.id);
 }
 
 
-void xtcp_abort(chanend tcp_svr,
+void xtcp_abort(chanend c_xtcp,
                 REFERENCE_PARAM(xtcp_connection_t,conn))
 {
-  send_cmd(tcp_svr, XTCP_CMD_ABORT, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_ABORT, conn.id);
 }
 
-void xtcp_pause(chanend tcp_svr,
+void xtcp_pause(chanend c_xtcp,
                 REFERENCE_PARAM(xtcp_connection_t,conn))
 {
-  send_cmd(tcp_svr, XTCP_CMD_PAUSE, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_PAUSE, conn.id);
 }
 
-void xtcp_unpause(chanend tcp_svr,
+void xtcp_unpause(chanend c_xtcp,
                   REFERENCE_PARAM(xtcp_connection_t,conn))
 {
-  send_cmd(tcp_svr, XTCP_CMD_UNPAUSE, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_UNPAUSE, conn.id);
 }
 
 
 
-int xtcp_recvi(chanend tcp_svr, unsigned char data[], int index) 
+int xtcp_recvi(chanend c_xtcp, unsigned char data[], int index)
 {
-  int len;
-  slave {
-    tcp_svr <: 1;
-    tcp_svr :> len;
-    for (int i=index;i<index+len;i++)
-      tcp_svr :> data[i];
-  }
-  return len;
+	int len;
+	slave
+	{
+		c_xtcp <: 1;
+		c_xtcp :> len;
+		for (int i=index;i<index+len;i++)
+			c_xtcp :> data[i];
+	}
+	return len;
 }
 
-int xtcp_recv(chanend tcp_svr, unsigned char data[]) {
-  return xtcp_recvi(tcp_svr, data, 0);
+#pragma unsafe arrays
+int xtcp_recv_count(chanend c_xtcp, char data[], int count)
+ {
+	int len, rxc;
+	slave
+	{
+		c_xtcp <: 1;
+		c_xtcp :> len;
+		rxc = (count < len) ? count : len;
+
+		for (int i=0;i<rxc;i++)
+			c_xtcp :> data[i];
+
+		for (int i=0;i<(len-count);i++)
+			c_xtcp :> char;
+	}
+	return len;
+}
+
+int xtcp_recv(chanend c_xtcp, unsigned char data[]) {
+	return xtcp_recvi(c_xtcp, data, 0);
 }
 
 
-void xtcp_ignore_recv(chanend tcp_svr) 
+void xtcp_ignore_recv(chanend c_xtcp)
 {
   int len;
   char tmp;
   slave {
-    tcp_svr <: 1;
-    tcp_svr :> len;
+    c_xtcp <: 1;
+    c_xtcp :> len;
     for (int i=0;i<len;i++)
-      tcp_svr :> tmp;
+      c_xtcp :> tmp;
   }
   return;
 }
 
 
-void xtcp_sendi(chanend tcp_svr,
+void xtcp_sendi(chanend c_xtcp,
                 unsigned char ?data[],
                 int index,
                 int len)
 {
   slave {
-    tcp_svr <: len;
+    c_xtcp <: len;
     for (int i=index;i<index+len;i++)
-      tcp_svr <: data[i];
+      c_xtcp <: data[i];
   }
 }
 
-void xtcp_send(chanend tcp_svr,
+void xtcp_send(chanend c_xtcp,
                unsigned char ?data[],
                int len)
 {
-  xtcp_sendi(tcp_svr, data, 0, len);
+  xtcp_sendi(c_xtcp, data, 0, len);
 }
 
 void xtcp_uint_to_ipaddr(xtcp_ipaddr_t ipaddr, unsigned int i) {
@@ -196,68 +216,68 @@ void xtcp_uint_to_ipaddr(xtcp_ipaddr_t ipaddr, unsigned int i) {
   ipaddr[3] = i & 0xff;
 }
 
-void xtcp_set_poll_interval(chanend tcp_svr,
+void xtcp_set_poll_interval(chanend c_xtcp,
                             REFERENCE_PARAM(xtcp_connection_t, conn),
                             int poll_interval)
 {
-  send_cmd(tcp_svr, XTCP_CMD_SET_POLL_INTERVAL, conn.id);
+  send_cmd(c_xtcp, XTCP_CMD_SET_POLL_INTERVAL, conn.id);
   master {
-    tcp_svr <: poll_interval;
+    c_xtcp <: poll_interval;
   }
 }
 
-void xtcp_join_multicast_group(chanend tcp_svr,
+void xtcp_join_multicast_group(chanend c_xtcp,
                                xtcp_ipaddr_t addr)
 {
-  send_cmd(tcp_svr, XTCP_CMD_JOIN_GROUP, 0);
+  send_cmd(c_xtcp, XTCP_CMD_JOIN_GROUP, 0);
   master {
-    tcp_svr <: addr[0];
-    tcp_svr <: addr[1];
-    tcp_svr <: addr[2];
-    tcp_svr <: addr[3];
+    c_xtcp <: addr[0];
+    c_xtcp <: addr[1];
+    c_xtcp <: addr[2];
+    c_xtcp <: addr[3];
   }
 }
 
-void xtcp_leave_multicast_group(chanend tcp_svr,
+void xtcp_leave_multicast_group(chanend c_xtcp,
                                xtcp_ipaddr_t addr)
 {
-  send_cmd(tcp_svr, XTCP_CMD_LEAVE_GROUP, 0);
+  send_cmd(c_xtcp, XTCP_CMD_LEAVE_GROUP, 0);
   master {
-    tcp_svr <: addr[0];
-    tcp_svr <: addr[1];
-    tcp_svr <: addr[2];
-    tcp_svr <: addr[3];
+    c_xtcp <: addr[0];
+    c_xtcp <: addr[1];
+    c_xtcp <: addr[2];
+    c_xtcp <: addr[3];
   }
 }
 
-void xtcp_get_mac_address(chanend tcp_svr, unsigned char mac_addr[])
+void xtcp_get_mac_address(chanend c_xtcp, unsigned char mac_addr[])
 {
-	send_cmd(tcp_svr, XTCP_CMD_GET_MAC_ADDRESS, 0);
-	tcp_svr :> mac_addr[0];
-	tcp_svr :> mac_addr[1];
-	tcp_svr :> mac_addr[2];
-	tcp_svr :> mac_addr[3];
-	tcp_svr :> mac_addr[4];
-	tcp_svr :> mac_addr[5];
+	send_cmd(c_xtcp, XTCP_CMD_GET_MAC_ADDRESS, 0);
+	c_xtcp :> mac_addr[0];
+	c_xtcp :> mac_addr[1];
+	c_xtcp :> mac_addr[2];
+	c_xtcp :> mac_addr[3];
+	c_xtcp :> mac_addr[4];
+	c_xtcp :> mac_addr[5];
 }
 
-void xtcp_get_ipconfig(chanend tcp_svr, 
+void xtcp_get_ipconfig(chanend c_xtcp,
                        xtcp_ipconfig_t &ipconfig)
 {
-  send_cmd(tcp_svr, XTCP_CMD_GET_IPCONFIG, 0);
+  send_cmd(c_xtcp, XTCP_CMD_GET_IPCONFIG, 0);
   slave {
-    tcp_svr :> ipconfig.ipaddr[0];
-    tcp_svr :> ipconfig.ipaddr[1];
-    tcp_svr :> ipconfig.ipaddr[2];
-    tcp_svr :> ipconfig.ipaddr[3];
-    tcp_svr :> ipconfig.netmask[0];
-    tcp_svr :> ipconfig.netmask[1];
-    tcp_svr :> ipconfig.netmask[2];
-    tcp_svr :> ipconfig.netmask[3];
-    tcp_svr :> ipconfig.gateway[0];
-    tcp_svr :> ipconfig.gateway[1];
-    tcp_svr :> ipconfig.gateway[2];
-    tcp_svr :> ipconfig.gateway[3];
+    c_xtcp :> ipconfig.ipaddr[0];
+    c_xtcp :> ipconfig.ipaddr[1];
+    c_xtcp :> ipconfig.ipaddr[2];
+    c_xtcp :> ipconfig.ipaddr[3];
+    c_xtcp :> ipconfig.netmask[0];
+    c_xtcp :> ipconfig.netmask[1];
+    c_xtcp :> ipconfig.netmask[2];
+    c_xtcp :> ipconfig.netmask[3];
+    c_xtcp :> ipconfig.gateway[0];
+    c_xtcp :> ipconfig.gateway[1];
+    c_xtcp :> ipconfig.gateway[2];
+    c_xtcp :> ipconfig.gateway[3];
   }
 }
 

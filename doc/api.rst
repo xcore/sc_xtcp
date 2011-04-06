@@ -78,6 +78,7 @@ Receiving Data
 
 .. doxygenfunction:: xtcp_recv
 .. doxygenfunction:: xtcp_recvi
+.. doxygenfunction:: xtcp_recv_count
 
 Sending Data
 ++++++++++++

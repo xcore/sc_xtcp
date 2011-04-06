@@ -332,7 +332,7 @@ void xtcp_abort(chanend c_xtcp,
 /**  \function xtcp_recv
  *   \brief Receive data from the server
  *
- *   This should be called after an XTCP_RECV_DATA event.
+ *   This can be called after an XTCP_RECV_DATA event.
  *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param data        A array to place the received data into
@@ -353,7 +353,7 @@ void xtcp_ignore_recv(chanend c_xtcp);
 /** \function xtcp_recvi
  *  \brief Receive data from the xtcp server
  *
- *  This should be called after an XTCP_RECV_DATA event.
+ *  This can be called after an XTCP_RECV_DATA event.
  *
  *  The data is put into the array data starting at index i i.e.
  *  the first byte of data is written to data[i].
@@ -364,6 +364,29 @@ void xtcp_ignore_recv(chanend c_xtcp);
  * \returns           The length of the received data in bytes
  */
 int xtcp_recvi(chanend c_xtcp, char data[], int i);
+
+/** \function xtcp_recv_count
+ *  \brief Receive a number of bytes of data from the xtcp server
+ *
+ *  This can be called after an XTCP_RECV_DATA event.
+ *
+ *  Data is pulled from the xtcp server and put into the array, until
+ *  either there is no more data to pull, or until count bytes have been
+ *  received.  If there are more bytes to be received from the server then
+ *  the remainder are discarded.  The return value reflects the number of
+ *  bytes pulled from the server, not the number stored in the buffer. From
+ *  this the user can determine if they have lost some data.
+ *
+ *  \note see the buffer client protocol for a mechanism for receiving bytes
+ *        without discarding the extra ones.
+ *
+ * \param c_xtcp      chanend connected to the xtcp server
+ * \param data        A array to place the received data into
+ * \param count       The number of bytes to receive
+ * \returns           The length of the received data in bytes, whether this
+ *                    was more or less than the requested amount.
+ */
+int xtcp_recv_count(chanend c_xtcp, char data[], int count);
 
 /** \function xtcp_ack_recv_mode
  *  \brief Set a connection into ack-receive mode.
