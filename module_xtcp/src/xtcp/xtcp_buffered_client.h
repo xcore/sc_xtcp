@@ -39,6 +39,10 @@ void xtcp_buffered_set_rx_buffer(chanend tcp_svr,
 /** \function xtcp_buffered_set_tx_buffer
  *  \brief set the location and size of the transmission buffer
  *
+ *  \note the size of the buffer should probably be no smaller than
+ *        XTCP_CLIENT_BUF_SIZE plus the maximum buffered message length. if
+ *        it is, then buffer overflow can be detected and data will be lost.
+ *
  *  \param tcp_svr   	the xtcp server control channel
  *  \param conn      	a pointer to the xtcp connection info structure
  *  \param bufinfo   	a pointer to the buffered API control structure
@@ -64,6 +68,21 @@ void xtcp_buffered_set_tx_buffer(chanend tcp_svr,
  *  This pulls a specified length of data from the data buffer.  It is most useful
  *  for protocols where the packet format is known, or at least where variable
  *  sized data blocks are preceeded by a length field.  A good example is DHCP.
+ *
+ *  The return value is either:
+ *  - the requested size, when the data read could be fullfilled.
+ *  - zero, when there is not enough data to fullfill the read.
+ *  - another value, when there is not enough data to fullfill the read and when
+ *    there is not enough space left in the buffer to read another packet into the
+ *    buffer to fullfill the read in the future. the overflow flag will be set.
+ *
+ *  when the user wants to pull N bytes from the buffer, but less than N have
+ *  been received into it, then the function returns zero.  In this case, a
+ *  calling function would typically not process further until another receive
+ *  event was detected, indicating that there is some more data available in
+ *  to read, and therefore that the number of bytes requested can now be
+ *  fullfilled.
+ *
  *
  *  \return				the number of characters received in the buffer, or
  *                      zero if we have used up all of the data, or

@@ -95,6 +95,9 @@ Other Connection Management
 .. doxygenfunction:: xtcp_close
 .. doxygenfunction:: xtcp_abort
 
+.. doxygenfunction:: xtcp_pause
+.. doxygenfunction:: xtcp_unpause
+
 Other General Client Functions
 ++++++++++++++++++++++++++++++
 
