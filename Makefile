@@ -42,6 +42,7 @@
 # prefixed with the app_ prefix)
 BUILD_SUBDIRS = app_simple_client app_simple_webserver app_xtcp_tests
 BUILD_SUBDIRS += app_buffered_protocol_demo app_xc2_firmware
+BUILD_SUBDIRS += app_buffered_protocol_demo_2
 
 # This variable should contain a space separated list of all
 # the directories containing buildable plugins (usually

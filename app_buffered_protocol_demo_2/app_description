@@ -1,0 +1,5 @@
+Example of TCP server utilising the buffered API.  It uses the character delimited version of
+the buffered API to read a line of text from the port, then echos the text back, with a
+header string.  A telnet program can be used as the other end of the connection.
+ 
+

@@ -69,6 +69,9 @@ void xtcp_buffered_set_tx_buffer(chanend tcp_svr,
  *  for protocols where the packet format is known, or at least where variable
  *  sized data blocks are preceeded by a length field.  A good example is DHCP.
  *
+ *  When calling this in response to a XTCP_RECV_DATA event, and you must keep
+ *  calling it until it returns zero.
+ *
  *  The return value is either:
  *  - the requested size, when the data read could be fullfilled.
  *  - zero, when there is not enough data to fullfill the read.
@@ -110,6 +113,9 @@ int xtcp_buffered_recv(chanend tcp_svr,
  *  Many protocols, eg SMTP, FTP, HTTP, have variable length records with delimiters
  *  at the end of the record.  This function can be used to fetch data from that
  *  type of data stream.
+ *
+ *  When calling this in response to a XTCP_RECV_DATA event, and you must keep
+ *  calling it until it returns zero.
  *
  *  The returned length contains the delimiter
  *

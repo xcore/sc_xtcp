@@ -53,7 +53,7 @@ int xtcp_buffered_recv_upto(chanend tcp_svr,
     bufinfo->rx_wrptr += len;
     bufinfo->rx_new_event = 0;
   }
-  
+
   // search for the delimiter
   for(char *p=bufinfo->rx_rdptr;!found && p<bufinfo->rx_wrptr;p++) {
     if (*p == delim) {
@@ -62,30 +62,28 @@ int xtcp_buffered_recv_upto(chanend tcp_svr,
     }
   }
 
-  if (!found) 
+  if (!found)
     {
       // this is the end of the current recv event
       int remaining = bufinfo->rx_wrptr - bufinfo->rx_rdptr;
       int space_left;
-     
-      memmove(bufinfo->rx_buf, 
-              bufinfo->rx_rdptr,
-              remaining);
+
+      memmove(bufinfo->rx_buf, bufinfo->rx_rdptr, remaining);
 
       bufinfo->rx_rdptr = bufinfo->rx_buf;
       bufinfo->rx_wrptr = bufinfo->rx_buf + remaining;
-      
+
       space_left = bufinfo->rx_end - bufinfo->rx_wrptr;
 
       if (space_left < XTCP_CLIENT_BUF_SIZE) {
-        *overflow = 1;    
+        *overflow = 1;
         len = remaining;
         *buf = bufinfo->rx_buf;
         bufinfo->rx_wrptr = bufinfo->rx_buf;
         bufinfo->rx_rdptr = bufinfo->rx_wrptr;
       }
-      else {      
-        bufinfo->rx_new_event = 1;        
+      else {
+        bufinfo->rx_new_event = 1;
         len = 0;
       }
     }
@@ -114,30 +112,28 @@ int xtcp_buffered_recv(chanend tcp_svr,
   }
 
 
-  if (bufinfo->rx_wrptr - bufinfo->rx_rdptr < len) 
+  if (bufinfo->rx_wrptr - bufinfo->rx_rdptr < len)
     {
       // this is the end of the current recv event
       int remaining = bufinfo->rx_wrptr - bufinfo->rx_rdptr;
       int space_left;
-     
-      memmove(bufinfo->rx_buf, 
-              bufinfo->rx_rdptr,
-              remaining);
+
+      memmove(bufinfo->rx_buf, bufinfo->rx_rdptr, remaining);
 
       bufinfo->rx_rdptr = bufinfo->rx_buf;
       bufinfo->rx_wrptr = bufinfo->rx_buf + remaining;
-      
+
       space_left = bufinfo->rx_end - bufinfo->rx_wrptr;
 
       if (space_left < XTCP_CLIENT_BUF_SIZE) {
-        *overflow = 1;    
+        *overflow = 1;
         len = remaining;
         *buf = bufinfo->rx_buf;
         bufinfo->rx_wrptr = bufinfo->rx_buf;
         bufinfo->rx_rdptr = bufinfo->rx_wrptr;
       }
-      else {      
-        bufinfo->rx_new_event = 1;        
+      else {
+        bufinfo->rx_new_event = 1;
         len = 0;
       }
     }
@@ -167,9 +163,7 @@ int xtcp_buffered_send(chanend tcp_svr,
   if (space_left < len) {
     int remaining = bufinfo->tx_wrptr - bufinfo->tx_prev_rdptr;
     int shift = bufinfo->tx_prev_rdptr - bufinfo->tx_buf;
-    memmove(bufinfo->tx_buf,
-            bufinfo->tx_prev_rdptr,
-            remaining);
+    memmove(bufinfo->tx_buf, bufinfo->tx_prev_rdptr, remaining);
 
     bufinfo->tx_prev_rdptr -= shift;
     bufinfo->tx_rdptr -= shift;
@@ -182,9 +176,7 @@ int xtcp_buffered_send(chanend tcp_svr,
     return 0;
   }
 
-  memcpy(bufinfo->tx_wrptr,
-         buf,
-         len);
+  memcpy(bufinfo->tx_wrptr, buf, len);
 
   if (bufinfo->tx_rdptr == bufinfo->tx_wrptr) {
     xtcp_init_send(tcp_svr, conn);
