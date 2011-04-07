@@ -13,10 +13,7 @@
  */
 
 // The buffered API is for C only
-#ifndef __XC__
-
-//!@{
-//! \name Buffered client API
+#if !defined(__XC__) || defined(__DOXYGEN__)
 
 //!@{
 //!@ \name Configuration functions
@@ -182,9 +179,6 @@ void xtcp_buffered_send_handler(chanend tcp_svr,
  *  \param bufinfo   	a pointer to the buffered API control structure
  */
 int xtcp_buffered_send_buffer_remaining(xtcp_bufinfo_t *bufinfo);
-
-
-//!@}
 
 
 //!@}
