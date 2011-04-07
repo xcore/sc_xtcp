@@ -10,24 +10,21 @@
  *  \brief Contains the write and read functions for a blocking TCP client
  */
 
-/** \function xtcp_wait_for_ifup
- *  \brief block until the xtcp interface has come up
+/** \brief block until the xtcp interface has come up
  *
  *  This means, amongst other things, that it has acquired an
  *  IP address using whatever scheme was necessary
  */
 void xtcp_wait_for_ifup(chanend tcp_svr);
 
-/** \function xtcp_wait_for_connection
- *  \brief Block until a connection attempt to is made
+/** \brief Block until a connection attempt to is made
  */
 xtcp_connection_t xtcp_wait_for_connection(chanend tcp_svr);
 
 //!@{
 //! \name Blocking client API
 
-/** \function xtcp_write
- *  \brief Write a buffer of data to a TCP connection
+/** \brief Write a buffer of data to a TCP connection
  *
  *  This is a blocking write of data to the given xtcp connection
  *
@@ -42,8 +39,7 @@ int xtcp_write(chanend tcp_svr,
                unsigned char buf[],
                int len);
 
-/** \function xtcp_read
- *  \brief Receive data from xtcp connection
+/** \brief Receive data from xtcp connection
  *
  *  This is a blocking read from the xtcp stack
  *
