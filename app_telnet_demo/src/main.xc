@@ -109,7 +109,7 @@ void demo(chanend xtcp) {
       break;
     case tmr when timerafter(t) :> void:
       if (active_conn != -1) {
-        char buf[10] = "<periodic>";
+        char buf[11] = "<periodic>";
         telnetd_send_line(xtcp, active_conn, buf);
       }
       t += 1000000000;
