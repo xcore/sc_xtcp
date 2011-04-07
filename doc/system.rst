@@ -109,6 +109,9 @@ Data is sent from host to client as the UDP or TCP packets come
 in. There is no buffering in the server so it will wait for the client
 to handle the event before processing new incoming packets.
 
+As an alternative to the low level interface, a higher level buffered
+interface is available.  See the section below.
+
 Sending Data
 ------------
 
@@ -159,3 +162,29 @@ The server is configured via arguments passed to the
 
 Client connections are configured via the client API described in
 Section :ref:`sec_config_defines`.
+
+Buffered API
+------------
+
+As an alternative to the low level interface, a buffered interface is
+available as a utility layer.
+
+To set up the buffered interface, the application must receive or make
+a new connection.  As part of the new connection processing a buffer
+must be associated with it, by calling :c:func:`xtcp_buffered_set_rx_buffer`
+and :c:func:`xtcp_buffered_set_tx_buffer`.
+
+When sending using the buffered interface, a call to :c:func:`xtcp_buffered_send`
+is all that is required.  When processing the :c:member:`XTCP_SENT_DATA`,
+:c:member:`XTCP_REQUEST_DATA` and :c:member:`XTCP_RESEND_DATA`, the function
+:c:func:`xtcp_buffered_send_handler` should be called.
+
+When processing a :c:member:`XTCP_RECV_DATA` event, either the function
+:c:func:`xtcp_buffered_recv` or :c:func:`xtcp_buffered_recv_upto` can be
+called.  These either return the data requested, or zero.  If some data
+is returned, indicated by a non-zero return value, then the application
+should process the data, and call the receive function again.  Only when
+the function returns zero can the application stop trying to receive and
+process the data.
+
+  
