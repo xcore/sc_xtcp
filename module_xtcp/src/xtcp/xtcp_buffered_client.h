@@ -21,8 +21,7 @@
 //!@{
 //!@ \name Configuration functions
 
-/** \function xtcp_buffered_set_rx_buffer
- *  \brief set the location and size of the receiver buffer
+/** \brief set the location and size of the receiver buffer
  *
  *  \param tcp_svr   	the xtcp server control channel
  *  \param conn      	a pointer to the xtcp connection info structure
@@ -36,8 +35,7 @@ void xtcp_buffered_set_rx_buffer(chanend tcp_svr,
                                  char *buf,
                                  int buflen);
 
-/** \function xtcp_buffered_set_tx_buffer
- *  \brief set the location and size of the transmission buffer
+/** \brief set the location and size of the transmission buffer
  *
  *  \note the size of the buffer should probably be no smaller than
  *        XTCP_CLIENT_BUF_SIZE plus the maximum buffered message length. if
@@ -62,8 +60,7 @@ void xtcp_buffered_set_tx_buffer(chanend tcp_svr,
 //!@{
 //!@ \name Receive functions
 
-/** \function xtcp_buffered_recv
- *  \brief Pull a buffer of data out of the received data buffer
+/** \brief Pull a buffer of data out of the received data buffer
  *
  *  This pulls a specified length of data from the data buffer.  It is most useful
  *  for protocols where the packet format is known, or at least where variable
@@ -107,8 +104,7 @@ int xtcp_buffered_recv(chanend tcp_svr,
                        int len,
                        int *overflow);
 
-/** \function xtcp_buffered_recv_upto
- *  \brief Receive data from the receive buffer, up to a given delimiter character
+/** \brief Receive data from the receive buffer, up to a given delimiter character
  *
  *  Many protocols, eg SMTP, FTP, HTTP, have variable length records with delimiters
  *  at the end of the record.  This function can be used to fetch data from that
@@ -144,8 +140,7 @@ int xtcp_buffered_recv_upto(chanend tcp_svr,
 //!@ \name Transmit functions
 
 
-/** \function xtcp_buffered_send
- *  \brief Add more data to the send buffer
+/** \brief Add more data to the send buffer
  *
  *  \return				1 if the data was able to be buffered for send, 0 otherwise
  *  \param tcp_svr   	the xtcp server control channel
@@ -161,8 +156,7 @@ int xtcp_buffered_send(chanend tcp_svr,
                        char *buf, 
                        int len);
 
-/** \function xtcp_buffered_send_handler
- *  \brief The handler function for transmission requests from the xtcp stack
+/** \brief The handler function for transmission requests from the xtcp stack
  *
  *  When one of the following event types is received from the xtcp server channel
  *  then this method should be called.
@@ -179,8 +173,7 @@ void xtcp_buffered_send_handler(chanend tcp_svr,
                                 xtcp_connection_t *conn,
                                 xtcp_bufinfo_t *bufinfo);
 
-/** \function xtcp_buffered_send_buffer_remaining
- *  \brief Get the remaining amount of space in the send buffer
+/** \brief Get the remaining amount of space in the send buffer
  *
  *  A client can use this to determine whether the outgoing buffer has enough
  *  space to accept more data before the call to send that data is made.
