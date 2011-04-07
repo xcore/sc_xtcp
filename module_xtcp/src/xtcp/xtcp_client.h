@@ -186,8 +186,7 @@ typedef struct xtcp_connection_t {
 //!@{
 //! \name xtcp lower level control interface
 
-/** \fn xtcp_uint_to_ipaddr
- *  \brief Convert a unsigned integer representation of an ip address into
+/** \brief Convert a unsigned integer representation of an ip address into
  *         the xtcp_ipaddr_t type.
  * 
  * \param ipaddr The result ipaddr
@@ -195,8 +194,7 @@ typedef struct xtcp_connection_t {
  */
 void xtcp_uint_to_ipaddr(xtcp_ipaddr_t ipaddr, unsigned int i);
 
-/** \fn xtcp_listen
- * 	\brief Listen to a particular incoming port.
+/** \brief Listen to a particular incoming port.
  *
  *  After this call, when a connection is established an
  *  XTCP_NEW_CONNECTION event is signalled.
@@ -207,7 +205,7 @@ void xtcp_uint_to_ipaddr(xtcp_ipaddr_t ipaddr, unsigned int i);
  */
 void xtcp_listen(chanend c_xtcp, int port_number, xtcp_protocol_t proto);
 
-/** Stop listening to a particular incoming port. Applies to TCP
+/** \brief Stop listening to a particular incoming port. Applies to TCP
  *  connections only.
  *
  * \param c_xtcp      chanend connected to the xtcp server
@@ -215,8 +213,7 @@ void xtcp_listen(chanend c_xtcp, int port_number, xtcp_protocol_t proto);
  */
 void xtcp_unlisten(chanend c_xtcp, int port_number);
 
-/** \fn xtcp_connect
- *  \brief Try to connect to a remote port.
+/** \brief Try to connect to a remote port.
  * 
  * \param c_xtcp      chanend connected to the xtcp server
  * \param port_number the remote port to try to connect to
@@ -229,8 +226,7 @@ void xtcp_connect(chanend c_xtcp,
                   xtcp_protocol_t proto);
 
 
-/** \fn xtcp_bind_local
- *  \brief Bind the local end of a connection to a particular port (UDP).
+/** \brief Bind the local end of a connection to a particular port (UDP).
  *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param conn        the connection
@@ -240,8 +236,7 @@ void xtcp_bind_local(chanend c_xtcp,
                      REFERENCE_PARAM(xtcp_connection_t,  conn),
                      int port_number);
 
-/** \fn xtcp_bind_remote
- *  \brief Bind the remote end of a connection to a particular port and
+/** \brief Bind the remote end of a connection to a particular port and
  *         ip address.
  *
  * This is only valid for XTCP_PROTOCOL_UDP connections.
@@ -258,8 +253,7 @@ void xtcp_bind_remote(chanend c_xtcp,
                       xtcp_ipaddr_t addr, int port_number);
 
 
-/** \fn xtcp_event
- *  \brief Receive the next connect event.
+/** \brief Receive the next connect event.
  *
  *  \note This can be used in a select statement.
  *
@@ -278,8 +272,7 @@ void do_xtcp_event(chanend c_xtcp,  xtcp_connection_t *conn);
 #endif
 
 
-/** \fn xtcp_init_send
- *  \brief Initiate sending data on a connection.
+/** \brief Initiate sending data on a connection.
  *
  *  After making this call, the
  *  server will respond with a XTCP_REQUEST_DATA event when it is
@@ -294,8 +287,7 @@ void xtcp_init_send(chanend c_xtcp,
 
 
 
-/** \fn xtcp_set_connection_appstate
- * \brief Set the connections application state data item
+/** \brief Set the connections application state data item
  *
  * After this call, subsequent events on this connection
  * will have the appstate field of the connection set
@@ -310,8 +302,7 @@ void xtcp_set_connection_appstate(chanend c_xtcp,
                                   REFERENCE_PARAM(xtcp_connection_t, conn), 
                                   xtcp_appstate_t appstate);
 
-/** \fn xtcp_close
- *  \brief Close a connection.
+/** \brief Close a connection.
  *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param conn        the connection
@@ -319,8 +310,7 @@ void xtcp_set_connection_appstate(chanend c_xtcp,
 void xtcp_close(chanend c_xtcp,
                 REFERENCE_PARAM(xtcp_connection_t,conn));
 
-/** \fn xtcp_abort
- *  \brief Abort a connection.
+/** \brief Abort a connection.
  *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param conn        the connection
@@ -329,8 +319,7 @@ void xtcp_abort(chanend c_xtcp,
                 REFERENCE_PARAM(xtcp_connection_t,conn));
 
 
-/**  \fn xtcp_recv
- *   \brief Receive data from the server
+/**  \brief Receive data from the server
  *
  *   This can be called after an XTCP_RECV_DATA event.
  *
@@ -340,8 +329,7 @@ void xtcp_abort(chanend c_xtcp,
  */
 int xtcp_recv(chanend c_xtcp, char data[]);
 
-/** \fn xtcp_ignore_recv
- *  \brief Ignore data from the server.
+/** \brief Ignore data from the server.
  *
  *  This can be called after an XTCP_RECV_DATA event.
  *
@@ -350,8 +338,7 @@ int xtcp_recv(chanend c_xtcp, char data[]);
 void xtcp_ignore_recv(chanend c_xtcp);
 
 
-/** \fn xtcp_recvi
- *  \brief Receive data from the xtcp server
+/** \brief Receive data from the xtcp server
  *
  *  This can be called after an XTCP_RECV_DATA event.
  *
@@ -365,8 +352,7 @@ void xtcp_ignore_recv(chanend c_xtcp);
  */
 int xtcp_recvi(chanend c_xtcp, char data[], int i);
 
-/** \fn xtcp_recv_count
- *  \brief Receive a number of bytes of data from the xtcp server
+/** \brief Receive a number of bytes of data from the xtcp server
  *
  *  This can be called after an XTCP_RECV_DATA event.
  *
@@ -388,8 +374,7 @@ int xtcp_recvi(chanend c_xtcp, char data[], int i);
  */
 int xtcp_recv_count(chanend c_xtcp, char data[], int count);
 
-/** \fn xtcp_ack_recv_mode
- *  \brief Set a connection into ack-receive mode.
+/** \brief Set a connection into ack-receive mode.
  *
  *  In ack-receive mode after a receive event the tcp window will be set to
  *  zero for the connection (i.e. no more data will be received from the other end).
@@ -402,8 +387,7 @@ void xtcp_ack_recv_mode(chanend c_xtcp,
                         REFERENCE_PARAM(xtcp_connection_t,conn)) ;
 
 
-/** \fn xtcp_ack_recv
- *  \brief Ack a receive event
+/** \brief Ack a receive event
  *  
  * In ack-receive mode this command will acknowledge the last receive and 
  * therefore
@@ -416,8 +400,7 @@ void xtcp_ack_recv(chanend c_xtcp,
                    REFERENCE_PARAM(xtcp_connection_t,conn));
 
 
-/** \fn xtcp_send
- *  \brief Send data to the xtcp server
+/** \brief Send data to the xtcp server
  *
  *  Send data to the server. This should be called after a
  *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event 
@@ -434,8 +417,7 @@ void xtcp_send(chanend c_xtcp,
                char NULLABLE data[],
                int len);
 
-/** \fn xtcp_complete_send
- *  \brief Complete a send transaction with the server.
+/** \brief Complete a send transaction with the server.
  *
  *  This function can be called after a
  *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event 
@@ -454,8 +436,7 @@ inline void xtcp_complete_send(chanend c_xtcp) {
 
 #define xtcp_ignore_send xtcp_complete_send
 
-/** \fn xtcp_sendi
- *  \brief Send data to the xtcp server
+/** \brief Send data to the xtcp server
  *
  *  Send data to the server. This should be called after a
  *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event 
@@ -476,8 +457,7 @@ void xtcp_sendi(chanend c_xtcp,
                 int len);
 
 
-/** \fn xtcp_set_poll_interval
- *  \brief Set UDP poll interval.
+/** \brief Set UDP poll interval.
  *
  *  When this is called then the udp connection will cause a poll event
  *  every poll_interval milliseconds.
@@ -490,8 +470,7 @@ void xtcp_set_poll_interval(chanend c_xtcp,
                             REFERENCE_PARAM(xtcp_connection_t, conn),
                             int poll_interval);
 
-/** \fn xtcp_join_multicast_group
- * \brief Subscribe to a particular ip multicast group address
+/** \brief Subscribe to a particular ip multicast group address
  *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param addr        The address of the multicast group to join. It is
@@ -500,8 +479,7 @@ void xtcp_set_poll_interval(chanend c_xtcp,
 void xtcp_join_multicast_group(chanend c_xtcp,
                                xtcp_ipaddr_t addr);
 
-/** \fn xtcp_leave_multicast_group
- *  \brief Unsubscribe to a particular ip multicast group address
+/** \brief Unsubscribe to a particular ip multicast group address
  *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param addr        The address of the multicast group to leave. It is
@@ -511,15 +489,14 @@ void xtcp_join_multicast_group(chanend c_xtcp,
 void xtcp_leave_multicast_group(chanend c_xtcp,
                                xtcp_ipaddr_t addr);
 
-/** Get the current host MAC address of the server.
+/** \brief Get the current host MAC address of the server.
  *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param mac_addr    the array to be filled with the mac address
  **/
 void xtcp_get_mac_address(chanend c_xtcp, unsigned char mac_addr[]);
 
-/** \fn xtcp_get_ipconfig
- *  \brief Get the IP config information into a local structure
+/** \brief Get the IP config information into a local structure
  *
  * Get the current host IP configuration of the server.
  *
@@ -531,8 +508,7 @@ void xtcp_get_ipconfig(chanend c_xtcp,
                        REFERENCE_PARAM(xtcp_ipconfig_t, ipconfig));
 
 
-/** \fn xtcp_pause
- *  \brief pause a connection.
+/** \brief pause a connection.
  *
  *  No further reads and writes will occur on the network.
  *  \param c_xtcp	chanend connected to the xtcp server
@@ -543,8 +519,7 @@ void xtcp_pause(chanend c_xtcp,
                 REFERENCE_PARAM(xtcp_connection_t,conn));
 
 
-/** \fn xtcp_unpause
- *  \brief unpause a connection
+/** \brief unpause a connection
  *
  *  Activity is resumed on a connection.
  *
