@@ -243,9 +243,9 @@ void igmp_join_group(uip_ipaddr_t addr)
     if (groups[i].state == NON_MEMBER)
       break;
 
-  if (i==MAX_IGMP_GROUPS)
-    printstr("error: max igmp groups reached");
-  else {
+  if (i==MAX_IGMP_GROUPS) {
+    // error: max igmp groups reached
+  } else {
     uip_ipaddr_copy(groups[i].addr, addr);
     groups[i].state = PENDING_JOIN;
   }
