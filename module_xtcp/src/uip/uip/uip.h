@@ -1,3 +1,22 @@
+/**
+ * Module:  module_xtcp
+ * Version: 1v3
+ * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
+ * File:    uip.h
+ *
+ * The copyrights, all other intellectual and industrial 
+ * property rights are retained by XMOS and/or its licensors. 
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2009
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the 
+ * copyright notice above.
+ *
+ **/                                   
 
 /**
  * \addtogroup uip
@@ -484,7 +503,6 @@ extern u8_t *uip_buf;
  * \param port A 16-bit port number in network byte order.
  */
 void uip_listen(u16_t port);
-void uip_udp_listen(u16_t port);
 
 /**
  * Stop listening to the specified port.
@@ -499,7 +517,6 @@ void uip_udp_listen(u16_t port);
  * \param port A 16-bit port number in network byte order.
  */
 void uip_unlisten(u16_t port);
-void uip_udp_unlisten(u16_t port);
 
 /**
  * Connect to a remote host using TCP.
@@ -1192,7 +1209,6 @@ extern u16_t uip_urglen, uip_surglen;
  * file pointers) for the connection. The type of this field is
  * configured in the "uipopt.h" header file.
  */
-
 struct uip_conn {
   uip_ipaddr_t ripaddr;   /**< The IP address of the remote host. */
   
@@ -1222,6 +1238,7 @@ struct uip_conn {
   /** The application state. */
   uip_tcp_appstate_t appstate;
 };
+
 
 /**
  * Pointer to the current TCP connection.
@@ -1267,11 +1284,6 @@ struct uip_udp_conn {
 /* This flag is used when a udp packet is succesfully sent
  */
 #define UDP_SENT 2
-
-/* This flag is used when a udp connection is a "server" connect i.e.
-   accepts packets from any source
- */
-#define UDP_IS_SERVER_CONN 4
 
 /**
  * The current UDP connection.

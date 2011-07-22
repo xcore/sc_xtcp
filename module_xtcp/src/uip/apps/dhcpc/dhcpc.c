@@ -1,4 +1,23 @@
 /**
+ * Module:  module_xtcp
+ * Version: 1v3
+ * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
+ * File:    dhcpc.c
+ *
+ * The copyrights, all other intellectual and industrial 
+ * property rights are retained by XMOS and/or its licensors. 
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2009
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the 
+ * copyright notice above.
+ *
+ **/                                   
+/**
  * Copyright (c) 2005, Swedish Institute of Computer Science
  * All rights reserved.
  *
@@ -259,39 +278,26 @@ PT_THREAD(handle_dhcp(void))
   s.state = STATE_SENDING;
   s.ticks = CLOCK_SECOND;
 
-  send_discover();
-  timer_set(&s.timer, s.ticks);
-
-  do {    
+  do {
+    send_discover();
+    timer_set(&s.timer, s.ticks);
     PT_WAIT_UNTIL(&s.pt, uip_newdata() || timer_expired(&s.timer));
- 
-    if(uip_newdata()) {
-      if (parse_msg() == DHCPOFFER) {
-        s.state = STATE_OFFER_RECEIVED;
-        break;
-      }
-      else {
-        PT_YIELD(&s.pt);
-      }
+
+    if(uip_newdata() && parse_msg() == DHCPOFFER) {
+      printstr("DHCP offer\n");
+      s.state = STATE_OFFER_RECEIVED;
+      break;
     }
-       
+
 #ifdef UIP_USE_AUTOIP
     if (s.ticks == CLOCK_SECOND * 4) {
       autoip_start();
     }
 #endif
 
-    if (s.state != STATE_OFFER_RECEIVED &&
-        timer_expired(&s.timer)) {
-
-      if(s.ticks < CLOCK_SECOND * 60) {
-        s.ticks *= 2;
-      }
-      
-      send_discover();
-      timer_set(&s.timer, s.ticks);
+    if(s.ticks < CLOCK_SECOND * 60) {
+      s.ticks *= 2;
     }
-
   } while(s.state != STATE_OFFER_RECEIVED);
   
   s.ticks = CLOCK_SECOND;
@@ -302,6 +308,7 @@ PT_THREAD(handle_dhcp(void))
   }
   send_request();
   timer_set(&s.timer, s.ticks);
+      printstr("DHCP request sent\n");
   PT_YIELD(&s.pt);
   do {
     PT_WAIT_UNTIL(&s.pt, uip_newdata() || timer_expired(&s.timer));
@@ -327,7 +334,9 @@ PT_THREAD(handle_dhcp(void))
       }
     }
   } while(s.state != STATE_CONFIG_RECEIVED);
+  
 
+  printstr("configured\n");
 #if 0
   printf("Got IP address %d.%d.%d.%d\n",
 	 uip_ipaddr1(s.ipaddr), uip_ipaddr2(s.ipaddr),
@@ -347,6 +356,8 @@ PT_THREAD(handle_dhcp(void))
 
   dhcpc_configured(&s);
   
+  /*  timer_stop(&s.timer);*/
+
   /*
    * PT_END restarts the thread so we do this instead. Eventually we
    * should reacquire expired leases here.
@@ -362,7 +373,7 @@ void
 dhcpc_init(const void *mac_addr, int mac_len)
 {
   uip_ipaddr_t addr;
-
+  printstr("dhcp_init\n");
   s.mac_addr = mac_addr;
   s.mac_len  = mac_len;
 
@@ -379,15 +390,15 @@ dhcpc_init(const void *mac_addr, int mac_len)
 
 void dhcpc_start()
 {
+  //  printstr("dhcp allocation started\n");
   s.state = STATE_INITIAL;
-  uip_udp_listen(HTONS(DHCPC_CLIENT_PORT));
   PT_INIT(&s.pt);
 }
 
 void dhcpc_stop()
 {
+  //  printstr("dhcp allocation stopped\n");
   s.state = STATE_DISABLED;
-  uip_udp_unlisten(HTONS(DHCPC_CLIENT_PORT));
   PT_INIT(&s.pt);
 }
 
@@ -406,6 +417,7 @@ dhcpc_request(void)
   if(s.state == STATE_INITIAL) {
     uip_ipaddr(ipaddr, 0,0,0,0);
     uip_sethostaddr(ipaddr);
+    /*    handle_dhcp(PROCESS_EVENT_NONE, NULL);*/
   }
 }
 /*---------------------------------------------------------------------------*/

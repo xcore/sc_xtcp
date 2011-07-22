@@ -1,3 +1,22 @@
+/**
+ * Module:  app_xc2_firmware
+ * Version: 1v3
+ * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
+ * File:    httpd.c
+ *
+ * The copyrights, all other intellectual and industrial 
+ * property rights are retained by XMOS and/or its licensors. 
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2009
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the 
+ * copyright notice above.
+ *
+ **/                                   
 /*
  * Copyright (c) 2001-2003 Swedish Institute of Computer Science.
  * All rights reserved. 
@@ -60,10 +79,9 @@ typedef struct httpd_state_t {
 
 httpd_state_t connection_states[NUM_HTTPD_CONNECTIONS];
 
-void httpd_init(chanend tcp_svr) 
+void httpd_init(void) 
 {
   int i;
-  xtcp_listen(tcp_svr, HTTP_SERVER_PORT, XTCP_PROTOCOL_TCP);
   for (i=0;i<NUM_HTTPD_CONNECTIONS;i++) {
     connection_states[i].active = 0;
   }
@@ -231,7 +249,7 @@ void httpd_recv(chanend tcp_svr,
                 chanend led_svr)
 {
   struct httpd_state_t *hs = (struct httpd_state_t *) conn->appstate;
-  char data[XTCP_CLIENT_BUF_SIZE];
+  unsigned char data[XTCP_CLIENT_BUF_SIZE];
   int len; 
 
   len = xtcp_recv(tcp_svr, data);
@@ -252,8 +270,8 @@ void httpd_handle_send_request(chanend tcp_svr,
                                chanend led_svr)
 {
   struct httpd_state_t *hs = (struct httpd_state_t *) conn->appstate;
-  char data[XTCP_CLIENT_BUF_SIZE];
-  char *dptr = &data[0];
+  unsigned char data[XTCP_CLIENT_BUF_SIZE];
+  unsigned char *dptr = &data[0];
   int len;
   int maxlen;
 
@@ -272,8 +290,6 @@ void httpd_handle_send_request(chanend tcp_svr,
     case XTCP_RESEND_DATA:
       hs->pss = hs->saved_pss;
       break;
-    default:
-      break;
     }
 
   hs->saved_pss = hs->pss;
@@ -285,7 +301,7 @@ void httpd_handle_send_request(chanend tcp_svr,
   while (len != maxlen && hs->pss.cmdptr != 0) {        
 
     if (len + hs->pss.left <= maxlen) {
-      page_server_get_data(page_svr, (char *) dptr, &(hs->pss), hs->pss.left);
+      page_server_get_data(page_svr, dptr, &(hs->pss), hs->pss.left);
       len += hs->pss.left;
       dptr += hs->pss.left;
       hs->pss.dptr += hs->pss.left;
@@ -296,7 +312,7 @@ void httpd_handle_send_request(chanend tcp_svr,
     }
     else {
       int partial_len = maxlen - len;
-      page_server_get_data(page_svr, (char *) dptr, &(hs->pss), partial_len);
+      page_server_get_data(page_svr, dptr, &(hs->pss), partial_len);
       len += partial_len;      
       hs->pss.left -= partial_len;
       hs->pss.dptr += partial_len;
@@ -351,46 +367,30 @@ void httpd_free_state(xtcp_connection_t *conn)
 }
 
 
-void http_xtcp_handler(chanend tcp_svr,
+void httpd_handle_event(chanend tcp_svr,
                         xtcp_connection_t *conn,
                         chanend page_svr,
                         chanend led_svr) 
 {
-  // Ignore events that are not directly relevant to http
   switch (conn->event) 
     {
-    case XTCP_IFUP:
-    case XTCP_IFDOWN:
-    case XTCP_ALREADY_HANDLED:
-      return;
-    default:
+    case XTCP_NEW_CONNECTION:
+      httpd_init_state(tcp_svr, conn);
+      break;
+    case XTCP_RECV_DATA:
+      httpd_recv(tcp_svr, conn, page_svr, led_svr);
+      break;
+    case XTCP_SENT_DATA:
+    case XTCP_REQUEST_DATA:
+    case XTCP_RESEND_DATA:
+      httpd_handle_send_request(tcp_svr, conn, page_svr, led_svr);
+      break;      
+    case XTCP_CLOSED:
+    case XTCP_TIMED_OUT:
+    case XTCP_ABORTED:
+      httpd_free_state(conn);
       break;
     }
-
-  if (conn->local_port == 80) {
-    switch (conn->event) 
-      {
-      case XTCP_NEW_CONNECTION:
-        httpd_init_state(tcp_svr, conn);
-        break;
-      case XTCP_RECV_DATA:
-        httpd_recv(tcp_svr, conn, page_svr, led_svr);
-        break;
-      case XTCP_SENT_DATA:
-      case XTCP_REQUEST_DATA:
-      case XTCP_RESEND_DATA:
-        httpd_handle_send_request(tcp_svr, conn, page_svr, led_svr);
-        break;      
-      case XTCP_CLOSED:
-      case XTCP_TIMED_OUT:
-      case XTCP_ABORTED:
-        httpd_free_state(conn);
-        break;
-      default:
-        break;
-      }
-    conn->event = XTCP_ALREADY_HANDLED;
-  }
 }
 
 

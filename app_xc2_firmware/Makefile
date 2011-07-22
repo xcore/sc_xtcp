@@ -1,28 +1,48 @@
-TARGET ?= XC-2
-BASE_DIR = .
+# The TARGET variable determines what target system the application is
+# compiled for. It either refers to an XN file in the source directories
+# or a valid argument for the --target option when compiling
+TARGET = XC-2
 
 DEMO_SOURCE_DIRS = src \
 		   src/misc \
                    src/config \
                    src/httpd \
-                   src/httpd/fsdata 
+                   src/httpd/fsdata \
+		   ../../sc_xtcp/module_xtcp/src/xtcp_apps/mdns
 
 SOURCE_DIRS += $(DEMO_SOURCE_DIRS)
 
-INCLUDE_DIRS += $(DEMO_SOURCE_DIRS) 
+INCLUDE_DIRS += $(DEMO_SOURCE_DIRS)
 
-XCC_FLAGS += -Xmapper --map -Xmapper map.out -DMDNS_NETBIOS=1 -O3 -save-temps -g -DXC2_FIRMWARE_VERSION=2v0
+# The APP_NAME variable determines the name of the final .xe file. It should
+# not include the .xe postfix. If left blank the name will default to
+# the project name
+APP_NAME =
+
+# The USED_MODULES variable lists other module used by the application.
+USED_MODULES = module_xtcp module_ethernet
+
+# The flags passed to xcc when building the application
+# You can also set the following to override flags for a particular language:
+# XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
+# If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
+# xcc for the final link (mapping) stage.
+
+ifeq "$(CONFIG)" "Debug"
+XCC_FLAGS = -g -O0 -DMDNS_NETBIOS=1 -DXC2_FIRMWARE_VERSION=1v3
+else
+XCC_FLAGS = -g -O3 -DMDNS_NETBIOS=1 -DXC2_FIRMWARE_VERSION=1v3
+endif
 
 EXCLUDE_FILES = httpd-fsdata.c app.c fsdata.c fsdata_old.c
 
-USED_MODULES = module_xtcp.2v0 module_zeroconf.1v0 module_ethernet.1v4 module_locks.1v1
+# The VERBOSE variable, if set to 1, enables verbose output from the make
+# system.
+VERBOSE = 0
 
-USE_XTCP_MAC_CUSTOM_FILTER = 1
+#=============================================================================
+# The following part of the Makefile includes the common build infrastructure
+# for compiling XMOS applications. You should not need to edit below here.
 
--include ../module_xcommon/build/Makefile.common
--include ../../xcommon/module_xcommon/build/Makefile.common
-
-all: $(BIN_DIR)/xc2_firmware.xe
-	@echo Build complete
-
-clean: clean_common
+XMOS_MAKE_PATH ?= ../..
+include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common

@@ -1,1 +1,0 @@
-#define XTCP_BUFFERED_API 1

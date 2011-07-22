@@ -1,18 +1,35 @@
+/**
+ * Module:  module_xtcp
+ * Version: 1v3
+ * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
+ * File:    xtcp_client.xc
+ *
+ * The copyrights, all other intellectual and industrial 
+ * property rights are retained by XMOS and/or its licensors. 
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2009
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the 
+ * copyright notice above.
+ *
+ **/                                   
 #include <xs1.h>
-#include <print.h>
 #include <xccompat.h>
 #include "xtcp_client.h"
 #include "xtcp_cmd.h"
 
 static void send_cmd(chanend c, xtcp_cmd_t cmd, int conn_id)
 {
-  outct(c, XTCP_CMD_TOKEN);
-  chkct(c, XS1_CT_END);
-  chkct(c, XS1_CT_END);
-  outuint(c, cmd);
-  outuint(c, conn_id);
-  outct(c, XS1_CT_END);
-  chkct(c, XS1_CT_END);  
+	outuchar(c, cmd);
+	outuchar(c, conn_id);
+	outuchar(c, 0);
+	outct(c, XS1_CT_END);
+//  c <: cmd;
+//  c <: conn_id;
 }
 
 void xtcp_listen(chanend tcp_svr, int port_number, xtcp_protocol_t p) {
@@ -64,16 +81,52 @@ void xtcp_bind_remote(chanend tcp_svr, xtcp_connection_t &conn,
   }
 }
 
-#pragma unsafe arrays
-transaction xtcp_event(chanend tcp_svr, xtcp_connection_t &conn)
-{
-  for(int i=0;i<sizeof(conn)>>2;i++) {
-    tcp_svr :> (conn,unsigned int[])[i];  
-  }
+void xtcp_ask_for_event(chanend tcp_svr) {
+  send_cmd(tcp_svr, XTCP_CMD_ASK, 0);
 }
 
-void do_xtcp_event(chanend tcp_svr, xtcp_connection_t &conn) {
-  slave xtcp_event(tcp_svr, conn);
+void xtcp_ask_for_config_event(chanend tcp_svr) {
+  send_cmd(tcp_svr, XTCP_CMD_ASK_CONFIG, 0);
+}
+
+void xtcp_ask_for_conn_or_config_event(chanend tcp_svr) {
+  send_cmd(tcp_svr, XTCP_CMD_ASK_BOTH, 0);
+}
+
+
+transaction xtcp_event(chanend tcp_svr, xtcp_connection_t &conn)
+{
+ tcp_svr :> int;
+ tcp_svr :> conn;  
+}
+
+transaction xtcp_config_event(chanend tcp_svr,
+                              xtcp_config_event_t &event,
+                              xtcp_ipconfig_t &ipconfig)
+{
+  tcp_svr :> int;
+  tcp_svr :> event;
+  tcp_svr :> ipconfig; 
+}
+
+
+transaction xtcp_conn_or_config_event(chanend tcp_svr,
+                                      xtcp_conn_or_config_t &event_type,
+                                      xtcp_config_event_t &event,
+                                      xtcp_ipconfig_t &ipconfig,
+                                      xtcp_connection_t &conn)
+{
+  tcp_svr :> event_type;
+  switch (event_type)
+    {
+    case XTCP_CONFIG_EVENT:
+      tcp_svr :> event;
+      tcp_svr :> ipconfig;
+      break;
+    case XTCP_CONN_EVENT:
+      tcp_svr :> conn;
+      break;
+    }  
 }
 
 void xtcp_init_send(chanend tcp_svr,                    
@@ -98,87 +151,39 @@ void xtcp_close(chanend tcp_svr,
   send_cmd(tcp_svr, XTCP_CMD_CLOSE, conn.id);
 }
 
-void xtcp_ack_recv(chanend tcp_svr,
-                   REFERENCE_PARAM(xtcp_connection_t,conn)) 
-{
-  send_cmd(tcp_svr, XTCP_CMD_ACK_RECV, conn.id);
-}
-
-void xtcp_ack_recv_mode(chanend tcp_svr,
-                        REFERENCE_PARAM(xtcp_connection_t,conn)) 
-{
-  send_cmd(tcp_svr, XTCP_CMD_ACK_RECV_MODE, conn.id);
-}
-
-
 void xtcp_abort(chanend tcp_svr,
                 REFERENCE_PARAM(xtcp_connection_t,conn))
 {
   send_cmd(tcp_svr, XTCP_CMD_ABORT, conn.id);
 }
 
-void xtcp_pause(chanend tcp_svr,
-                REFERENCE_PARAM(xtcp_connection_t,conn))
+void xtcp_request_null_event(chanend tcp_svr, int link)
 {
-  send_cmd(tcp_svr, XTCP_CMD_PAUSE, conn.id);
-}
-
-void xtcp_unpause(chanend tcp_svr,
-                  REFERENCE_PARAM(xtcp_connection_t,conn))
-{
-  send_cmd(tcp_svr, XTCP_CMD_UNPAUSE, conn.id);
+  send_cmd(tcp_svr, XTCP_CMD_REQUEST_NULL_EVENT, link);
 }
 
 
-
-int xtcp_recvi(chanend tcp_svr, unsigned char data[], int index) 
+int xtcp_recv(chanend tcp_svr, unsigned char data[]) 
 {
   int len;
   slave {
-    tcp_svr <: 1;
-    tcp_svr :> len;
-    for (int i=index;i<index+len;i++)
+  tcp_svr :> len;
+    for (int i=0;i<len;i++)
       tcp_svr :> data[i];
   }
   return len;
 }
 
-int xtcp_recv(chanend tcp_svr, unsigned char data[]) {
-  return xtcp_recvi(tcp_svr, data, 0);
-}
 
-
-void xtcp_ignore_recv(chanend tcp_svr) 
-{
-  int len;
-  char tmp;
-  slave {
-    tcp_svr <: 1;
-    tcp_svr :> len;
-    for (int i=0;i<len;i++)
-      tcp_svr :> tmp;
-  }
-  return;
-}
-
-
-void xtcp_sendi(chanend tcp_svr,
-                unsigned char ?data[],
-                int index,
-                int len)
+void xtcp_send(chanend tcp_svr,
+               unsigned char data[],
+               int len)
 {
   slave {
     tcp_svr <: len;
-    for (int i=index;i<index+len;i++)
+    for (int i=0;i<len;i++)
       tcp_svr <: data[i];
   }
-}
-
-void xtcp_send(chanend tcp_svr,
-               unsigned char ?data[],
-               int len)
-{
-  xtcp_sendi(tcp_svr, data, 0, len);
 }
 
 void xtcp_uint_to_ipaddr(xtcp_ipaddr_t ipaddr, unsigned int i) {
@@ -235,25 +240,3 @@ void xtcp_get_mac_address(chanend tcp_svr, unsigned char mac_addr[])
 	tcp_svr :> mac_addr[4];
 	tcp_svr :> mac_addr[5];
 }
-
-void xtcp_get_ipconfig(chanend tcp_svr, 
-                       xtcp_ipconfig_t &ipconfig)
-{
-  send_cmd(tcp_svr, XTCP_CMD_GET_IPCONFIG, 0);
-  slave {
-    tcp_svr :> ipconfig.ipaddr[0];
-    tcp_svr :> ipconfig.ipaddr[1];
-    tcp_svr :> ipconfig.ipaddr[2];
-    tcp_svr :> ipconfig.ipaddr[3];
-    tcp_svr :> ipconfig.netmask[0];
-    tcp_svr :> ipconfig.netmask[1];
-    tcp_svr :> ipconfig.netmask[2];
-    tcp_svr :> ipconfig.netmask[3];
-    tcp_svr :> ipconfig.gateway[0];
-    tcp_svr :> ipconfig.gateway[1];
-    tcp_svr :> ipconfig.gateway[2];
-    tcp_svr :> ipconfig.gateway[3];
-  }
-}
-
-extern inline void xtcp_complete_send(chanend c_xtcp);

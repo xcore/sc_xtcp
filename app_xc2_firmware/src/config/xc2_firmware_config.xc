@@ -1,10 +1,28 @@
+/**
+ * Module:  app_xc2_firmware
+ * Version: 1v3
+ * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
+ * File:    xc2_firmware_config.xc
+ *
+ * The copyrights, all other intellectual and industrial 
+ * property rights are retained by XMOS and/or its licensors. 
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2009
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the 
+ * copyright notice above.
+ *
+ **/                                   
 #include "AtmelOps.h"
 #include "SpiPorts.h"
 #include <print.h>
 #include "xc2_firmware_config.h"
 #include "xtcp_client.h"
 #include "leds.h"
-#include <xs1.h>
 
 typedef enum {
   GET_IP_CONFIG,
@@ -216,7 +234,7 @@ void xc2_firmware_config(chanend config_ch[],
 {
   unsigned int id;
   xtcp_ipconfig_t ipconfig;
-  xtcp_connection_t conn;
+  xtcp_config_event_t event;
   spiMasterInit();
   atmel_getId(id);
   readFromFlash();
@@ -230,13 +248,13 @@ void xc2_firmware_config(chanend config_ch[],
       {
       case (int i=0;i<num_config_ch;i++) config_ch[i] :> int cmd:
         if (cmd == ENABLE_IPCONFIG)  {
+          xtcp_ask_for_config_event(xtcp_svr);
         }          
         else 
           processCommand(config_ch[i], cmd);
         break;
-      case xtcp_event(xtcp_svr, conn):
-        if (conn.event == XTCP_IFUP) {
-          xtcp_get_ipconfig(xtcp_svr, ipconfig);
+      case xtcp_config_event(xtcp_svr, event, ipconfig):
+        if (event == XTCP_IFUP) {
           printstr("if up: ");
           printint(ipconfig.ipaddr[0]);
           printstr(".");
@@ -256,6 +274,7 @@ void xc2_firmware_config(chanend config_ch[],
           printstr("if down\n");
           led_set_connected(led_svr, 0);          
         }                
+        xtcp_ask_for_config_event(xtcp_svr);
         break;
       }
   }

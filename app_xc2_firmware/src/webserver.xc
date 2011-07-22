@@ -1,3 +1,22 @@
+/**
+ * Module:  app_xc2_firmware
+ * Version: 1v3
+ * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
+ * File:    webserver.xc
+ *
+ * The copyrights, all other intellectual and industrial 
+ * property rights are retained by XMOS and/or its licensors. 
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2009
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the 
+ * copyright notice above.
+ *
+ **/                                   
 #include <xs1.h>
 #include <platform.h>
 
@@ -16,7 +35,7 @@
 #include <print.h>
 #include <xs1.h>
 
-
+on stdcore[2]: clock clk_mii_ref = XS1_CLKBLK_REF;
 
 on stdcore[2]: mii_interface_t mii =
   {
@@ -57,11 +76,6 @@ on stdcore[0]: port buttonB = XS1_PORT_4D;
 
 on stdcore[0]: port uart_tx = PORT_UART_TX;
 
-on stdcore[2]: port otp_data = XS1_PORT_32B; 		// OTP_DATA_PORT
-on stdcore[2]: out port otp_addr = XS1_PORT_16C;	// OTP_ADDR_PORT
-on stdcore[2]: port otp_ctrl = XS1_PORT_16D;		// OTP_CTRL_PORT
-
-
 int main(void) {
   chan mac_rx[1], mac_tx[2];
   chan c_led0, c_led1, c_led2, c_led3, led_svr0, led_svr1;
@@ -76,8 +90,8 @@ int main(void) {
     on stdcore[2]:
     {
       int mac_address[2];
-      ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl, (mac_address, char[]));
-      phy_init(clk_smi, 
+      ethernet_getmac_otp((mac_address, char[]));
+      phy_init(clk_smi, clk_mii_ref, 
 #ifdef PORT_ETH_RST_N               
                p_mii_resetn,
 #else
@@ -85,7 +99,7 @@ int main(void) {
 #endif
                smi,
                mii);
-      ethernet_server(mii, mac_address, 
+      ethernet_server(mii, clk_mii_ref, mac_address, 
                       mac_rx, 1, 
                       mac_tx, 2,
                       smi,

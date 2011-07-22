@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use File::Find;
 
 $cmd_end=0;
@@ -36,9 +35,6 @@ sub process {
         @cmds = ();
         $name = "$File::Find::dir/$_";
         open(FILE, "<$_");
-        if ($binary == 1) {
-            binmode(FILE);
-        }
         $name  =~ s/\.\//\//g;
         $id = $name;
         $id =~ s/\.|\//_/g;

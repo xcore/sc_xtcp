@@ -1,3 +1,22 @@
+/**
+ * Module:  module_xtcp
+ * Version: 1v3
+ * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
+ * File:    dhcpc.h
+ *
+ * The copyrights, all other intellectual and industrial 
+ * property rights are retained by XMOS and/or its licensors. 
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2009
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the 
+ * copyright notice above.
+ *
+ **/                                   
 /*
  * Copyright (c) 2005, Swedish Institute of Computer Science
  * All rights reserved.
@@ -62,7 +81,7 @@ void dhcpc_appcall(void);
 void dhcpc_configured(const struct dhcpc_state *s);
 void dhcpc_start();
 void dhcpc_stop();
-//typedef struct dhcpc_state uip_udp_appstate_t;
+typedef struct dhcpc_state uip_udp_appstate_t;
 
 #ifndef UIP_UDP_APPCALL
 #define UIP_UDP_APPCALL dhcpc_appcall

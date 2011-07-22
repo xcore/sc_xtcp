@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<xpkg>
+	<dependency repo="xcommon">
+		<githash>
+			e1a96de831569a0083c79a46f6de68801cbf6e31
+		</githash>
+		<uri>
+			ssh://git@github.com/xcore/xcommon
+		</uri>
+	</dependency>
+	<dependency repo="sc_ethernet">
+		<githash>
+			2d234c57fb2d0ff80dcf74607f3001662813e5e9
+		</githash>
+		<uri>
+			git@github.com:xcore/sc_ethernet.git
+		</uri>
+		<version>
+			2.0.0alpha0
+		</version>
+	</dependency>
+	<location>
+		ssh://git@github.com/davelxmos/sc_xtcp
+	</location>
+	<name>
+		sc_xtcp
+	</name>
+</xpkg>

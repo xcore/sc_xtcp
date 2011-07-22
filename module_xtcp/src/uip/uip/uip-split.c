@@ -1,3 +1,22 @@
+/**
+ * Module:  module_xtcp
+ * Version: 1v3
+ * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
+ * File:    uip-split.c
+ *
+ * The copyrights, all other intellectual and industrial 
+ * property rights are retained by XMOS and/or its licensors. 
+ * Terms and conditions covering the use of this code can
+ * be found in the Xmos End User License Agreement.
+ *
+ * Copyright XMOS Ltd 2009
+ *
+ * In the case where this code is a modification of existing code
+ * under a separate license, the separate license terms are shown
+ * below. The modifications to the code are still covered by the 
+ * copyright notice above.
+ *
+ **/                                   
 /*
  * Copyright (c) 2004, Swedish Institute of Computer Science.
  * All rights reserved.
@@ -54,8 +73,8 @@ uip_split_output(chanend mac_tx)
 
   /* We only try to split maximum sized TCP segments. */
   if(BUF->proto == UIP_PROTO_TCP &&
-     uip_len + UIP_TCPIP_HLEN > UIP_BUFSIZE/2) {
-//    printstr("split");
+     uip_len == UIP_BUFSIZE) {
+    //printstr("split");
     tcplen = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
     /* Split the segment in two. If the original packet length was
        odd, we make the second packet one byte larger. */
@@ -134,7 +153,7 @@ uip_split_output(chanend mac_tx)
     uip_len += UIP_LLH_LEN;
     xcoredev_send(mac_tx);
   } else {
-//    printintln(uip_len);
+    //        printintln(uip_len);
     /*    uip_fw_output();*/
     /*tcpip_output();*/
     xcoredev_send(mac_tx);
