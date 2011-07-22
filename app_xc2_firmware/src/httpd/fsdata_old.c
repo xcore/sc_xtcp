@@ -1,22 +1,8 @@
-/**
- * Module:  app_xc2_firmware
- * Version: 1v3
- * Build:   ceb87a043f18842a34b85935baf3f2a402246dbd
- * File:    fsdata_old.c
- *
- * The copyrights, all other intellectual and industrial 
- * property rights are retained by XMOS and/or its licensors. 
- * Terms and conditions covering the use of this code can
- * be found in the Xmos End User License Agreement.
- *
- * Copyright XMOS Ltd 2009
- *
- * In the case where this code is a modification of existing code
- * under a separate license, the separate license terms are shown
- * below. The modifications to the code are still covered by the 
- * copyright notice above.
- *
- **/                                   
+// Copyright (c) 2011, XMOS Ltd., All rights reserved
+// This software is freely distributable under a derivative of the
+// University of Illinois/NCSA Open Source License posted in
+// LICENSE.txt and at <http://github.xcore.com/>
+
 static const unsigned char data_img_sics_gif[] = {
   /* /img/sics.gif */
   0x2f, 0x69, 0x6d, 0x67, 0x2f, 0x73, 0x69, 0x63, 0x73, 0x2e, 0x67, 0x69, 0x66, 0,
