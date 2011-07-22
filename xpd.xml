@@ -13,6 +13,7 @@
     <location>ssh://git@github.com/davelxmos/sc_xtcp</location>
     <name>sc_xtcp</name>
     <maintainer>DavidNorman</maintainer>
+    <release parenthash = "33e5b987446bbbd97e17cbc4089efce5d903b131" version = "1.3.1beta0"></release>
     <scope>example</scope>
     <vendor>XMOS</vendor>
     <xpd_version>1.0</xpd_version>
