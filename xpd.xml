@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <xpd>
     <dependency repo = "xcommon">
-        <githash>e3815133bf6db792ab03589ee8faeabb8c0acfe4</githash>
+        <githash>787a61092487a135f6f49f41d190fa5cc03e2986</githash>
         <uri>ssh://git@github.com/xcore/xcommon</uri>
     </dependency>
     <dependency repo = "sc_ethernet">
@@ -13,7 +13,8 @@
     <location>ssh://git@github.com/davelxmos/sc_xtcp</location>
     <name>sc_xtcp</name>
     <maintainer>DavidNorman</maintainer>
-    <release parenthash = "33e5b987446bbbd97e17cbc4089efce5d903b131" version = "1.3.1beta0"></release>
+    <release parenthash = "33e5b987446bbbd97e17cbc4089efce5d903b131" version = "1.3.1beta0" githash = "f814b4d48ab22c2475e17a6b743c912e7e4d1d79"></release>
+    <release parenthash = "8362ada5fe9cec24f7afad2fd7847e3c44bdb8ba" version = "1.3.1beta1"></release>
     <scope>example</scope>
     <vendor>XMOS</vendor>
     <xpd_version>1.0</xpd_version>
