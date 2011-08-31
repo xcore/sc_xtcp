@@ -433,7 +433,7 @@ uip_connect(uip_ipaddr_t *ripaddr, u16_t rport)
 	}
 
 	if(conn == 0) {
-		printstr("max tcp connections reached\n");
+		// max tcp connections reached
 		return 0;
 	}
 

@@ -165,7 +165,7 @@ static void register_listener(struct listener_info_t listeners[],
         break;
     
     if (i==n) {
-      printstr("Error: max number of listeners reached");
+      // Error: max number of listeners reached
     }
     else {
       listeners[i].active = 1;
@@ -440,7 +440,7 @@ xtcpd_appcall(void)
   }
   else
     if (uip_conn == NULL) {
-      printstr("dodgy uip_conn");
+      // dodgy uip_conn
       return;
     }
     else
