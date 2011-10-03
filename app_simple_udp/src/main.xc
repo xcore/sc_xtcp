@@ -140,7 +140,7 @@ void udp_reflect(chanend c_xtcp)
           else {
             // This is a new connection to the listening port
             printstr("New connection to listening port:");
-            printintln(conn.id);
+            printintln(conn.local_port);
             if (responding_connection.id == -1) {
               responding_connection = conn;
             }
