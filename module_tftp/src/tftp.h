@@ -105,8 +105,8 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn);
  *
  *	It generates an error packet in tx_buf[].
  *
-*	\param tx_buf	A global transmit packet buffer of size TFTP_TX_BUFFER_SIZE
- *	\return 		The number of bytes generated in tx_buf.
+ *	\param tx_buf	A global transmit packet buffer of size TFTP_TX_BUFFER_SIZE
+ *	\return			The number of bytes generated in tx_buf.
  *
  **/
 int tftp_process_app_error(unsigned char tx_buf[]);
@@ -121,15 +121,15 @@ int tftp_process_app_error(unsigned char tx_buf[]);
  *	\param num_bytes		The number of valid bytes in rx_buf
  *	\param block_num		A pointer to a global variable for returning the TFTP block
  *							number associated with a received DATA packet
-*	\param signal_error		A pointer to a global variable for returning an error signal
-*							to tftp_handle_event(), if this function has created an
-*							error packet in response to the received packet
-*	\param signal_complete	A pointer to a global variable for returning a signal when
-*							the very last TFTP DATA packet has been received
-*	\return					The number of bytes in tx_buf (the reply packet), or -1 to
-*							indicate no reply should be sent and the connection should
-*							be closed.
-*
+ *	\param signal_error		A pointer to a global variable for returning an error signal
+ *							to tftp_handle_event(), if this function has created an
+ *							error packet in response to the received packet
+ *	\param signal_complete	A pointer to a global variable for returning a signal when
+ *							the very last TFTP DATA packet has been received
+ *	\return					The number of bytes in tx_buf (the reply packet), or -1 to
+ *							indicate no reply should be sent and the connection should
+ *							be closed.
+ *
  **/
 int tftp_process_packet(unsigned char tx_buf[], unsigned char rx_buf[], int num_bytes,
 						REFERENCE_PARAM(unsigned short, block_num),
