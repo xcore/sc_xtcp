@@ -21,7 +21,7 @@ static int tftp_make_ack_pkt(unsigned char *tx_buf, unsigned short block_num)
 	pkt->block_number = hton16(block_num);
 
 #if TFTP_DEBUG_PRINT
-				printstr("TFTP: Generated ACK for block #");
+				printstr("TFTP: Gen ACK, block #");
 				printintln(block_num);
 #endif
 
@@ -46,7 +46,7 @@ static int tftp_make_error_pkt(unsigned char *tx_buf, unsigned short code, char 
 	strcpy(pkt->error_msg, msg);
 
 #if TFTP_DEBUG_PRINT
-				printstr("TFTP: Generated ERROR with code ");
+				printstr("TFTP: Gen ERROR, code ");
 				printintln(code);
 #endif
 
@@ -119,7 +119,7 @@ int tftp_process_packet(unsigned char *tx_buf, unsigned char *rx_buf, int num_by
 				prev_block_num = block_num;
 
 #if TFTP_DEBUG_PRINT
-				printstr("TFTP: Received data with block #");
+				printstr("TFTP: Rcvd data, block #");
 				printintln(block_num);
 #endif
 
@@ -141,7 +141,7 @@ int tftp_process_packet(unsigned char *tx_buf, unsigned char *rx_buf, int num_by
 			else
 			{
 #if TFTP_DEBUG_PRINT
-				printstr("TFTP: Received invalid data with block #");
+				printstr("TFTP: Rvcd invalid data, block #");
 				printintln(block_num);
 #endif
 

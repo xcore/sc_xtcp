@@ -95,7 +95,7 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 		case XTCP_IFUP:
 		{
 #if TFTP_DEBUG_PRINT
-				printstrln("TFTP: Ethernet Up");
+				printstrln("TFTP: IP Up");
 #endif
 			// When the network interface comes up, we are ready to accept a TFTP connection
 			tftp_state = TFTP_WAITING_FOR_CONNECTION;
@@ -109,7 +109,7 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 			if (tftp_state == TFTP_WAITING_FOR_DATA || tftp_state == TFTP_SENDING_ACK)
 			{
 #if TFTP_DEBUG_PRINT
-				printstrln("TFTP: Ethernet Down");
+				printstrln("TFTP: IP Down");
 #endif
 				tftp_app_transfer_error();
 
