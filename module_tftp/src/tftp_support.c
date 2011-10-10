@@ -17,7 +17,7 @@ static int tftp_make_ack_pkt(unsigned char *tx_buf, unsigned short block_num)
 {
 	tftp_ack_t *pkt = (tftp_ack_t*) &tx_buf[0];
 
-	pkt->opcode = hton16((unsigned short)TFTP_OPCODE_ACK);
+	pkt->opcode = hton16((unsigned short) TFTP_OPCODE_ACK);
 	pkt->block_number = hton16(block_num);
 
 	return TFTP_MIN_PKT_SIZE;
@@ -35,7 +35,7 @@ static int tftp_make_error_pkt(unsigned char *tx_buf, unsigned short code, char 
 	// The length of the error message must always be less than TFTP_ERROR_MSG_MAX_LENGTH
 	assert(strlen(msg) < TFTP_ERROR_MSG_MAX_LENGTH);
 
-	pkt->opcode = hton16((unsigned short)TFTP_OPCODE_ERROR);
+	pkt->opcode = hton16((unsigned short) TFTP_OPCODE_ERROR);
 	pkt->error_code = hton16(code);
 
 	strcpy(pkt->error_msg, msg);
@@ -66,7 +66,7 @@ int tftp_process_packet(unsigned char *tx_buf, unsigned char *rx_buf, int num_by
 		{
 			char *filename;
 			char *mode;
-			filename = (char *)pkt->payload;
+			filename = (char *) pkt->payload;
 
 #if !TFTP_ACCEPT_ANY_FILENAME
 			// Check that the requested filename matches what we expect
