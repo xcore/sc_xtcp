@@ -28,8 +28,7 @@ static enum
 	TFTP_WAITING_FOR_CONNECTION,
 	TFTP_WAITING_FOR_DATA,
 	TFTP_SENDING_ACK,
-	TFTP_COMPLETE,
-	TFTP_ERROR
+	TFTP_COMPLETE
 } tftp_state = TFTP_IDLE;
 
 static unsigned short local_tid = TFTP_SOURCE_TID_SEED;
@@ -56,7 +55,6 @@ void tftp_init(chanend c_xtcp)
 
 	num_tx_bytes = 0;
 
-	// Gen local_tid random
 	local_tid++;
 
 	tftp_conn.id = -1;
