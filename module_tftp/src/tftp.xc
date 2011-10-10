@@ -96,8 +96,10 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 		}
 		case XTCP_NEW_CONNECTION:
 		{
-			printstr("New connection to listening port:");
+#if TFTP_DEBUG_PRINT
+			printstr("TFTP: New connection to listening port ");
 			printintln(conn.local_port);
+#endif
 
 			if (tftp_state == TFTP_WAITING_FOR_CONNECTION && conn.local_port == TFTP_DEFAULT_PORT)
 			{
@@ -156,6 +158,9 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 				}
 				else
 				{
+#if TFTP_DEBUG_PRINT
+				printstr("TFTP: Received an error");
+#endif
 					tftp_app_transfer_error();
 
 					xtcp_close(c_xtcp, conn);
@@ -184,6 +189,9 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 
 			if (signal_error)
 			{
+#if TFTP_DEBUG_PRINT
+				printstrln("TFTP: Transfer error");
+#endif
 				tftp_app_transfer_error();
 
 				xtcp_close(c_xtcp, conn);
@@ -196,6 +204,9 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 
 			if (signal_complete)
 			{
+#if TFTP_DEBUG_PRINT
+				printstrln("TFTP: Transfer complete");
+#endif
 				tftp_app_transfer_complete();
 
 				xtcp_close(c_xtcp, conn);
@@ -213,7 +224,9 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 			// Handles timeouts
 			if (tftp_state == TFTP_WAITING_FOR_DATA && prev_block_num == block_num)
 			{
-				printstrln("Timed out!");
+#if TFTP_DEBUG_PRINT
+				printstrln("TFTP: Connection timed out");
+#endif
 				xtcp_close(c_xtcp, tftp_conn);
 				tftp_init(c_xtcp);
 
@@ -229,9 +242,10 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 		case XTCP_ABORTED:
 		case XTCP_CLOSED:
 		{
-			// TODO:
-			printstr("Closed connection:");
+#if TFTP_DEBUG_PRINT
+			printstr("TFTP: Closed connection ");
 			printintln(conn.id);
+#endif
 			break;
 		}
 		case XTCP_ALREADY_HANDLED:

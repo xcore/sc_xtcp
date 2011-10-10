@@ -6,6 +6,10 @@
 #ifndef TFTP_CONF_H_
 #define TFTP_CONF_H_
 
+#ifndef TFTP_DEBUG_PRINT
+#define TFTP_DEBUG_PRINT			0
+#endif
+
 #ifndef TFTP_DEFAULT_PORT
 #define TFTP_DEFAULT_PORT			69
 #endif

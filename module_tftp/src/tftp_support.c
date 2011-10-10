@@ -20,6 +20,11 @@ static int tftp_make_ack_pkt(unsigned char *tx_buf, unsigned short block_num)
 	pkt->opcode = hton16((unsigned short) TFTP_OPCODE_ACK);
 	pkt->block_number = hton16(block_num);
 
+#if TFTP_DEBUG_PRINT
+				printstr("TFTP: Generated ACK for block #");
+				printintln(block_num);
+#endif
+
 	return TFTP_MIN_PKT_SIZE;
 }
 
@@ -39,6 +44,11 @@ static int tftp_make_error_pkt(unsigned char *tx_buf, unsigned short code, char 
 	pkt->error_code = hton16(code);
 
 	strcpy(pkt->error_msg, msg);
+
+#if TFTP_DEBUG_PRINT
+				printstr("TFTP: Generated ERROR with code ");
+				printintln(code);
+#endif
 
 	return (TFTP_MIN_PKT_SIZE + strlen(msg) + TFTP_NULL_BYTE);
 }
@@ -108,6 +118,11 @@ int tftp_process_packet(unsigned char *tx_buf, unsigned char *rx_buf, int num_by
 			{
 				prev_block_num = block_num;
 
+#if TFTP_DEBUG_PRINT
+				printstr("TFTP: Received data with block #");
+				printintln(block_num);
+#endif
+
 				if ((block_num * TFTP_BLOCK_SIZE) >= TFTP_MAX_FILE_SIZE)
 				{
 					// We have received more data that the allowed maximum - send an error
@@ -122,6 +137,14 @@ int tftp_process_packet(unsigned char *tx_buf, unsigned char *rx_buf, int num_by
 					// error from the application layer */
 					return tftp_make_error_pkt(tx_buf, TFTP_ERROR_ACCESS_VIOLATION, "", error);
 				}
+			}
+			else
+			{
+#if TFTP_DEBUG_PRINT
+				printstr("TFTP: Received invalid data with block #");
+				printintln(block_num);
+#endif
+
 			}
 
 			// Make the ACK packet for the received data
