@@ -55,12 +55,23 @@ void tftp_init(chanend c_xtcp)
 
 	num_tx_bytes = 0;
 
-	local_tid++;
-
 	tftp_conn.id = -1;
 
 	xtcp_listen(c_xtcp, TFTP_DEFAULT_PORT, XTCP_PROTOCOL_UDP);
 
+}
+
+void tftp_close(chanend c_xtcp, xtcp_connection_t conn)
+{
+	xtcp_close(c_xtcp, conn);
+
+	tftp_conn.id = -1;
+
+	signal_error = 0;
+	signal_complete = 0;
+	block_num = 0;
+	prev_block_num = 0;
+	num_tx_bytes = 0;
 }
 
 void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
@@ -83,6 +94,9 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 	{
 		case XTCP_IFUP:
 		{
+#if TFTP_DEBUG_PRINT
+				printstrln("TFTP: Ethernet Up");
+#endif
 			// When the network interface comes up, we are ready to accept a TFTP connection
 			tftp_state = TFTP_WAITING_FOR_CONNECTION;
 
@@ -92,6 +106,17 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 		{
 			// If the interface goes down during a transfer, we should flag an error to the application
 			// layer and close the active connection.
+			if (tftp_state == TFTP_WAITING_FOR_DATA || tftp_state == TFTP_SENDING_ACK)
+			{
+#if TFTP_DEBUG_PRINT
+				printstrln("TFTP: Ethernet Down");
+#endif
+				tftp_app_transfer_error();
+
+				tftp_close(c_xtcp, conn);
+
+				tftp_state == TFTP_IDLE;
+			}
 			break;
 		}
 		case XTCP_NEW_CONNECTION:
@@ -105,7 +130,9 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 			{
 				tftp_conn = conn;
 
-				// We always reply from a new (random) port and rebind to port 69 if there's an error
+				// We always reply from a new (random) port
+				local_tid++;
+
 				xtcp_bind_local(c_xtcp, tftp_conn, local_tid);
 
 				if (tftp_app_transfer_begin() != 0)
@@ -163,7 +190,7 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 #endif
 					tftp_app_transfer_error();
 
-					xtcp_close(c_xtcp, conn);
+					tftp_close(c_xtcp, conn);
 
 					tftp_state = TFTP_WAITING_FOR_CONNECTION;
 				}
@@ -194,9 +221,7 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 #endif
 				tftp_app_transfer_error();
 
-				xtcp_close(c_xtcp, conn);
-
-				signal_error = 0;
+				tftp_close(c_xtcp, conn);
 
 				tftp_state = TFTP_WAITING_FOR_CONNECTION;
 				break;
@@ -209,7 +234,7 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 #endif
 				tftp_app_transfer_complete();
 
-				xtcp_close(c_xtcp, conn);
+				tftp_close(c_xtcp, conn);
 
 				tftp_state = TFTP_COMPLETE;
 				break;
@@ -227,8 +252,7 @@ void tftp_handle_event(chanend c_xtcp, xtcp_connection_t conn)
 #if TFTP_DEBUG_PRINT
 				printstrln("TFTP: Connection timed out");
 #endif
-				xtcp_close(c_xtcp, tftp_conn);
-				tftp_init(c_xtcp);
+				tftp_close(c_xtcp, tftp_conn);
 
 				tftp_state = TFTP_WAITING_FOR_CONNECTION;
 			}
