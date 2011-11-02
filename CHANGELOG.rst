@@ -1,14 +1,23 @@
 XCORE.com xTcp Changelog
 ======================
 
-:Version:
-  2v0
+:Version: 2.0.0
 
 Firmware
 =======
 
 module_xtcp
 ----------------------
+
+2.0.0
+-----
+
+   * Memory improvements
+   * Fix error whereby UDP packets with broadcast destination were not received
+
+1.3.1
+-----
+
 
    * Initial implementation
 

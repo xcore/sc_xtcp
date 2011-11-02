@@ -1,8 +1,18 @@
 <?xml version="1.0" ?>
 <xpd>
+    <dependency repo = "sc_ethernet">
+        <githash>6af9f48ee64859e61d6c27380aee18b4a61651ac</githash>
+        <uri>git@github.com:xcore/sc_ethernet.git</uri>
+    </dependency>
+    <dependency repo = "xcommon">
+        <githash>2d310cc19558a756d2477625338491f66ff0e57d</githash>
+        <uri>https://github.com/xcore/xcommon.git</uri>
+    </dependency>
     <location>ssh://git@github.com/davelxmos/sc_xtcp</location>
     <name>sc_xtcp</name>
+    <maintainer>davidn@xmos.com</maintainer>
     <release parenthash = "33e5b987446bbbd97e17cbc4089efce5d903b131" version = "1.3.1beta0" githash = "f814b4d48ab22c2475e17a6b743c912e7e4d1d79"></release>
-    <release parenthash = "8362ada5fe9cec24f7afad2fd7847e3c44bdb8ba" version = "1.3.1beta1"></release>
+    <release parenthash = "8362ada5fe9cec24f7afad2fd7847e3c44bdb8ba" version = "1.3.1beta1" githash = "bb2affe1c1319538bd430e8165e459b98a253c2b"></release>
+    <vendor>XMOS</vendor>
     <xpd_version>1.0</xpd_version>
 </xpd>
