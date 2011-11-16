@@ -940,8 +940,11 @@ void uip_process(u8_t flag) {
 
 		/* Check if the packet is destined for our IP address */
 #if !UIP_CONF_IPV6
-		if (!uip_ipaddr_cmp(BUF->destipaddr, uip_hostaddr) && !igmp_check_addr(
-				BUF->destipaddr)) {
+		if (!uip_ipaddr_cmp(BUF->destipaddr, uip_hostaddr)
+#if UIP_IGMP
+				&& !igmp_check_addr(BUF->destipaddr)
+#endif
+				) {
 			UIP_STAT(++uip_stat.ip.drop);
 			goto drop;
 		}

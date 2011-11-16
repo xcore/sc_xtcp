@@ -610,16 +610,20 @@ void xtcpd_set_poll_interval(int linknum, int conn_id, int poll_interval)
 
 void xtcpd_join_group(xtcp_ipaddr_t addr)
 {
+#if UIP_IGMP
   uip_ipaddr_t ipaddr;
   uip_ipaddr(ipaddr, addr[0], addr[1], addr[2], addr[3]);
   igmp_join_group(ipaddr);
+#endif
 }
 
 void xtcpd_leave_group(xtcp_ipaddr_t addr)
 {
+#if UIP_IGMP
   uip_ipaddr_t ipaddr;
   uip_ipaddr(ipaddr, addr[0], addr[1], addr[2], addr[3]);
   igmp_leave_group(ipaddr);
+#endif
 }
 
 void xtcpd_get_mac_address(unsigned char mac_addr[]){

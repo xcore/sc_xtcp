@@ -169,7 +169,7 @@ typedef unsigned short uip_stats_t;
 #endif
 
 #ifndef UIP_IGMP
-#define UIP_IGMP 1
+#define UIP_IGMP 0
 #endif
 
 #include "xtcp_server.h"

@@ -8,6 +8,9 @@
 #include "timer.h"
 #include <string.h>
 #include <print.h>
+
+#if UIP_IGMP
+
 #define UNSOLICITED_REPORT_INTERVAL 10
 
 #define MAX_IGMP_GROUPS 10
@@ -273,3 +276,5 @@ int igmp_check_addr(uip_ipaddr_t addr)
       return 1;
   return 0;
 }
+
+#endif
