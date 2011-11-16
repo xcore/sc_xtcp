@@ -36,6 +36,7 @@ static void send(chanend mac_tx) {
 	}
 }
 
+#ifdef XTCP_VERBOSE
 static void printip4(const uip_ipaddr_t ip4) {
 	printint(uip_ipaddr1(ip4));
 	printstr(".");
@@ -45,21 +46,24 @@ static void printip4(const uip_ipaddr_t ip4) {
 	printstr(".");
 	printint(uip_ipaddr4(ip4));
 }
+#endif
 
+#if UIP_LOGGING == 1
 void uip_log(char *m) {
 	printstr("uIP log message: ");
 	printstr(m);
 	printstr("\n");
 }
+#endif
 
 static int static_ip = 0;
 static xtcp_ipconfig_t static_ipconfig;
 
 void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 		xtcp_ipconfig_t *ipconfig, chanend connect_status) {
-	int i;
+
 	uip_ipaddr_t ipaddr;
-	struct uip_timer periodic_timer, arp_timer, autoip_timer, igmp_timer;
+	struct uip_timer periodic_timer, arp_timer, autoip_timer;
 	struct uip_eth_addr hwaddr;
 
 	if (ipconfig != NULL)
@@ -67,7 +71,6 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 
 	timer_set(&periodic_timer, CLOCK_SECOND / 10);
 	timer_set(&autoip_timer, CLOCK_SECOND / 2);
-	timer_set(&igmp_timer, CLOCK_SECOND / 10);
 	timer_set(&arp_timer, CLOCK_SECOND * 10);
 
 	mac_get_macaddr(mac_tx, hwaddr.addr);
@@ -143,7 +146,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 	{
 		xtcpd_service_clients(xtcp, num_xtcp);
 
-		for (i = 0; i < UIP_CONNS; i++) {
+		for (int i = 0; i < UIP_CONNS; i++) {
 			if (uip_conn_needs_poll(&uip_conns[i])) {
 				uip_poll_conn(&uip_conns[i]);
 				if (uip_len > 0) {
@@ -153,7 +156,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 			}
 		}
 
-		for (i = 0; i < UIP_UDP_CONNS; i++) {
+		for (int i = 0; i < UIP_UDP_CONNS; i++) {
 			if (uip_udp_conn_needs_poll(&uip_udp_conns[i])) {
 				uip_udp_periodic(i);
 				if (uip_len > 0) {
@@ -183,7 +186,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 				if (uip_len > 0) {
 					send(mac_tx);
 				}
-				for (i = 0; i < UIP_UDP_CONNS; i++) {
+				for (int i = 0; i < UIP_UDP_CONNS; i++) {
 					uip_udp_arp_event(i);
 					if (uip_len > 0) {
 						uip_arp_out(&uip_udp_conns[i]);
@@ -193,7 +196,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 			}
 		}
 
-		for (i = 0; i < UIP_UDP_CONNS; i++) {
+		for (int i = 0; i < UIP_UDP_CONNS; i++) {
 			if (uip_udp_conn_has_ack(&uip_udp_conns[i])) {
 				uip_udp_ackdata(i);
 				if (uip_len > 0) {
@@ -216,19 +219,15 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 			}
 		}
 
+		if (timer_expired(&periodic_timer)) {
+
 #if UIP_IGMP
-		if(timer_expired(&igmp_timer)) {
-			timer_reset(&igmp_timer);
 			igmp_periodic();
 			if(uip_len > 0) {
 				send(mac_tx);
 			}
-		}
 #endif
-
-		if (timer_expired(&periodic_timer)) {
-
-			for (i = 0; i < UIP_UDP_CONNS; i++) {
+			for (int i = 0; i < UIP_UDP_CONNS; i++) {
 				uip_udp_periodic(i);
 				if (uip_len > 0) {
 					uip_arp_out(&uip_udp_conns[i]);
@@ -236,7 +235,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 				}
 			}
 
-			for (i = 0; i < UIP_CONNS; i++) {
+			for (int i = 0; i < UIP_CONNS; i++) {
 				uip_periodic(i);
 				if (uip_len > 0) {
 					uip_arp_out( NULL);
@@ -254,9 +253,11 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 static int dhcp_done = 0;
 
 void dhcpc_configured(const struct dhcpc_state *s) {
+#ifdef XTCP_VERBOSE
 	printstr("dhcp: ");
 	printip4(s->ipaddr);
 	printstr("\n");
+#endif
 	autoip_stop();
 	uip_sethostaddr(s->ipaddr);
 	uip_setdraddr(s->default_router);
@@ -268,9 +269,11 @@ void dhcpc_configured(const struct dhcpc_state *s) {
 void autoip_configured(uip_ipaddr_t autoip_ipaddr) {
 	if (!dhcp_done) {
 		uip_ipaddr_t ipaddr;
+#ifdef XTCP_VERBOSE
 		printstr("ipv4ll: ");
 		printip4(autoip_ipaddr);
 		printstr("\n");
+#endif
 		uip_sethostaddr(autoip_ipaddr);
 		uip_ipaddr(ipaddr, 255, 255, 0, 0);
 		uip_setnetmask(ipaddr);
@@ -300,7 +303,6 @@ void uip_linkup() {
 		uip_setnetmask(ipaddr);
 		uip_xtcp_up();
 	} else {
-		//    printstr("link up\n");
 		dhcp_done = 0;
 		dhcpc_stop();
 		autoip_stop();
