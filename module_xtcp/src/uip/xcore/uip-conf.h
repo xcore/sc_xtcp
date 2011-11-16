@@ -138,6 +138,8 @@ typedef unsigned short uip_stats_t;
 #define UIP_CONF_LOGGING         0
 #endif
 
+#define UIP_CONF_BROADCAST		1
+
 /**
  * UDP support on or off
  *
