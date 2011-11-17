@@ -36,7 +36,7 @@ static void send(chanend mac_tx) {
 	}
 }
 
-#ifdef XTCP_VERBOSE
+#ifdef XTCP_VERBOSE_DEBUG
 static void printip4(const uip_ipaddr_t ip4) {
 	printint(uip_ipaddr1(ip4));
 	printstr(".");
@@ -253,7 +253,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 static int dhcp_done = 0;
 
 void dhcpc_configured(const struct dhcpc_state *s) {
-#ifdef XTCP_VERBOSE
+#ifdef XTCP_VERBOSE_DEBUG
 	printstr("dhcp: ");
 	printip4(s->ipaddr);
 	printstr("\n");
@@ -269,7 +269,7 @@ void dhcpc_configured(const struct dhcpc_state *s) {
 void autoip_configured(uip_ipaddr_t autoip_ipaddr) {
 	if (!dhcp_done) {
 		uip_ipaddr_t ipaddr;
-#ifdef XTCP_VERBOSE
+#ifdef XTCP_VERBOSE_DEBUG
 		printstr("ipv4ll: ");
 		printip4(autoip_ipaddr);
 		printstr("\n");
