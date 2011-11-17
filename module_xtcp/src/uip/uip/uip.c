@@ -90,6 +90,20 @@
 #include "uip_arch.h"
 #include <print.h>
 
+
+void uip_ipaddr_copy(void *dest, const void *src)
+{
+  ((u16_t *)dest)[0] = ((u16_t *)src)[0];
+  ((u16_t *)dest)[1] = ((u16_t *)src)[1];
+}
+
+int uip_ipaddr_cmp(const void *addr1, const void *addr2)
+{
+    return (((u16_t *)addr1)[0] == ((u16_t *)addr2)[0] &&
+            ((u16_t *)addr1)[1] == ((u16_t *)addr2)[1]);
+}
+
+
 #if UIP_CONF_IPV6
 #include "uip-neighbor.h"
 #endif /* UIP_CONF_IPV6 */
