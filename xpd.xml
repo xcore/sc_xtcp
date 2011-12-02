@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
 <xpd>
     <dependency repo = "sc_ethernet">
-        <githash>6af9f48ee64859e61d6c27380aee18b4a61651ac</githash>
+        <githash>edea7ba21dc18c2ecfee818a64e9a26ea25f53de</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
+        <version>2.0.2</version>
     </dependency>
     <dependency repo = "xcommon">
-        <githash>2d310cc19558a756d2477625338491f66ff0e57d</githash>
+        <githash>7ee08c2272e28e9b12e756a8e1045ab783fe761a</githash>
         <uri>https://github.com/xcore/xcommon.git</uri>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
