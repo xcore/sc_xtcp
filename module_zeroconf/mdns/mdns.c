@@ -6,6 +6,7 @@
 
 #include "xtcp_client.h"
 #include "mdns.h"
+#include <print.h>
 #include <string.h>
 
 typedef enum mdns_entry_type_t {
@@ -867,15 +868,7 @@ static int mdns_started = 0;
 void mdns_init(chanend tcp_svr)
 {
   int i;
-#if MDNS_NETBIOS
-  xtcp_ipaddr_t broadcast_addr = {255,255,255,255};
-#endif
   xtcp_ipaddr_t mdns_addr = {224,0,0,251};
-#if MDNS_NETBIOS
-  //  xtcp_listen(tcp_svr, NETBIOS_PORT, XTCP_PROTOCOL_UDP);
-  xtcp_connect(tcp_svr, NETBIOS_PORT, broadcast_addr, XTCP_PROTOCOL_UDP);
-#endif
-  //xtcp_listen(tcp_svr, MDNS_SERVER_PORT, XTCP_PROTOCOL_UDP);
   xtcp_connect(tcp_svr, MDNS_SERVER_PORT, mdns_addr, XTCP_PROTOCOL_UDP);
 
   for (i=0;i<MDNS_NUM_TABLE_ENTRIES;i++) {
@@ -1350,10 +1343,16 @@ mdns_event mdns_handle_event(chanend tcp_svr,
   }
 
   if (conn->remote_port == MDNS_SERVER_PORT &&
-      conn->event == XTCP_NEW_CONNECTION)
-    {
-      xtcp_set_poll_interval(tcp_svr, conn, 125);
-      xtcp_bind_local(tcp_svr, conn, MDNS_SERVER_PORT);
+      conn->event == XTCP_NEW_CONNECTION) {
+#if MDNS_NETBIOS
+    xtcp_ipaddr_t broadcast_addr = {255,255,255,255};
+#endif
+
+    xtcp_set_poll_interval(tcp_svr, conn, 125);
+    xtcp_bind_local(tcp_svr, conn, MDNS_SERVER_PORT);
+#if MDNS_NETBIOS
+    xtcp_connect(tcp_svr, NETBIOS_PORT, broadcast_addr, XTCP_PROTOCOL_UDP);
+#endif
     }
 
 #if MDNS_NETBIOS
