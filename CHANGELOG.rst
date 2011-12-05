@@ -18,6 +18,7 @@ Core functionality
 
    * Further memory improvements
    * Additional conditional compilation
+   * Fix to zeroconf with netbios option enabled
 
 2.0.0
 ~~~~~
