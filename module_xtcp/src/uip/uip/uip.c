@@ -1172,8 +1172,9 @@ void uip_process(u8_t flag) {
 				UDPBUF->destport == uip_udp_conn->lport &&
 				UDPBUF->srcport == uip_udp_conn->rport &&
 				(uip_ipaddr_cmp(UDPBUF->srcipaddr, uip_udp_conn->ripaddr)
-						||
-						uip_ipaddr_is_multicast(uip_udp_conn->ripaddr)))
+                || (UDPBUF->destport == 0x4400) // Fix for DHCP
+                || (uip_ipaddr_is_multicast(uip_udp_conn->ripaddr)))
+          )
 		{
 			goto udp_found;
 		}
@@ -1241,7 +1242,7 @@ void uip_process(u8_t flag) {
 
 	uip_ipaddr_copy(BUF->srcipaddr, uip_hostaddr);
 	uip_ipaddr_copy(BUF->destipaddr, uip_udp_conn->ripaddr);
-
+    
 	uip_appdata = &uip_buf[UIP_LLH_LEN + UIP_IPTCPH_LEN];
 
 #if UIP_UDP_CHECKSUMS
