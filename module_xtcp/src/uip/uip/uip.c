@@ -945,7 +945,8 @@ void uip_process(u8_t flag) {
 #if UIP_BROADCAST
 		DEBUG_PRINTF("UDP IP checksum 0x%04x\n", uip_ipchksum());
 		if(BUF->proto == UIP_PROTO_UDP &&
-				uip_ipaddr_cmp(BUF->destipaddr, all_ones_addr)
+				(uip_ipaddr_cmp(BUF->destipaddr, all_ones_addr) ||
+                uip_ipaddr_is_multicast(BUF->destipaddr)) // Fix for UDP multicast traffic
 				/*&&
 				 uip_ipchksum() == 0xffff*/) {
 			goto udp_input;
@@ -1127,6 +1128,7 @@ void uip_process(u8_t flag) {
 	 UDP/IP headers, but let the UDP application do all the hard
 	 work. If the application sets uip_slen, it has a packet to
 	 send. */
+     
 #if UIP_UDP_CHECKSUMS
 	uip_len = uip_len - UIP_IPUDPH_LEN;
 	uip_appdata = &uip_buf[UIP_LLH_LEN + UIP_IPUDPH_LEN];
