@@ -58,7 +58,7 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
 
 #if defined(PIP_IGMP)
     if (ethType == 0x02) {
-        pipIncomingIGMP(packet, ipOffset);
+        pipIncomingIGMP(packet, ipOffset, srcIP, dstIP);
         return;
     }
 #endif

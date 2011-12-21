@@ -5,8 +5,7 @@
 
 #include "udp.h"
 
-// RFC 768
-// DHCP: RFC 2131
+// RFC 0768
 
 void pipIncomingUDP(unsigned short packet[], int offset, int srcIP, int dstIP) {
 
