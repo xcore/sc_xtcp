@@ -13,12 +13,16 @@
 
 extern char notifySeen;
 
+int timeOut[10];
+int timeOuts = 0;
+
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend appIn, chanend appOut) {
     int havePacket = 0;
     int outBytes;
     int nBytes, a, timeStamp;
     int b[3200];
     int txbuf[400];
+    timer t;
 
     miiBufferInit(cIn, cNotifications, b, 3200);
     miiOutInit(cOut);
@@ -27,22 +31,12 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
         select {
         case inuchar_byref(cNotifications, notifySeen):
             break;
-//        case miiNotified(cNotifications);
-        case havePacket => appIn :> int _:   // Receive confirmation.
-            for(int i = 0; i < ((nBytes + 3) >>2); i++) {
-                int val;
-                asm("ldw %0, %1[%2]" : "=r" (val) : "r" (a) , "r" (i));
-                appIn <: val;
+        case timeOuts != 0 => t when timerafter(timeOut[0]):
+            timeOuts--;
+            for(int i = 0; i < timeOuts; i++) {
+                timeOut[i] = timeOut[i+1];
             }
-//            printintln(nBytes);
-            miiFreeInBuffer(a);
-            miiRestartBuffer();
-            {a,nBytes,timeStamp} = miiGetInBuffer();
-            if (a == 0) {
-                havePacket = 0;
-            } else {
-                outuint(appIn, nBytes);
-            }
+            pipTimeOut();
             break;
         case appOut :> outBytes:
             for(int i = 0; i < ((outBytes + 3) >>2); i++) {
@@ -59,8 +53,9 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
         if (!havePacket) {
             {a,nBytes,timeStamp} = miiGetInBuffer();
             if (a != 0) {
-                havePacket = 1;
-                outuint(appIn, nBytes);
+                pipIncomingEthernet(a, nBytes);
+                miiFreeInBuffer(a);
+                miiRestartBuffer();
             }
         }
     } 
