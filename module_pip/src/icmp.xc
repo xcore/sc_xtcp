@@ -7,12 +7,17 @@
 
 // RFC 0792
 
-void pipIncomingICMP(unsigned short packet[], int offset, int srcIP, int dstIP) {
-    int type = (packet, unsigned char[])[offset * 2];
-    int identifier = packet[offset + 2];
-    int sequence   = packet[offset + 3];
+void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int srcIP, int dstIP) {
+    int type = (packet, unsigned char[])[icmpOffset * 2];
+    int identifier = packet[icmpOffset + 2];
+    int sequence   = packet[icmpOffset + 3];
     if (type == 8) {  // Echo request (PING).
                       // bounce message back with type = 0 (PONG), everything else is identical.
                       // And swap srcIP and dstIP.
+        txData(6, (packet, unsigned char[]), 12, n);
+        txData(0, (packet, unsigned char[]), 6, 6);
+        txData(3, (packet, unsigned char[]), 0, 6);
+        txInt(ipOffset + 6, byterev(dstIP));
+        txInt(ipOffset + 8, byterev(srcIP));
     }
 }

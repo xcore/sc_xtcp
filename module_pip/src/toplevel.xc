@@ -13,15 +13,17 @@
 
 extern char notifySeen;
 
-int timeOut[10];
-int timeOuts = 0;
+static int timeOut[10];
+static int timeOuts = 0;
+
+static short txbuf[400];
+static int txbufLength = 0;
 
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend appIn, chanend appOut) {
     int havePacket = 0;
     int outBytes;
     int nBytes, a, timeStamp;
     int b[3200];
-    int txbuf[400];
     timer t;
 
     miiBufferInit(cIn, cNotifications, b, 3200);
@@ -38,17 +40,6 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
             }
             pipTimeOut();
             break;
-        case appOut :> outBytes:
-            for(int i = 0; i < ((outBytes + 3) >>2); i++) {
-                appOut :> txbuf[i];
-            }
-            if(outBytes < 64) {
-                printstr("ERR ");
-                printhexln(outBytes);
-            }
-            miiOutPacket(cOut, txbuf, 0, outBytes);
-            miiOutPacketDone(cOut);
-            break;
         }
         if (!havePacket) {
             {a,nBytes,timeStamp} = miiGetInBuffer();
@@ -58,14 +49,41 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
                 miiRestartBuffer();
             }
         }
+        if (txbufLength != 0) {
+            miiOutPacket(cOut, (txbuf, unsigned int[]), 0, txbufLength);
+            miiOutPacketDone(cOut);
+            txbufLength = 0;
+        }
     } 
 }
 
-void miiSingleServer(clock clk_smi,
-                     out port ?p_mii_resetn,
-                     smi_interface_t &smi,
-                     mii_interface_t &m,
-                     chanend appIn, chanend appOut, chanend server) {
+void txInt(int offset, int x) {
+    txbuf[offset] = x >> 16;
+    txbuf[offset+1] = x >> 16;
+    offset = offset * 2 + 4;
+    if (offset > txbufLength) txbufLength = offset;
+}
+
+void txShort(int offset, int short) {
+    txbuf[offset] = x;
+    offset = offset * 2 + 2;
+    if (offset > txbufLength) txbufLength = offset;
+}
+
+void txData(int offset, char data[], int dataOffset, int n) {
+    for(int i = 0; i < n; i++) {
+        (txbuf, unsigned char[])[i+offset*2] = data[i+dataOffset];
+    }
+    offset = offset * 2 + n;
+    if (offset > txbufLength) txbufLength = offset;
+}
+
+
+void pipServer(clock clk_smi,
+               out port ?p_mii_resetn,
+               smi_interface_t &smi,
+               mii_interface_t &m,
+               chanend appIn, chanend appOut, chanend server) {
     chan cIn, cOut;
     chan notifications;
     par {
