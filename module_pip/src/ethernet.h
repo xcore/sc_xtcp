@@ -33,3 +33,6 @@ void pipIncomingEthernetC(int a);
  *                  the predefined types above.
  */
 void pipOutgoingEthernet(unsigned char macDest[], int offset, int revType);
+
+
+extern unsigned char ourMacAddress[6];

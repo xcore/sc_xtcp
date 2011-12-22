@@ -13,24 +13,27 @@
 #include "pipServer.h"
 #include "tx.h"
 #include "ethernet.h"
+#include "dhcp.h"
 
 extern char notifySeen;
 
 static int timeOut[10];
 static int timeOuts = 0;
 
-static short txbuf[400];
+short txbuf[400];
 static int txbufLength = 0;
 
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend appIn, chanend appOut) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
     int b[3200];
-    timer t;
+    timer t, t2;
+    int thetime;
 
     miiBufferInit(cIn, cNotifications, b, 3200);
     miiOutInit(cOut);
     
+    t2 :> thetime;
     while (1) {
         select {
         case inuchar_byref(cNotifications, notifySeen):
@@ -41,6 +44,9 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
                 timeOut[i] = timeOut[i+1];
             }
 //TODO            pipTimeOut();
+            break;
+        case t2 when timerafter(thetime + 200000000) :> thetime:
+            pipDhcpCreate(1,0,0,0);
             break;
         }
         if (!havePacket) {
@@ -86,6 +92,17 @@ void txData(int offset, char data[], int dataOffset, int n) {
     if (offset > txbufLength) txbufLength = offset;
 }
 
+void txShortZeroes(int offset, int len) {
+    for(int i = 0; i < len; i++) {
+        txbuf[offset+i] = 0;
+    }
+    offset = (offset + len) * 2;
+    if (offset > txbufLength) txbufLength = offset;
+}
+
+unsigned shortrev(unsigned x) {
+    return ((unsigned)byterev(x))>>16;
+}
 
 void pipServer(clock clk_smi,
                out port ?p_mii_resetn,

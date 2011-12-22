@@ -11,6 +11,8 @@
 #include "icmp.h"
 #include "igmp.h"
 #include "checksum.h"
+#include "tx.h"
+#include "ethernet.h"
 
 // RFC 791
 
@@ -50,31 +52,61 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
 
     }
 #if defined(PIP_TCP)
-    if (ipType == 0x06) {
+    if (ipType == PIP_IPTYPE_TCP) {
         pipIncomingTCP(packet, contentOffset, srcIP, dstIP);
         return;
     }
 #endif
 
 #if defined(PIP_UDP)
-    if (ipType == 0x11) {
+    if (ipType == PIP_IPTYPE_UDP) {
         pipIncomingUDP(packet, contentOffset, srcIP, dstIP);
         return;
     }
 #endif
 
 #if defined(PIP_ICMP)
-    if (ipType == 0x01) {
+    if (ipType == PIP_IPTYPE_ICMP) {
         pipIncomingICMP(packet, offset, contentOffset, srcIP, dstIP);
         return;
     }
 #endif
 
 #if defined(PIP_IGMP)
-    if (ipType == 0x02) {
+    if (ipType == PIP_IPTYPE_IGMP) {
         pipIncomingIGMP(packet, contentOffset, srcIP, dstIP);
         return;
     }
 #endif
 
+}
+
+#define ARPENTRIES 10
+
+struct arp {
+    int ipAddress;
+    char macAddr[8];     // last two bytes are flags
+};
+
+struct arp arpTable[ARPENTRIES] = {
+    0xFFFFFFFF, {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 1, 0xff},
+};
+
+void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
+    int totalLength = length + 20;
+    txShort(7, 0x0045);                    // IPv4, header length 5, no flags.
+    txShort(8, shortrev(totalLength));     // Length, including header.
+    txInt(9, 0x0);                         // Zero id, no flags, no fragment offset.
+    txShort(11, 0xff | ipType << 8);       // Set ETH mac dst
+    txShort(12, 0);                        // Init checksum
+    txInt(13, byterev(myIP));             // Set source IP address.
+    txInt(15, byterev(ipDst));            // Set destination IP address.
+    txShort(12, onesChecksum(0, (txbuf, unsigned short[]), 7, 17)); // Compute checksum
+    for(int i = 0; i < ARPENTRIES; i++) {
+        if (arpTable[i].ipAddress == ipDst) {
+            pipOutgoingEthernet(arpTable[i].macAddr, 0, PIP_ETHTYPE_IPV4_REV);
+            return;
+        }
+    }
+    printstr("No arp entry...\n");
 }

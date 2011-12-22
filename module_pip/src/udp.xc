@@ -4,8 +4,11 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #include <xclib.h>
+#include <print.h>
 #include "udp.h"
 #include "checksum.h"
+#include "ipv4.h"
+#include "tx.h"
 
 // RFC 0768
 
@@ -32,4 +35,19 @@ void pipIncomingUDP(unsigned short packet[], int offset, int srcIP, int dstIP) {
     }
 #endif
 
+}
+
+
+
+void pipOutgoingUDP(int dstIP, int srcPort, int dstPort, int length) {
+    int srcIP = 0xa9feffff;
+    int totalLength = length + 8;
+    int chkSum;
+    txShort(17, shortrev(srcPort));             // Store source port
+    txShort(18, shortrev(dstPort));             // Store source port
+    txShort(19, shortrev(totalLength));         // Total length, including header.
+    txShort(20, 0);                        // Total length, including header.
+    chkSum = onesChecksum(0x0011 + totalLength + onesAdd(srcIP, dstIP), (txbuf, unsigned short[]), 17, 17 + ((totalLength + 1) >> 1));
+    txShort(20, chkSum);                        // Total length, including header.
+    pipOutgoingIPv4(PIP_IPTYPE_UDP, dstIP, totalLength);
 }

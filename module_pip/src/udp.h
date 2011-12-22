@@ -18,3 +18,6 @@
  *               host if all is well, or some sort of multicast address), in host order.
  */
 void pipIncomingUDP(unsigned short packet[], int offset, int srcIP, int dstIP);
+
+
+void pipOutgoingUDP(int ipDst, int srcPort, int dstPort, int length);

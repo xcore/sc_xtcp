@@ -8,15 +8,15 @@
 #include <print.h>
 #include "checksum.h"
 
-static int onesReduce(int sum, int carry) {
+static int onesReduce(unsigned int sum, int carry) {
     sum = (sum & 0xffff) + (sum >> 16) + carry;
     return (sum & 0xffff) + (sum >> 16);
 }
 
 unsigned onesAdd(unsigned int x, unsigned int y) {
-    unsigned int h, l;
-    asm("ladd %0,%1,%2,%3,%4" : "=r" (h), "=r" (l) : "r" (x), "r" (y), "r" (0));
-    return onesReduce(l, h);
+    unsigned int carry, sum;
+    asm("ladd %0,%1,%2,%3,%4" : "=r" (carry), "=r" (sum) : "r" (x), "r" (y), "r" (0));
+    return onesReduce(sum, carry);
 }
 
 unsigned onesChecksum(unsigned int sum, unsigned short data[], int begin, int end) {
