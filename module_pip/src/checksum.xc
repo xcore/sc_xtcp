@@ -3,16 +3,19 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
-#include <checksum.h>
+#include <xs1.h>
+#include <xclib.h>
+#include <print.h>
+#include "checksum.h"
 
-static void onesReduce(int sum, int carry) {
+static int onesReduce(int sum, int carry) {
     sum = (sum & 0xffff) + (sum >> 16) + carry;
     return (sum & 0xffff) + (sum >> 16);
 }
 
 unsigned onesAdd(unsigned int x, unsigned int y) {
     unsigned int h, l;
-    {h, l} = ladd(x, y, 0);
+    asm("ladd %0,%1,%2,%3,%4" : "=r" (h), "=r" (l) : "r" (x), "r" (y), "r" (0));
     return onesReduce(l, h);
 }
 

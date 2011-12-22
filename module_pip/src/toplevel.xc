@@ -10,6 +10,9 @@
 #include "miiDriver.h"
 #include "mii.h"
 #include "miiClient.h"
+#include "pipServer.h"
+#include "tx.h"
+#include "ethernet.h"
 
 extern char notifySeen;
 
@@ -21,7 +24,6 @@ static int txbufLength = 0;
 
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend appIn, chanend appOut) {
     int havePacket = 0;
-    int outBytes;
     int nBytes, a, timeStamp;
     int b[3200];
     timer t;
@@ -33,24 +35,24 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
         select {
         case inuchar_byref(cNotifications, notifySeen):
             break;
-        case timeOuts != 0 => t when timerafter(timeOut[0]):
+        case timeOuts != 0 => t when timerafter(timeOut[0]) :> void:
             timeOuts--;
             for(int i = 0; i < timeOuts; i++) {
                 timeOut[i] = timeOut[i+1];
             }
-            pipTimeOut();
+//TODO            pipTimeOut();
             break;
         }
         if (!havePacket) {
             {a,nBytes,timeStamp} = miiGetInBuffer();
             if (a != 0) {
-                pipIncomingEthernet(a, nBytes);
+                pipIncomingEthernetC(a);//TODO, nBytes);
                 miiFreeInBuffer(a);
                 miiRestartBuffer();
             }
         }
         if (txbufLength != 0) {
-            miiOutPacket(cOut, (txbuf, unsigned int[]), 0, txbufLength);
+            miiOutPacket(cOut, (txbuf, int[]), 0, txbufLength);
             miiOutPacketDone(cOut);
             txbufLength = 0;
         }
@@ -58,15 +60,21 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
 }
 
 void txInt(int offset, int x) {
-    txbuf[offset] = x >> 16;
+    txbuf[offset] = x;
     txbuf[offset+1] = x >> 16;
     offset = offset * 2 + 4;
     if (offset > txbufLength) txbufLength = offset;
 }
 
-void txShort(int offset, int short) {
+void txShort(int offset, int x) {
     txbuf[offset] = x;
     offset = offset * 2 + 2;
+    if (offset > txbufLength) txbufLength = offset;
+}
+
+void txByte(int offset, int x) {
+    (txbuf, unsigned char[])[offset] = x;
+    offset = offset + 1;
     if (offset > txbufLength) txbufLength = offset;
 }
 

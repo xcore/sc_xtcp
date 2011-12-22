@@ -8,11 +8,13 @@
  *
  * \param packet packetdata.
  *
- * \param offset Index of first element in the array that contains the ICMP header.
+ * \param ipOffset Index of first element in the array that contains the IP header.
+ *
+ * \param icmpOffset Index of first element in the array that contains the ICMP header.
  *
  * \param srcIP  Source IP address from IP header, in host order.
  *
  * \param dstIP  Destination IP address from IP header (the address of this
  *               host if all is well, or some sort of multicast address), in host order.
  */
-void pipIncomingICMP(unsigned short packet[], int offset, int srcIP, int dstIP);
+void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int srcIP, int dstIP);

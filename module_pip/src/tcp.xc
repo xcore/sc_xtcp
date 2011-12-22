@@ -18,7 +18,7 @@ struct tcpConnection incomingConnections[] = {
     {0, 80, 0, 0, 0},
 };
 
-void pipIncomingTCP(unsigned short packet[], int offset) {
+void pipIncomingTCP(unsigned short packet[], int offset, int srcIP, int dstIP) {
     int dataOffset = packet[offset + 6] & 0xF;
     int tcpOffset = offset + dataOffset * 2;
     

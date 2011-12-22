@@ -7,7 +7,9 @@
 
 void pipIncomingARP(unsigned short packet[], int offset) {
     int oper = packet[offset + 3];
-    
+    int tha; // TODO.
+    int localAddress; // TODO.
+
     if (oper == 1) {             // REQUEST
         if (tha == localAddress) { // for us.
             // store sha and spa.

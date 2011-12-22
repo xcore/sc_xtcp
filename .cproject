@@ -38,6 +38,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                                 <inputType id="com.xmos.cdt.xc.compiler.input.56447172" name="XC Sources" superClass="com.xmos.cdt.xc.compiler.input" />
                                 <option id="gnu.c.compiler.option.include.paths.2854749" valueType="includePath" superClass="gnu.c.compiler.option.include.paths">
@@ -60,6 +64,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.xc.compiler.base.73453196" name="com.xmos.cdt.xc.compiler.base" superClass="com.xmos.cdt.xc.compiler.base">
@@ -83,6 +91,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.83975402" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -104,6 +116,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.c.compiler.base.68257933" name="com.xmos.cdt.c.compiler.base" superClass="com.xmos.cdt.c.compiler.base">
@@ -127,6 +143,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.32330641" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -148,6 +168,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.cpp.compiler.base.26693281" name="com.xmos.cdt.cpp.compiler.base" superClass="com.xmos.cdt.cpp.compiler.base">
@@ -171,6 +195,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.16627019" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -192,6 +220,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.core.assembler.base.24520274" name="com.xmos.cdt.core.assembler.base" superClass="com.xmos.cdt.core.assembler.base">
@@ -215,6 +247,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.42681785" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -236,6 +272,10 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_xtcp/src/xtcp}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_telnet_console}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_xtcp/module_pip}&quot;' />
                                 </option>
                             </tool>
                         </toolChain>

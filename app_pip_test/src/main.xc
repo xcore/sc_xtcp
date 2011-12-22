@@ -4,11 +4,13 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #include <platform.h>
+#include "miiDriver.h"
+#include "mii.h"
 #include "pipServer.h"
 
 #define PORT_ETH_FAKE    XS1_PORT_8C
 
-#define PORT_ETH_RST_N_MDIO  XS1_PORT_1P
+#define PORT_ETH_RST_N  XS1_PORT_4C
 
 on stdcore[1]: mii_interface_t mii =
   {
@@ -37,8 +39,13 @@ on stdcore[1]: smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
 on stdcore[1]: clock clk_smi = XS1_CLKBLK_5;
 
 
-main() {
-    par {
-        on stdcore[1]: pipServer();
+int main(void) {
+	chan mac_rx[1], mac_tx[1], connect_status;
+
+	par
+	{
+	 	on stdcore[1]: pipServer(clk_smi, p_mii_resetn, smi, mii,
+                                       mac_rx[0], mac_tx[0], connect_status);
     }
+    return 0;
 }
