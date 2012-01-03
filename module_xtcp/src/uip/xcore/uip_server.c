@@ -22,6 +22,8 @@
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
 #define TCPBUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
+extern void uip_printip4(const uip_ipaddr_t ip4);
+
 /* Make sure that the uip_buf is word aligned */
 unsigned int uip_buf32[(UIP_BUFSIZE + 5) >> 2];
 u8_t *uip_buf = (u8_t *) &uip_buf32[0];
@@ -33,28 +35,8 @@ static void send(chanend mac_tx) {
 	}
 }
 
-#ifdef XTCP_VERBOSE_DEBUG
-static void printip4(const uip_ipaddr_t ip4) {
-	printint(uip_ipaddr1(ip4));
-	printstr(".");
-	printint(uip_ipaddr2(ip4));
-	printstr(".");
-	printint(uip_ipaddr3(ip4));
-	printstr(".");
-	printint(uip_ipaddr4(ip4));
-}
-#endif
-
-#if UIP_LOGGING == 1
-void uip_log(char m[]) {
-	printstr("uIP log message: ");
-	printstr(m);
-	printstr("\n");
-}
-#endif
-
-static int static_ip = 0;
-static xtcp_ipconfig_t static_ipconfig;
+int uip_static_ip = 0;
+xtcp_ipconfig_t uip_static_ipconfig;
 
 static int needs_poll(xtcpd_state_t *s)
 {
@@ -81,7 +63,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 	struct uip_eth_addr hwaddr;
 
 	if (ipconfig != NULL)
-		memcpy(&static_ipconfig, ipconfig, sizeof(xtcp_ipconfig_t));
+		memcpy(&uip_static_ipconfig, ipconfig, sizeof(xtcp_ipconfig_t));
 
 	timer_set(&periodic_timer, CLOCK_SECOND / 10);
 	timer_set(&autoip_timer, CLOCK_SECOND / 2);
@@ -99,7 +81,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 	
 	if (ipconfig != NULL && (ipconfig->ipaddr[0] != 0 || ipconfig->ipaddr[1]
 			!= 0 || ipconfig->ipaddr[2] != 0 || ipconfig->ipaddr[3] != 0)) {
-		static_ip = 1;
+		uip_static_ip = 1;
 		uip_ipaddr(ipaddr, ipconfig->ipaddr[0], ipconfig->ipaddr[1],
 						ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
 	}
@@ -115,7 +97,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 				ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
 #ifdef XTCP_VERBOSE_DEBUG
 		printstr("Address: ");
-		printip4(ipaddr);
+		uip_printip4(ipaddr);
 		printstr("\n");
 #endif
 	}
@@ -127,7 +109,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 				ipconfig->gateway[2], ipconfig->gateway[3]);
 #ifdef XTCP_VERBOSE_DEBUG
 		printstr("Gateway: ");
-		printip4(ipaddr);
+		uip_printip4(ipaddr);
 		printstr("\n");
 #endif
 	}
@@ -139,7 +121,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 				ipconfig->netmask[2], ipconfig->netmask[3]);
 #ifdef XTCP_VERBOSE_DEBUG
 		printstr("Netmask: ");
-		printip4(ipaddr);
+		uip_printip4(ipaddr);
 		printstr("\n");
 #endif
 	}
@@ -262,69 +244,3 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 	return;
 }
 
-static int dhcp_done = 0;
-
-void dhcpc_configured(const struct dhcpc_state *s) {
-#ifdef XTCP_VERBOSE_DEBUG
-	printstr("dhcp: ");
-	printip4(s->ipaddr);
-	printstr("\n");
-#endif
-	autoip_stop();
-	uip_sethostaddr(s->ipaddr);
-	uip_setdraddr(s->default_router);
-	uip_setnetmask(s->netmask);
-	uip_xtcp_up();
-	dhcp_done = 1;
-}
-
-void autoip_configured(uip_ipaddr_t autoip_ipaddr) {
-	if (!dhcp_done) {
-		uip_ipaddr_t ipaddr;
-#ifdef XTCP_VERBOSE_DEBUG
-		printstr("ipv4ll: ");
-		printip4(autoip_ipaddr);
-		printstr("\n");
-#endif
-		uip_sethostaddr(autoip_ipaddr);
-		uip_ipaddr(ipaddr, 255, 255, 0, 0);
-		uip_setnetmask(ipaddr);
-		uip_ipaddr(ipaddr, 0, 0, 0, 0);
-		uip_setdraddr(ipaddr);
-		uip_xtcp_up();
-	}
-}
-
-void uip_linkup() {
-	if (get_uip_xtcp_ifstate())
-		uip_xtcp_down();
-
-	if (static_ip) {
-		uip_ipaddr_t ipaddr;
-		uip_ipaddr(ipaddr, static_ipconfig.ipaddr[0],
-				static_ipconfig.ipaddr[1], static_ipconfig.ipaddr[2],
-				static_ipconfig.ipaddr[3]);
-		uip_sethostaddr(ipaddr);
-		uip_ipaddr(ipaddr, static_ipconfig.gateway[0],
-				static_ipconfig.gateway[1], static_ipconfig.gateway[2],
-				static_ipconfig.gateway[3]);
-		uip_setdraddr(ipaddr);
-		uip_ipaddr(ipaddr, static_ipconfig.netmask[0],
-				static_ipconfig.netmask[1], static_ipconfig.netmask[2],
-				static_ipconfig.netmask[3]);
-		uip_setnetmask(ipaddr);
-		uip_xtcp_up();
-	} else {
-		dhcp_done = 0;
-		dhcpc_stop();
-		autoip_stop();
-		dhcpc_start();
-	}
-}
-
-void uip_linkdown() {
-	dhcp_done = 0;
-	dhcpc_stop();
-	autoip_stop();
-	uip_xtcp_down();
-}
