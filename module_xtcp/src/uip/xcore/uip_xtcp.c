@@ -338,24 +338,6 @@ void xtcpd_unpause(int conn_id)
   }
 }
 
-
-static int needs_poll(xtcpd_state_t *s)
-{
-  return (s->s.connect_request | s->s.send_request | s->s.abort_request | s->s.close_request);
-}
-
-int uip_conn_needs_poll(struct uip_conn *uip_conn)
-{
-  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_conn->appstate);
-  return needs_poll(s);
-}
-
-int uip_udp_conn_needs_poll(struct uip_udp_conn *uip_udp_conn)
-{
-  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conn->appstate);
-  return needs_poll(s);
-}
-
 void uip_xtcpd_handle_poll(xtcpd_state_t *s)
 {
  if (s->s.abort_request) {

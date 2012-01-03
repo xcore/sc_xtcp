@@ -19,9 +19,6 @@
 #include "autoip.h"
 #include "igmp.h"
 
-int uip_conn_needs_poll(struct uip_conn *uip_conn);
-int uip_udp_conn_needs_poll(struct uip_udp_conn *uip_udp_conn);
-
 #define BUF ((struct uip_eth_hdr *)&uip_buf[0])
 #define TCPBUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
@@ -49,7 +46,7 @@ static void printip4(const uip_ipaddr_t ip4) {
 #endif
 
 #if UIP_LOGGING == 1
-void uip_log(char *m) {
+void uip_log(char m[]) {
 	printstr("uIP log message: ");
 	printstr(m);
 	printstr("\n");
@@ -58,6 +55,23 @@ void uip_log(char *m) {
 
 static int static_ip = 0;
 static xtcp_ipconfig_t static_ipconfig;
+
+static int needs_poll(xtcpd_state_t *s)
+{
+  return (s->s.connect_request | s->s.send_request | s->s.abort_request | s->s.close_request);
+}
+
+static int uip_conn_needs_poll(struct uip_conn *uip_conn)
+{
+  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_conn->appstate);
+  return needs_poll(s);
+}
+
+static int uip_udp_conn_needs_poll(struct uip_udp_conn *uip_udp_conn)
+{
+  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conn->appstate);
+  return needs_poll(s);
+}
 
 void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 		xtcp_ipconfig_t *ipconfig, chanend connect_status) {
@@ -88,9 +102,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 		static_ip = 1;
 		uip_ipaddr(ipaddr, ipconfig->ipaddr[0], ipconfig->ipaddr[1],
 						ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
-		printstr("Using static ip\n");
-	} else
-		printstr("Using dynamic ip\n");
+	}
 
 	if (ipconfig == NULL)
 	{
