@@ -12,14 +12,13 @@
 #include "igmp.h"
 #include "checksum.h"
 #include "tx.h"
+#include "arp.h"
 #include "ethernet.h"
 
 // RFC 791
 
 // TODO: Must be doing defragmentation somewhere.
 // TODO: Must support datagrams of at least 576 octets.
-
-extern unsigned myIP, mySubnetIP;
 
 unsigned int getReversedInt(unsigned short packet[], int offset) {
     unsigned int x = packet[offset+1] << 16 | packet[offset];
@@ -29,6 +28,7 @@ unsigned int getReversedInt(unsigned short packet[], int offset) {
 void pipIncomingIPv4(unsigned short packet[], int offset) {
     int ipType = (packet, unsigned char[])[offset * 2 + 9];
     int headerLength = (packet, unsigned char[])[offset * 2] & 0xF; // # words
+    int totalLength = byterev(packet[offset + 1]) >> 16;
     int contentOffset = headerLength * 2 + offset;
 
     unsigned int srcIP = getReversedInt(packet, offset + 6);
@@ -67,7 +67,7 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
 
 #if defined(PIP_ICMP)
     if (ipType == PIP_IPTYPE_ICMP) {
-        pipIncomingICMP(packet, offset, contentOffset, srcIP, dstIP);
+        pipIncomingICMP(packet, offset, contentOffset, srcIP, dstIP, totalLength - headerLength * 4);
         return;
     }
 #endif
@@ -81,17 +81,6 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
 
 }
 
-#define ARPENTRIES 10
-
-struct arp {
-    int ipAddress;
-    char macAddr[8];     // last two bytes are flags
-};
-
-struct arp arpTable[ARPENTRIES] = {
-    0xFFFFFFFF, {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 1, 0xff},
-};
-
 void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
     int totalLength = length + 20;
     txShort(7, 0x0045);                    // IPv4, header length 5, no flags.
@@ -103,10 +92,11 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
     txInt(15, byterev(ipDst));            // Set destination IP address.
     txShort(12, onesChecksum(0, (txbuf, unsigned short[]), 7, 20)); // Compute checksum
     for(int i = 0; i < ARPENTRIES; i++) {
-        if (arpTable[i].ipAddress == ipDst) {
-            pipOutgoingEthernet(arpTable[i].macAddr, 0, PIP_ETHTYPE_IPV4_REV);
+        if (pipArpTable[i].ipAddress == ipDst) {
+            pipOutgoingEthernet(pipArpTable[i].macAddr, 0, PIP_ETHTYPE_IPV4_REV);
             return;
         }
     }
-    printstr("No arp entry...\n");
+    txClear();
+    pipCreateARP(0, ipDst, pipArpTable[0].macAddr, 0);
 }

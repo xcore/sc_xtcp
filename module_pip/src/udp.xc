@@ -40,8 +40,6 @@ void pipIncomingUDP(unsigned short packet[], int offset, int srcIP, int dstIP) {
 
 }
 
-extern unsigned int myIP;
-
 void pipOutgoingUDP(int dstIP, int srcPort, int dstPort, int length) {
     int totalLength = length + 8;
     int chkSum;

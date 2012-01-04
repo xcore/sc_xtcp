@@ -16,5 +16,7 @@
  *
  * \param dstIP  Destination IP address from IP header (the address of this
  *               host if all is well, or some sort of multicast address), in host order.
+ *
+ * \param length Number of bytes in ICMP part of packet.
  */
-void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int srcIP, int dstIP);
+void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int srcIP, int dstIP, int length);

@@ -1,6 +1,6 @@
 TARGET = XP-DSC-BLDC
 APP_NAME =
-XCC_FLAGS = -Os -g -report -DPIP_ICMP -DPIP_DHCP -DPIP_UDP
+XCC_FLAGS = -Os -g -report -DPIP_ICMP -DPIP_DHCP -DPIP_UDP -DPIP_ARP
 USED_MODULES = module_pip module_mii_singlethread
 
 

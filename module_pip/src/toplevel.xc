@@ -96,6 +96,21 @@ void txShortZeroes(int offset, int len) {
     if (offset > txbufLength) txbufLength = offset;
 }
 
+void txClear() {
+    txbufLength = 0;
+}
+
+void txPrint() {
+    for(int i = 0; i < txbufLength; i++) {
+        printhex((txbuf, unsigned char[])[i]);
+        printstr(" ");
+        if ((i & 15) == 15) {
+            printstr("\n");
+        }
+    }
+    printstr("\n");
+}
+
 unsigned shortrev(unsigned x) {
     return ((unsigned)byterev(x))>>16;
 }

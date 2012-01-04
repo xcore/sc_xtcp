@@ -19,3 +19,5 @@ void pipIncomingIPv4(unsigned short packet[], int offset);
 
 
 void pipOutgoingIPv4(int ipType, unsigned ipDst, int length);
+
+extern unsigned myIP, mySubnetIP;

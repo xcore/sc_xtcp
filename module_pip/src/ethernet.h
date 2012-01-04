@@ -35,4 +35,4 @@ void pipIncomingEthernetC(int a);
 void pipOutgoingEthernet(unsigned char macDest[], int offset, int revType);
 
 
-extern unsigned char ourMacAddress[6];
+extern unsigned char myMacAddress[6];

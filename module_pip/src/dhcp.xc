@@ -39,11 +39,11 @@ void pipDhcpCreate(int firstMessage,
     }
 
     txInt(zero, 0x00060102);             // Fill Hop, Hlen, HType, OP.
-    txInt(zero + 2, 0xFFFFFF);           // Fill XID - could be random
+    txInt(zero + 2, xid);                // Fill XID
     txShort(zero + 4, shortrev(seconds));// Seconds since we started
     txShort(zero + 5, 0x0080);           // Flags: broadcase
     txShortZeroes(zero + 6, 112);        // Set all addr values to 0, chaddr, sname, file
-    txData(zero+14, ourMacAddress, 0, 6);   // FIll in mac address
+    txData(zero+14, myMacAddress, 0, 6);   // FIll in mac address
     txInt(zero+118, 0x63538263);         // Fill Hop, Hlen, HType, OP.
     txInt(zero+120, 0xFF010135);         // Discover & end option.
     if (firstMessage) {
@@ -73,6 +73,12 @@ void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         printhexln(packet[offset+119]);
         return;
     }
+    if ((packet[offset+2] | packet[offset+3]<<16) != xid) {
+        printstr("Illegal XID ");
+        printhexln(packet[offset+2] | packet[offset+3]<<16);
+        printhexln(xid);
+        return;
+    }
     proposedIP = getIntUnaligned(packet, offset*2 + 16);
     subnet = 0;
     leaseTime = 0;
@@ -100,7 +106,7 @@ void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         if (rebindTime == 0) {
             rebindTime = leaseTime - (leaseTime >> 3);
         }
-        pipSetTimeOut(PIP_DHCP_TIMER_T1, renewalTime, 0, 0);
+        pipSetTimeOut(PIP_DHCP_TIMER_T1, renewalTime, 0, 1);
         pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, 1);
         myIP = proposedIP;
         mySubnetIP = subnet;

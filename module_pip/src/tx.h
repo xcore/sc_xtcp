@@ -10,4 +10,7 @@ void txByte(int offset, int x);
 void txData(int offset, char data[], int dataOffset, int n);
 unsigned shortrev(unsigned x);
 
+void txClear();
+void txPrint();
+
 extern short txbuf[400];      // THis is not good - for checksum only. TODO.
