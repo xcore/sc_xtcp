@@ -26,9 +26,9 @@ unsigned int onesAdd(unsigned int x, unsigned int y);
  *
  * \param begin index of first entry of array.
  *
- * \param end   index of last entry + 1 of array.
+ * \param lengthInBytes   Number of bytes over which to compute checksum.
  *
  * \returns the checksum in network order, xored with 0xffff. Possible
  *          values are in the range 0x0001-0xffff (0x0000 is reserved for no checksum) 
  */
-unsigned int onesChecksum(unsigned int sum, unsigned short data[], int begin, int end);
+unsigned int onesChecksum(unsigned int sum, unsigned short data[], int begin, int lengthInBytes);

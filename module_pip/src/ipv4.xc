@@ -19,7 +19,7 @@
 // TODO: Must be doing defragmentation somewhere.
 // TODO: Must support datagrams of at least 576 octets.
 
-int myIP = 0xA9FEFFFF;
+extern unsigned myIP, mySubnetIP;
 
 unsigned int getReversedInt(unsigned short packet[], int offset) {
     unsigned int x = packet[offset+1] << 16 | packet[offset];
@@ -34,7 +34,7 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
     unsigned int srcIP = getReversedInt(packet, offset + 6);
     unsigned int dstIP = getReversedInt(packet, offset + 8);
 
-    int chkSum = onesChecksum(0, packet, offset, contentOffset);
+    int chkSum = onesChecksum(0, packet, offset, headerLength * 4);
     
     if (chkSum != 0) {
         printstr("Bad chksum ");
@@ -42,7 +42,7 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
         return;        // Bad checksum; drop.
     }
 
-    if (dstIP != 0xFFFFFFFF &&
+    if ((dstIP | mySubnetIP) != 0xFFFFFFFF &&
         (dstIP >> 24) != 224 && 
         dstIP != 0 &&
         dstIP != myIP) {
@@ -101,7 +101,7 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
     txShort(12, 0);                        // Init checksum
     txInt(13, byterev(myIP));             // Set source IP address.
     txInt(15, byterev(ipDst));            // Set destination IP address.
-    txShort(12, onesChecksum(0, (txbuf, unsigned short[]), 7, 17)); // Compute checksum
+    txShort(12, onesChecksum(0, (txbuf, unsigned short[]), 7, 20)); // Compute checksum
     for(int i = 0; i < ARPENTRIES; i++) {
         if (arpTable[i].ipAddress == ipDst) {
             pipOutgoingEthernet(arpTable[i].macAddr, 0, PIP_ETHTYPE_IPV4_REV);

@@ -19,9 +19,13 @@ unsigned onesAdd(unsigned int x, unsigned int y) {
     return onesReduce(sum, carry);
 }
 
-unsigned onesChecksum(unsigned int sum, unsigned short data[], int begin, int end) {
-    for(int i = begin; i < end; i++) {
+unsigned onesChecksum(unsigned int sum, unsigned short data[], int begin, int lengthInBytes) {
+    int i;
+    for(i = begin; i < begin + (lengthInBytes>>1); i++) {
         sum += byterev(data[i]) >> 16;
+    }
+    if (lengthInBytes & 1) {
+        sum += (data, unsigned char[])[2*i] << 8;
     }
     sum = onesReduce(sum, 0);
     return byterev((~sum) & 0xffff) >> 16;

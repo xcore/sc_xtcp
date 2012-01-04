@@ -14,11 +14,9 @@
 #include "tx.h"
 #include "ethernet.h"
 #include "dhcp.h"
+#include "timer.h"
 
 extern char notifySeen;
-
-static int timeOut[10];
-static int timeOuts = 0;
 
 short txbuf[400];
 static int txbufLength = 0;
@@ -32,21 +30,19 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
 
     miiBufferInit(cIn, cNotifications, b, 3200);
     miiOutInit(cOut);
-    
+
     t2 :> thetime;
+
+    pipDhcpInit();
+    if (txbufLength != 0) {
+        miiOutPacket(cOut, (txbuf, int[]), 0, txbufLength);
+        miiOutPacketDone(cOut);
+        txbufLength = 0;
+    }
     while (1) {
         select {
+        case pipTimeOut(t);
         case inuchar_byref(cNotifications, notifySeen):
-            break;
-        case timeOuts != 0 => t when timerafter(timeOut[0]) :> void:
-            timeOuts--;
-            for(int i = 0; i < timeOuts; i++) {
-                timeOut[i] = timeOut[i+1];
-            }
-//TODO            pipTimeOut();
-            break;
-        case t2 when timerafter(thetime + 200000000) :> thetime:
-            pipDhcpCreate(1,0,0,0);
             break;
         }
         if (!havePacket) {
