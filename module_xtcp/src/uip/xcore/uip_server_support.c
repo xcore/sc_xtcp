@@ -6,7 +6,9 @@
 #include <print.h>
 #include <xccompat.h>
 #include <string.h>
+
 #include "uip.h"
+#include "uip_arp.h"
 #include "uip_xtcp.h"
 #include "autoip.h"
 
@@ -30,17 +32,81 @@ void uip_printip4(const uip_ipaddr_t ip4) {
 }
 #endif
 
-extern int uip_static_ip;
-extern xtcp_ipconfig_t uip_static_ipconfig;
-
+int uip_static_ip = 0;
+xtcp_ipconfig_t uip_static_ipconfig;
 
 static int dhcp_done = 0;
 
+void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, unsigned char mac_address[6])
+{
+	uip_ipaddr_t ipaddr;
+
+	if (ipconfig != NULL)
+		memcpy(&uip_static_ipconfig, ipconfig, sizeof(xtcp_ipconfig_t));
+
+	memcpy(&uip_ethaddr.addr[0], mac_address, 6);
+
+	uip_init();
+
+#if UIP_IGMP
+	igmp_init();
+#endif
+
+	if (ipconfig != NULL && (ipconfig->ipaddr[0] != 0 || ipconfig->ipaddr[1]
+			!= 0 || ipconfig->ipaddr[2] != 0 || ipconfig->ipaddr[3] != 0)) {
+		uip_static_ip = 1;
+		uip_ipaddr(ipaddr, ipconfig->ipaddr[0], ipconfig->ipaddr[1],
+						ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
+	}
+
+	if (ipconfig == NULL)
+	{
+		uip_ipaddr(ipaddr, 0, 0, 0, 0);
+	}
+
+	if (ipconfig != NULL)
+	{
+		uip_ipaddr(ipaddr, ipconfig->ipaddr[0], ipconfig->ipaddr[1],
+				ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
+#ifdef XTCP_VERBOSE_DEBUG
+		printstr("Address: ");uip_printip4(ipaddr);printstr("\n");
+#endif
+	}
+	uip_sethostaddr(ipaddr);
+
+	if (ipconfig != NULL)
+	{
+		uip_ipaddr(ipaddr, ipconfig->gateway[0], ipconfig->gateway[1],
+				ipconfig->gateway[2], ipconfig->gateway[3]);
+#ifdef XTCP_VERBOSE_DEBUG
+		printstr("Gateway: ");uip_printip4(ipaddr);printstr("\n");
+#endif
+	}
+	uip_setdraddr(ipaddr);
+
+	if (ipconfig != NULL)
+	{
+		uip_ipaddr(ipaddr, ipconfig->netmask[0], ipconfig->netmask[1],
+				ipconfig->netmask[2], ipconfig->netmask[3]);
+#ifdef XTCP_VERBOSE_DEBUG
+		printstr("Netmask: ");uip_printip4(ipaddr);printstr("\n");
+#endif
+	}
+	uip_setnetmask(ipaddr);
+
+	{
+		int hwsum = mac_address[0] + mac_address[1] + mac_address[2]
+				+ mac_address[3] + mac_address[4] + mac_address[5];
+		autoip_init(hwsum + (hwsum << 16) + (hwsum << 24));
+		dhcpc_init(mac_address, 6);
+		xtcpd_init(xtcp, num_xtcp);
+	}
+}
+
+
 void dhcpc_configured(const struct dhcpc_state *s) {
 #ifdef XTCP_VERBOSE_DEBUG
-	printstr("dhcp: ");
-	uip_printip4(s->ipaddr);
-	printstr("\n");
+	printstr("dhcp: ");uip_printip4(s->ipaddr);printstr("\n");
 #endif
 	autoip_stop();
 	uip_sethostaddr(s->ipaddr);

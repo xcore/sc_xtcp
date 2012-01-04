@@ -3,6 +3,8 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
+#ifndef UIP_USE_SINGLE_THREADED_ETHERNET
+
 #include <print.h>
 #include <xccompat.h>
 #include <string.h>
@@ -23,6 +25,10 @@
 #define TCPBUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 extern void uip_printip4(const uip_ipaddr_t ip4);
+void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, unsigned char mac_address[6]);
+
+extern int uip_static_ip;
+extern xtcp_ipconfig_t uip_static_ipconfig;
 
 /* Make sure that the uip_buf is word aligned */
 unsigned int uip_buf32[(UIP_BUFSIZE + 5) >> 2];
@@ -34,9 +40,6 @@ static void send(chanend mac_tx) {
 		uip_len = 0;
 	}
 }
-
-int uip_static_ip = 0;
-xtcp_ipconfig_t uip_static_ipconfig;
 
 static int needs_poll(xtcpd_state_t *s)
 {
@@ -58,82 +61,18 @@ static int uip_udp_conn_needs_poll(struct uip_udp_conn *uip_udp_conn)
 void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 		xtcp_ipconfig_t *ipconfig, chanend connect_status) {
 
-	uip_ipaddr_t ipaddr;
 	struct uip_timer periodic_timer, arp_timer, autoip_timer;
-	struct uip_eth_addr hwaddr;
-
-	if (ipconfig != NULL)
-		memcpy(&uip_static_ipconfig, ipconfig, sizeof(xtcp_ipconfig_t));
+	unsigned char hwaddr[6];
 
 	timer_set(&periodic_timer, CLOCK_SECOND / 10);
 	timer_set(&autoip_timer, CLOCK_SECOND / 2);
 	timer_set(&arp_timer, CLOCK_SECOND * 10);
 
-	mac_get_macaddr(mac_tx, hwaddr.addr);
-	uip_setethaddr(hwaddr);
-
 	xcoredev_init(mac_rx, mac_tx);
-	uip_init();
-	
-#if UIP_IGMP
-	igmp_init();
-#endif
-	
-	if (ipconfig != NULL && (ipconfig->ipaddr[0] != 0 || ipconfig->ipaddr[1]
-			!= 0 || ipconfig->ipaddr[2] != 0 || ipconfig->ipaddr[3] != 0)) {
-		uip_static_ip = 1;
-		uip_ipaddr(ipaddr, ipconfig->ipaddr[0], ipconfig->ipaddr[1],
-						ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
-	}
 
-	if (ipconfig == NULL)
-	{
-		uip_ipaddr(ipaddr, 0, 0, 0, 0);
-	}
+	mac_get_macaddr(mac_tx, hwaddr);
 
-	if (ipconfig != NULL)
-	{
-		uip_ipaddr(ipaddr, ipconfig->ipaddr[0], ipconfig->ipaddr[1],
-				ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
-#ifdef XTCP_VERBOSE_DEBUG
-		printstr("Address: ");
-		uip_printip4(ipaddr);
-		printstr("\n");
-#endif
-	}
-	uip_sethostaddr(ipaddr);
-
-	if (ipconfig != NULL)
-	{
-		uip_ipaddr(ipaddr, ipconfig->gateway[0], ipconfig->gateway[1],
-				ipconfig->gateway[2], ipconfig->gateway[3]);
-#ifdef XTCP_VERBOSE_DEBUG
-		printstr("Gateway: ");
-		uip_printip4(ipaddr);
-		printstr("\n");
-#endif
-	}
-	uip_setdraddr(ipaddr);
-
-	if (ipconfig != NULL)
-	{
-		uip_ipaddr(ipaddr, ipconfig->netmask[0], ipconfig->netmask[1],
-				ipconfig->netmask[2], ipconfig->netmask[3]);
-#ifdef XTCP_VERBOSE_DEBUG
-		printstr("Netmask: ");
-		uip_printip4(ipaddr);
-		printstr("\n");
-#endif
-	}
-	uip_setnetmask(ipaddr);
-	
-	{
-		int hwsum = hwaddr.addr[0] + hwaddr.addr[1] + hwaddr.addr[2]
-				+ hwaddr.addr[3] + hwaddr.addr[4] + hwaddr.addr[5];
-		autoip_init(hwsum + (hwsum << 16) + (hwsum << 24));
-		dhcpc_init(&(hwaddr.addr), 6);
-		xtcpd_init(xtcp, num_xtcp);
-	}
+	uip_server_init(xtcp, num_xtcp, ipconfig, hwaddr);
 
 	// Main uIP service loop
 	while (1)
@@ -244,3 +183,4 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 	return;
 }
 
+#endif
