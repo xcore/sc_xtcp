@@ -10,7 +10,10 @@
 
 
 // Default HTTP page with HTTP headers included
-char page[] = "HTTP/1.0 200 OK\nServer: xc2/pre-1.0 (http://xmos.com)\nContent-type: text/html\n\n<html><head></head><body>Hello World!</body></html>\n\n";
+char page[] = 	"HTTP/1.0 200 OK\nServer: xc2/pre-1.0 (http://xmos.com)\nContent-type: text/html\n\n"
+				"<!DOCTYPE html>\n"
+				"<html><head><title>Hello world</title></head>\n"
+				"<body>Hello World!</body></html>";
 
 
 // Maximum number of concurrent connections
