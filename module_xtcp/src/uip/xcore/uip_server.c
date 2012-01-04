@@ -3,14 +3,18 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
-#ifndef UIP_USE_SINGLE_THREADED_ETHERNET
-
 #include <print.h>
 #include <xccompat.h>
 #include <string.h>
+
+#ifdef __xtcp_client_conf_h_exists__
+#include "xtcp_client_conf.h"
+#endif
+
+#ifndef UIP_USE_SINGLE_THREADED_ETHERNET
+
 #include "uip.h"
 #include "uip_arp.h"
-#include "uip-split.h"
 #include "xcoredev.h"
 #include "xtcp_server.h"
 #include "timer.h"
@@ -21,42 +25,17 @@
 #include "autoip.h"
 #include "igmp.h"
 
-#define BUF ((struct uip_eth_hdr *)&uip_buf[0])
-#define TCPBUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
-
+// Functions from the uip_server_support file
 extern void uip_printip4(const uip_ipaddr_t ip4);
-void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, unsigned char mac_address[6]);
+extern void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, unsigned char mac_address[6]);
+extern void xtcpd_check_connection_poll(chanend mac_tx);
+extern void xtcp_tx_buffer(chanend mac_tx);
+extern void xtcp_process_incoming_packet(chanend mac_tx);
+extern void xtcp_process_udp_acks(chanend mac_tx);
 
+// Global variables from the uip_server_support file
 extern int uip_static_ip;
 extern xtcp_ipconfig_t uip_static_ipconfig;
-
-/* Make sure that the uip_buf is word aligned */
-unsigned int uip_buf32[(UIP_BUFSIZE + 5) >> 2];
-u8_t *uip_buf = (u8_t *) &uip_buf32[0];
-
-static void send(chanend mac_tx) {
-	if (TCPBUF->srcipaddr != 0) {
-		uip_split_output(mac_tx);
-		uip_len = 0;
-	}
-}
-
-static int needs_poll(xtcpd_state_t *s)
-{
-  return (s->s.connect_request | s->s.send_request | s->s.abort_request | s->s.close_request);
-}
-
-static int uip_conn_needs_poll(struct uip_conn *uip_conn)
-{
-  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_conn->appstate);
-  return needs_poll(s);
-}
-
-static int uip_udp_conn_needs_poll(struct uip_udp_conn *uip_udp_conn)
-{
-  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conn->appstate);
-  return needs_poll(s);
-}
 
 void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 		xtcp_ipconfig_t *ipconfig, chanend connect_status) {
@@ -79,65 +58,17 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 	{
 		xtcpd_service_clients(xtcp, num_xtcp);
 
-		for (int i = 0; i < UIP_CONNS; i++) {
-			if (uip_conn_needs_poll(&uip_conns[i])) {
-				uip_poll_conn(&uip_conns[i]);
-				if (uip_len > 0) {
-					uip_arp_out( NULL);
-					send(mac_tx);
-				}
-			}
-		}
-
-		for (int i = 0; i < UIP_UDP_CONNS; i++) {
-			if (uip_udp_conn_needs_poll(&uip_udp_conns[i])) {
-				uip_udp_periodic(i);
-				if (uip_len > 0) {
-					uip_arp_out(&uip_udp_conns[i]);
-					send(mac_tx);
-				}
-			}
-		}
+		xtcpd_check_connection_poll(mac_tx);
 
 		uip_xtcp_checkstate();
 		uip_xtcp_checklink(connect_status);
 		uip_len = xcoredev_read(mac_rx, UIP_CONF_BUFFER_SIZE);
 		if (uip_len > 0) {
-			if (BUF->type == htons(UIP_ETHTYPE_IP)) {
-				uip_arp_ipin();
-				uip_input();
-				if (uip_len > 0) {
-					if (uip_udpconnection())
-						uip_arp_out( uip_udp_conn);
-					else
-						uip_arp_out( NULL);
-					send(mac_tx);
-				}
-			} else if (BUF->type == htons(UIP_ETHTYPE_ARP)) {
-				uip_arp_arpin();
-
-				if (uip_len > 0) {
-					send(mac_tx);
-				}
-				for (int i = 0; i < UIP_UDP_CONNS; i++) {
-					uip_udp_arp_event(i);
-					if (uip_len > 0) {
-						uip_arp_out(&uip_udp_conns[i]);
-						send(mac_tx);
-					}
-				}
-			}
+			xtcp_process_incoming_packet(mac_tx);
 		}
 
-		for (int i = 0; i < UIP_UDP_CONNS; i++) {
-			if (uip_udp_conn_has_ack(&uip_udp_conns[i])) {
-				uip_udp_ackdata(i);
-				if (uip_len > 0) {
-					uip_arp_out(&uip_udp_conns[i]);
-					send(mac_tx);
-				}
-			}
-		}
+		xtcp_process_udp_acks(mac_tx);
+
 
 		if (timer_expired(&arp_timer)) {
 			timer_reset(&arp_timer);
@@ -148,7 +79,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 			timer_reset(&autoip_timer);
 			autoip_periodic();
 			if (uip_len > 0) {
-				send(mac_tx);
+				xtcp_tx_buffer(mac_tx);
 			}
 		}
 
@@ -157,14 +88,14 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 #if UIP_IGMP
 			igmp_periodic();
 			if(uip_len > 0) {
-				send(mac_tx);
+				xtcp_tx_buffer(mac_tx);
 			}
 #endif
 			for (int i = 0; i < UIP_UDP_CONNS; i++) {
 				uip_udp_periodic(i);
 				if (uip_len > 0) {
 					uip_arp_out(&uip_udp_conns[i]);
-					send(mac_tx);
+					xtcp_tx_buffer(mac_tx);
 				}
 			}
 
@@ -172,7 +103,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 				uip_periodic(i);
 				if (uip_len > 0) {
 					uip_arp_out( NULL);
-					send(mac_tx);
+					xtcp_tx_buffer(mac_tx);
 				}
 			}
 

@@ -1,0 +1,6 @@
+This demonstrates the two thread TCP plus ethernet.  The threads are:
+
+- TCP plus ethernet service
+- Ethernet MII
+
+
