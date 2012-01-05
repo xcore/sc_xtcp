@@ -49,8 +49,11 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
         printstr("Not us ");
         printhexln(dstIP);
         return;        // dest ip address is not us; drop.
-
     }
+
+    pipARPStoreEntry(srcIP, (packet, unsigned char[]), 6);
+
+
 #if defined(PIP_TCP)
     if (ipType == PIP_IPTYPE_TCP) {
         pipIncomingTCP(packet, contentOffset, srcIP, dstIP);
@@ -97,6 +100,8 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
             return;
         }
     }
+    printstr("Missing arp\n");
+    printhexln(ipDst);
     txClear();
     pipCreateARP(0, ipDst, pipArpTable[0].macAddr, 0);
 }

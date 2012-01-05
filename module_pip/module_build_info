@@ -1,2 +1,2 @@
-MODULE_XCC_FLAGS = $(XCC_FLAGS) -Os -Wall
+MODULE_XCC_FLAGS = $(XCC_FLAGS) -Os -Wall -g
 

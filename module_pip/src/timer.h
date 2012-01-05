@@ -10,3 +10,5 @@ void pipSetTimeOut(int timerNumber, int secsDelay, int tenNSdelay, int fuzz);
 #define PIP_DHCP_TIMER_T2   1
 
 #define PIP_ARP_TIMER       2
+
+#define PIP_TCP_TIMER       3

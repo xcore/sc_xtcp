@@ -24,7 +24,7 @@ static void macCopy(unsigned char to[], unsigned char from[], int offset) {
     }
 }
 
-static void storeEntry(int ipAddress, unsigned char macAddress[], int offset) {
+void pipARPStoreEntry(int ipAddress, unsigned char macAddress[], int offset) {
     int min = pipArpTable[1].macAddr[7];
     int minEntry = 1;
     for(int i = 1; i < ARPENTRIES; i++) {
@@ -32,6 +32,9 @@ static void storeEntry(int ipAddress, unsigned char macAddress[], int offset) {
             macCopy(pipArpTable[i].macAddr, macAddress, offset);
             pipArpTable[i].macAddr[6] = 1;
             pipArpTable[i].macAddr[7] = 0xfe;
+//            printstr("Refreshed ARP ");
+//            printintln(i);
+//            printhexln(ipAddress);
             return;
         }
         if (pipArpTable[i].macAddr[7] < min) {
@@ -43,6 +46,9 @@ static void storeEntry(int ipAddress, unsigned char macAddress[], int offset) {
     macCopy(pipArpTable[minEntry].macAddr, macAddress, offset);
     pipArpTable[minEntry].macAddr[6] = 1;
     pipArpTable[minEntry].macAddr[7] = 0xfe;
+    printstr("Added ARP ");
+    printintln(minEntry);
+    printhexln(ipAddress);
 }
 
 
@@ -66,17 +72,18 @@ void pipIncomingARP(unsigned short packet[], int offset) {
 
     if (oper == 256) {             // REQUEST
         if (tpa == myIP) {         // for us.
-            storeEntry(spa, (packet, unsigned char[]), 2*offset + 8);
+            pipARPStoreEntry(spa, (packet, unsigned char[]), 2*offset + 8);
             pipCreateARP(1, spa, (packet, unsigned char[]), 2*offset + 8);
         }
     } else if (oper == 512) {      // REPLY
-        storeEntry(spa, (packet, unsigned char[]), 2*offset + 8);
+        pipARPStoreEntry(spa, (packet, unsigned char[]), 2*offset + 8);
     } else {
         printstr("Unkown arp ");
         printintln(oper);
     }
 }
 
+// TODO: initialise timeout, and repeat timeout of ARP entries.
 void pipArpTimeOut() {
     for(int i = 1; i < ARPENTRIES; i++) {
         if (pipArpTable[i].macAddr[7] > 0) {

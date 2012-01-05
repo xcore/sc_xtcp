@@ -18,3 +18,14 @@
  *               host if all is well, or some sort of multicast address), in host order.
  */
 void pipIncomingTCP(unsigned short packet[], int offset, int srcIP, int dstIP);
+
+
+#define PIP_TCP_ACK_CT 3
+#define PIP_TCP_ERROR_CT 5
+#define PIP_TCP_CLOSED_CT 6
+
+
+#define PIP_TCP_ACCEPT 1
+#define PIP_TCP_CLOSE 2
+#define PIP_TCP_READ 3
+#define PIP_TCP_WRITE 4

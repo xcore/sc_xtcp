@@ -29,3 +29,6 @@ void pipArpTimeOut();
 
 
 void pipCreateARP(int reply, int tpa, unsigned char tha[], int offset);
+
+
+void pipARPStoreEntry(int ipAddress, unsigned char macAddress[], int offset);

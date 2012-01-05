@@ -54,6 +54,9 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
             }
         }
         if (txbufLength != 0) {
+            if (txbufLength < 64) {
+                txbufLength = 64;
+            }
             miiOutPacket(cOut, (txbuf, int[]), 0, txbufLength);
             miiOutPacketDone(cOut);
             txbufLength = 0;

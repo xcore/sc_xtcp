@@ -15,7 +15,6 @@ static int interval = 4;
 
 unsigned myIP, serverIP, mySubnetIP;
 
-
 // TODO: share with other files.
 // TODO: make all unaligned - saves code.
 
@@ -94,6 +93,8 @@ void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         case 0x3A: renewalTime = getIntUnaligned(packet, i+2); break;
         case 0x3B: rebindTime  = getIntUnaligned(packet, i+2); break;
         case 0x01: subnet      = getIntUnaligned(packet, i+2); break;
+            // TODO: store router(s)
+            // TODO: store DNS server(s)
         }
         i += (packet, unsigned char[])[i+1] + 2;
     }
@@ -110,8 +111,6 @@ void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, 1);
         myIP = proposedIP;
         mySubnetIP = subnet;
-        // switch IP on.
-        // Set our IP.
     }
 }
 
@@ -119,6 +118,8 @@ void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
 void pipDhcpInit() {
     timer t;
     t :> xid;
+    myIP = 0;
+    mySubnetIP = 0;
     pipDhcpCreate(1, 0, 0);
     pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, 1);
     interval *= 2;
