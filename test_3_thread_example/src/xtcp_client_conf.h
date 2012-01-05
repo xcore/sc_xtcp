@@ -4,4 +4,5 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #define XTCP_BUFFERED_API 1
-
+#define XTCP_VERBOSE_DEBUG
+#define PHY_ADDRESS 0x0

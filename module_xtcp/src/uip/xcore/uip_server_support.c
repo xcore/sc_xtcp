@@ -111,7 +111,7 @@ void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, un
 		int hwsum = mac_address[0] + mac_address[1] + mac_address[2]
 				+ mac_address[3] + mac_address[4] + mac_address[5];
 		autoip_init(hwsum + (hwsum << 16) + (hwsum << 24));
-		dhcpc_init(mac_address, 6);
+		dhcpc_init(uip_ethaddr.addr, 6);
 		xtcpd_init(xtcp, num_xtcp);
 	}
 }
@@ -197,6 +197,30 @@ void xtcp_process_udp_acks(chanend mac_tx)
 	}
 }
 
+void xtcp_process_periodic_timer(chanend mac_tx)
+{
+#if UIP_IGMP
+	igmp_periodic();
+	if(uip_len > 0) {
+		xtcp_tx_buffer(mac_tx);
+	}
+#endif
+	for (int i = 0; i < UIP_UDP_CONNS; i++) {
+		uip_udp_periodic(i);
+		if (uip_len > 0) {
+			uip_arp_out(&uip_udp_conns[i]);
+			xtcp_tx_buffer(mac_tx);
+		}
+	}
+
+	for (int i = 0; i < UIP_CONNS; i++) {
+		uip_periodic(i);
+		if (uip_len > 0) {
+			uip_arp_out( NULL);
+			xtcp_tx_buffer(mac_tx);
+		}
+	}
+}
 
 void dhcpc_configured(const struct dhcpc_state *s) {
 #ifdef XTCP_VERBOSE_DEBUG

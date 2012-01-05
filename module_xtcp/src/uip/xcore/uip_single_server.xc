@@ -32,9 +32,16 @@ extern void xtcpd_check_connection_poll(chanend mac_tx);
 extern void xtcp_tx_buffer(chanend mac_tx);
 extern void xtcp_process_incoming_packet(chanend mac_tx);
 extern void xtcp_process_udp_acks(chanend mac_tx);
+extern void xtcp_process_periodic_timer(chanend mac_tx);
 
+// Global variables from uip_server_support
 extern unsigned short uip_len;
 extern unsigned int uip_buf32[];
+
+// Global functions from the uip stack
+extern void uip_arp_timer(void);
+extern void autoip_periodic();
+extern void igmp_periodic();
 
 // The transmit packet buffer
 static int txbuf[400];
@@ -62,12 +69,13 @@ void copy_packet(unsigned dst[], unsigned src, unsigned len)
 }
 
 static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
+		clock clk_smi, smi_interface_t &smi,
 		chanend xtcp[], int num_xtcp, xtcp_ipconfig_t& ipconfig,
 		char mac_address[6]) {
     int address, length, timeStamp;
 
 	timer tmr;
-	unsigned timeout;
+	unsigned timeout, autoip_timer=0, arp_timer=0;
 
 	// The Receive packet buffer
     int b[3200];
@@ -84,52 +92,39 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 		xtcpd_service_clients(xtcp, num_xtcp);
 		xtcpd_check_connection_poll(mac_tx);
 		uip_xtcp_checkstate();
-		//uip_xtcp_checklink(connect_status);
 
 		xtcp_process_udp_acks(mac_tx);
 
         select {
 		case tmr when timerafter(timeout) :> unsigned:
 			timeout += 10000000;
-			//		if (timer_expired(&arp_timer)) {
-			//			timer_reset(&arp_timer);
-			//			uip_arp_timer();
-			//		}
-			//
-			//		if (timer_expired(&autoip_timer)) {
-			//			timer_reset(&autoip_timer);
-			//			autoip_periodic();
-			//			if (uip_len > 0) {
-			//				send(mac_tx);
-			//			}
-			//		}
-			//
-			//		if (timer_expired(&periodic_timer)) {
-			//
-			//#if UIP_IGMP
-			//			igmp_periodic();
-			//			if(uip_len > 0) {
-			//				send(mac_tx);
-			//			}
-			//#endif
-			//			for (int i = 0; i < UIP_UDP_CONNS; i++) {
-			//				uip_udp_periodic(i);
-			//				if (uip_len > 0) {
-			//					uip_arp_out(&uip_udp_conns[i]);
-			//					send(mac_tx);
-			//				}
-			//			}
-			//
-			//			for (int i = 0; i < UIP_CONNS; i++) {
-			//				uip_periodic(i);
-			//				if (uip_len > 0) {
-			//					uip_arp_out( NULL);
-			//					send(mac_tx);
-			//				}
-			//			}
-			//
-			//			timer_reset(&periodic_timer);
-			//		}
+
+			// Check for the link state
+			{
+				static int linkstate=0;
+				int status = miiCheckLinkState(smi);
+				if (!status && linkstate) {
+				  uip_linkdown();
+				}
+				if (status && !linkstate) {
+				  uip_linkup();
+				}
+				linkstate = status;
+			}
+
+			if (++arp_timer == 100) {
+				uip_arp_timer();
+			}
+
+			if (++autoip_timer == 5) {
+				autoip_timer = 0;
+				autoip_periodic();
+				if (uip_len > 0) {
+					xtcp_tx_buffer(mac_tx);
+				}
+			}
+
+			xtcp_process_periodic_timer(mac_tx);
 			break;
 
 
@@ -148,8 +143,8 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 
             break;
 
-//		default:
-//			break;
+		default:
+			break;
 
         }
     }
@@ -164,9 +159,10 @@ void uipSingleServer(clock clk_smi,
                      char mac_address[6]) {
     chan cIn, cOut;
     chan notifications;
+	miiInitialise(clk_smi, p_mii_resetn, smi, mii);
     par {
-        miiDriver(clk_smi, p_mii_resetn, smi, mii, cIn, cOut, 0);
-        theServer(cIn, cOut, notifications, xtcp, num_xtcp, ipconfig, mac_address);
+    	miiDriver(mii, cIn, cOut);
+        theServer(cIn, cOut, notifications, clk_smi, smi, xtcp, num_xtcp, ipconfig, mac_address);
     }
 }
 

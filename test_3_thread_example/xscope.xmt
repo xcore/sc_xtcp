@@ -5,17 +5,6 @@
 <XtEventColors>
 <XtEventColor Id="0" R="211" G="63" B="118" KeyText="n"/>
 </XtEventColors>
-<TotalXtEvents Number="10"/>
-<XtEventRecords>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="0"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="1"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="2"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="3"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="4"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="5"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="6"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="7"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="8"/>
-<Record Type="0" Color="0" Start="0" End="0" PC="0" Core="stdcore[0]" Thread="0" User="9"/>
-</XtEventRecords>
+<TotalXtEvents Number="0"/>
+<XtEventRecords/>
 </XtEvents>

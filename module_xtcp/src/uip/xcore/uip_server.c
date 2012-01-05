@@ -32,6 +32,8 @@ extern void xtcpd_check_connection_poll(chanend mac_tx);
 extern void xtcp_tx_buffer(chanend mac_tx);
 extern void xtcp_process_incoming_packet(chanend mac_tx);
 extern void xtcp_process_udp_acks(chanend mac_tx);
+extern void xtcp_process_periodic_timer(chanend mac_tx);
+
 
 // Global variables from the uip_server_support file
 extern int uip_static_ip;
@@ -85,27 +87,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 
 		if (timer_expired(&periodic_timer)) {
 
-#if UIP_IGMP
-			igmp_periodic();
-			if(uip_len > 0) {
-				xtcp_tx_buffer(mac_tx);
-			}
-#endif
-			for (int i = 0; i < UIP_UDP_CONNS; i++) {
-				uip_udp_periodic(i);
-				if (uip_len > 0) {
-					uip_arp_out(&uip_udp_conns[i]);
-					xtcp_tx_buffer(mac_tx);
-				}
-			}
-
-			for (int i = 0; i < UIP_CONNS; i++) {
-				uip_periodic(i);
-				if (uip_len > 0) {
-					uip_arp_out( NULL);
-					xtcp_tx_buffer(mac_tx);
-				}
-			}
+			xtcp_process_periodic_timer(mac_tx);
 
 			timer_reset(&periodic_timer);
 		}

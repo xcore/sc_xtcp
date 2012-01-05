@@ -38,14 +38,20 @@ on stdcore[0]: mii_interface_t mii =
   };
 
 on stdcore[0]: port p_reset = PORT_SHARED_RS;
-on stdcore[0]: smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
+on stdcore[0]: smi_interface_t smi = { PORT_ETH_MDIO, PORT_ETH_MDC, 0 };
 on stdcore[0]: clock clk_smi = XS1_CLKBLK_5;
 
 
 xtcp_ipconfig_t ipconfig = {
+#if 0
 		{ 192, 168, 0, 10 }, // ip address (eg 192,168,0,2)
 		{ 255, 255, 255, 0 }, // netmask (eg 255,255,255,0)
 		{ 0, 0, 0, 0 } // gateway (eg 192,168,0,1)
+#else
+		{ 0, 0, 0, 0 },
+		{ 0, 0, 0, 0 },
+		{ 0, 0, 0, 0 }
+#endif
 };
 
 #define RX_BUFFER_SIZE 1200
