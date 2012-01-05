@@ -6,6 +6,7 @@
 #include <xs1.h>
 #include <xclib.h>
 #include <safestring.h>
+#include <print.h>
 
 #ifdef __xtcp_client_conf_h_exists__
 #include "xtcp_client_conf.h"
@@ -37,21 +38,32 @@ extern unsigned int uip_buf32[];
 
 // The transmit packet buffer
 static int txbuf[400];
+static int tx_buf_in_use=0;
 
-void
-xcoredev_send(chanend tx)
+void xcoredev_send(chanend tx)
 {
 	unsigned nWords = (uip_len+3)>>2;
-	for (unsigned i=0; i<nWords; ++i) txbuf[i] = uip_buf32[i];
-    miiOutPacket(tx, txbuf, 0, uip_len);
-    miiOutPacketDone(tx);
+	if (tx_buf_in_use) miiOutPacketDone(tx);
+	for (unsigned i=0; i<nWords; ++i) { txbuf[i] = uip_buf32[i]; }
+    miiOutPacket(tx, txbuf, 0, (uip_len<60)?60:uip_len);
+    tx_buf_in_use=1;
+}
+
+#pragma unsafe arrays
+void copy_packet(unsigned dst[], unsigned src, unsigned len)
+{
+	unsigned word_len = (len+3) >> 2;
+	unsigned d;
+	for (unsigned i=0; i<word_len; ++i)
+	{
+		asm( "ldw %0, %1[%2]" : "=r"(d) : "r"(src) , "r"(i) );
+		asm( "stw %0, %1[%2]" :: "r"(d) , "r"(dst) , "r"(i) );
+	}
 }
 
 static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 		chanend xtcp[], int num_xtcp, xtcp_ipconfig_t& ipconfig,
 		char mac_address[6]) {
-    //int havePacket = 0;
-    //int outBytes;
     int address, length, timeStamp;
 
 	timer tmr;
@@ -69,7 +81,6 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
     timeout += 10000000;
 
     while (1) {
-
 		xtcpd_service_clients(xtcp, num_xtcp);
 		xtcpd_check_connection_poll(mac_tx);
 		uip_xtcp_checkstate();
@@ -126,15 +137,19 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 			do {
 				{address,length,timeStamp} = miiGetInBuffer();
 				if (address != 0) {
+					static unsigned pcnt=1;
 					uip_len = length;
-					// copy the data
-					//xtcp_process_incoming_packet(mac_tx);
+					copy_packet(uip_buf32, address, length);
+					xtcp_process_incoming_packet(mac_tx);
+		            miiFreeInBuffer(address);
+		            miiRestartBuffer();
 				}
 			} while (address!=0);
+
             break;
 
-		default:
-			break;
+//		default:
+//			break;
 
         }
     }
