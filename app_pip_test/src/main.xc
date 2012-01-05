@@ -7,6 +7,7 @@
 #include "miiDriver.h"
 #include "mii.h"
 #include "pipServer.h"
+#include "tcpApplication.h"
 
 #define PORT_ETH_FAKE    XS1_PORT_8C
 
@@ -38,14 +39,18 @@ on stdcore[1]: smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
 
 on stdcore[1]: clock clk_smi = XS1_CLKBLK_5;
 
+static void httpServer(streaming chanend tcpStack) {
+    pipApplicationAccept(tcpStack, 0);
+    pipApplicationClose(tcpStack, 0);
+}
 
 int main(void) {
-	chan mac_rx[1], mac_tx[1], connect_status;
+	streaming chan tcpApps;
 
 	par
 	{
-	 	on stdcore[1]: pipServer(clk_smi, p_mii_resetn, smi, mii,
-                                       mac_rx[0], mac_tx[0], connect_status);
+	 	on stdcore[1]: pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
+	 	on stdcore[1]: httpServer(tcpApps);
     }
     return 0;
 }

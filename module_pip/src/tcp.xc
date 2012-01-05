@@ -7,9 +7,11 @@
 #include <xclib.h>
 #include <print.h>
 #include "tcp.h"
+#include "tcpApplication.h"
 #include "tx.h"
 #include "checksum.h"
 #include "ipv4.h"
+#include "timer.h"
 
 // RFC 793
 
@@ -92,6 +94,10 @@ static void goTimeWait(struct tcpConnection & conn) {
     }
 }
 
+void pipInitTCP() {
+    pipSetTimeOut(PIP_TCP_TIMER_TIMEWAIT, 0, 10*1000*100, 0); // 10 ms clock
+}
+
 void pipTimeoutTimewaitTCP() {
     for(int i = 0; i < TCPCONNECTIONS; i++) {
         switch(tcpConnections[i].state) {
@@ -106,6 +112,7 @@ void pipTimeoutTimewaitTCP() {
             break;
         }
     }
+    pipSetTimeOut(PIP_TCP_TIMER_TIMEWAIT, 0, 10*1000*100, 0); // 10 ms clock
 }
 
 void pipIncomingTCP(unsigned short packet[], int offset, int srcIP, int dstIP) {
@@ -313,25 +320,28 @@ static void doRead(struct tcpConnection &conn, streaming chanend app) {
     }
 }
 
+// Application interface to TCP, comes in two parts
+// 1) implemented on the Stack side. (1 function)
+// 2) implemented on the Application side. (series of functions)
+
 void pipApplicationTCP(streaming chanend app, int cmd) {
     int connectionNumber;
+    app :> connectionNumber;
     switch(cmd) {
     case PIP_TCP_ACCEPT:
-        app :> connectionNumber;
         setAppWaiting(tcpConnections[connectionNumber], app);
         break;
     case PIP_TCP_CLOSE:
-        app :> connectionNumber;
         doClose(tcpConnections[connectionNumber], app);
         break;
     case PIP_TCP_READ:
-        app :> connectionNumber;
         doRead(tcpConnections[connectionNumber], app);
         break;
     case PIP_TCP_WRITE:
         break;
     }
 }
+
 
 void pipApplicationAccept(streaming chanend stack, int connection) {
     stack <: PIP_TCP_ACCEPT;
@@ -344,6 +354,7 @@ void pipApplicationClose(streaming chanend stack, int connection) {
     stack <: connection;
     stack :> int ack;
 }
+
 #if 0
 
 #define HEADERS_LEN_TCP 54

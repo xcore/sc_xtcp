@@ -8,6 +8,7 @@
 #include "timer.h"
 #include "dhcp.h"
 #include "arp.h"
+#include "tcp.h"
 
 /* 
  * TImes are represented by a pair of numbers, an epoch and a time value.
@@ -48,6 +49,11 @@ static void numberZeroTimedOut() {
 #ifdef PIP_ARP
     case PIP_ARP_TIMER:
         pipArpTimeOut();
+        break;
+#endif
+#ifdef PIP_TCP
+    case PIP_TCP_TIMER_TIMEWAIT:
+        pipTimeoutTimewaitTCP();
         break;
 #endif
     }

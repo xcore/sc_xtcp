@@ -11,6 +11,7 @@
 #include "ipv4.h"
 #include "tx.h"
 #include "ethernet.h"
+#include "timer.h"
 
 struct arp pipArpTable[ARPENTRIES] = {
     {0xFFFFFFFF, {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 1, 0xff}},
@@ -22,6 +23,10 @@ static void macCopy(unsigned char to[], unsigned char from[], int offset) {
     for(int i = 0; i < 6; i++) {
         to[i] = from[i+offset];
     }
+}
+
+void pipInitARP() {
+    pipSetTimeOut(PIP_ARP_TIMER, 1, 0, 0); // 1 s clock
 }
 
 void pipARPStoreEntry(int ipAddress, unsigned char macAddress[], int offset) {
@@ -92,4 +97,5 @@ void pipArpTimeOut() {
             pipArpTable[i].macAddr[6] = 0;
         }
     }
+    pipSetTimeOut(PIP_ARP_TIMER, 1, 0, 0); // 1 s clock
 }

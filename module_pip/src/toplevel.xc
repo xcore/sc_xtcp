@@ -15,13 +15,12 @@
 #include "ethernet.h"
 #include "dhcp.h"
 #include "timer.h"
+#include "tcp.h"
+#include "arp.h"
 
 extern char notifySeen;
 
-short txbuf[400];
-static int txbufLength = 0;
-
-static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend appIn, chanend appOut) {
+static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streaming chanend tcpApps) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
     int b[3200];
@@ -33,17 +32,30 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
 
     t2 :> thetime;
 
+#ifdef PIP_ARP
+    pipInitARP();
+#endif
+
+#ifdef PIP_TCP
+    pipInitTCP();
+#endif
+
+#ifdef PIP_DHCP
     pipDhcpInit();
-    if (txbufLength != 0) {
-        miiOutPacket(cOut, (txbuf, int[]), 0, txbufLength);
-        miiOutPacketDone(cOut);
-        txbufLength = 0;
-    }
+    doTx(cOut);
+#endif
+
     while (1) {
+        int cmd;
         select {
         case pipTimeOut(t);
         case inuchar_byref(cNotifications, notifySeen):
             break;
+#ifdef PIP_TCP
+        case tcpApps :> cmd:
+            pipApplicationTCP(tcpApps,cmd);
+            break;
+#endif
         }
         if (!havePacket) {
             {a,nBytes,timeStamp} = miiGetInBuffer();
@@ -53,80 +65,20 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, chanend
                 miiRestartBuffer();
             }
         }
-        if (txbufLength != 0) {
-            if (txbufLength < 64) {
-                txbufLength = 64;
-            }
-            miiOutPacket(cOut, (txbuf, int[]), 0, txbufLength);
-            miiOutPacketDone(cOut);
-            txbufLength = 0;
-        }
+        doTx(cOut);
     } 
 }
 
-void txInt(int offset, int x) {
-    txbuf[offset] = x;
-    txbuf[offset+1] = x >> 16;
-    offset = offset * 2 + 4;
-    if (offset > txbufLength) txbufLength = offset;
-}
-
-void txShort(int offset, int x) {
-    txbuf[offset] = x;
-    offset = offset * 2 + 2;
-    if (offset > txbufLength) txbufLength = offset;
-}
-
-void txByte(int offset, int x) {
-    (txbuf, unsigned char[])[offset] = x;
-    offset = offset + 1;
-    if (offset > txbufLength) txbufLength = offset;
-}
-
-void txData(int offset, char data[], int dataOffset, int n) {
-    for(int i = 0; i < n; i++) {
-        (txbuf, unsigned char[])[i+offset*2] = data[i+dataOffset];
-    }
-    offset = offset * 2 + n;
-    if (offset > txbufLength) txbufLength = offset;
-}
-
-void txShortZeroes(int offset, int len) {
-    for(int i = 0; i < len; i++) {
-        txbuf[offset+i] = 0;
-    }
-    offset = (offset + len) * 2;
-    if (offset > txbufLength) txbufLength = offset;
-}
-
-void txClear() {
-    txbufLength = 0;
-}
-
-void txPrint() {
-    for(int i = 0; i < txbufLength; i++) {
-        printhex((txbuf, unsigned char[])[i]);
-        printstr(" ");
-        if ((i & 15) == 15) {
-            printstr("\n");
-        }
-    }
-    printstr("\n");
-}
-
-unsigned shortrev(unsigned x) {
-    return ((unsigned)byterev(x))>>16;
-}
 
 void pipServer(clock clk_smi,
                out port ?p_mii_resetn,
                smi_interface_t &smi,
                mii_interface_t &m,
-               chanend appIn, chanend appOut, chanend server) {
+               streaming chanend tcpApps) {
     chan cIn, cOut;
     chan notifications;
     par {
         miiDriver(clk_smi, p_mii_resetn, smi, m, cIn, cOut, 0);
-        theServer(cIn, cOut, notifications, appIn, appOut);
+        theServer(cIn, cOut, notifications, tcpApps);
     }
 }
