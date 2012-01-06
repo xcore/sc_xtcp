@@ -5,6 +5,13 @@
 
 #include <print.h>
 #include <xs1.h>
+
+#ifdef __xtcp_client_conf_h_exists__
+#include "xtcp_client_conf.h"
+#endif
+
+#ifndef UIP_USE_SINGLE_THREADED_ETHERNET
+
 #include "ethernet_rx_client.h"
 #include "ethernet_tx_client.h"
 #include "mac_custom_filter.h"
@@ -12,14 +19,10 @@
 extern unsigned short uip_len;
 extern unsigned int uip_buf32[];
 
-static unsigned char mac_addr[6];
-
 /*---------------------------------------------------------------------------*/
 void
 xcoredev_init(chanend rx, chanend tx)
 {
-  mac_get_macaddr(tx, mac_addr);
-
   // Configure the mac link to send the server anything
   // arp or ip
   mac_set_custom_filter(rx, MAC_FILTER_ARPIP);
@@ -58,3 +61,6 @@ xcoredev_send(chanend tx)
   }
 }
 /*---------------------------------------------------------------------------*/
+
+#endif
+

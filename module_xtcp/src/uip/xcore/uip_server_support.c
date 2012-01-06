@@ -9,8 +9,16 @@
 
 #include "uip.h"
 #include "uip_arp.h"
+#include "uip-split.h"
 #include "uip_xtcp.h"
 #include "autoip.h"
+
+// This is the buffer where TCP constructs its packets
+unsigned int uip_buf32[(UIP_BUFSIZE + 5) >> 2];
+u8_t *uip_buf = (u8_t *) &uip_buf32[0];
+
+#define BUF ((struct uip_eth_hdr *)&uip_buf[0])
+#define TCPBUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 #if UIP_LOGGING == 1
 void uip_log(char m[]) {
@@ -36,6 +44,11 @@ int uip_static_ip = 0;
 xtcp_ipconfig_t uip_static_ipconfig;
 
 static int dhcp_done = 0;
+
+void xtcp_tx_buffer(chanend mac_tx) {
+	uip_split_output(mac_tx);
+	uip_len = 0;
+}
 
 void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, unsigned char mac_address[6])
 {
@@ -98,11 +111,116 @@ void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, un
 		int hwsum = mac_address[0] + mac_address[1] + mac_address[2]
 				+ mac_address[3] + mac_address[4] + mac_address[5];
 		autoip_init(hwsum + (hwsum << 16) + (hwsum << 24));
-		dhcpc_init(mac_address, 6);
+		dhcpc_init(uip_ethaddr.addr, 6);
 		xtcpd_init(xtcp, num_xtcp);
 	}
 }
 
+static int needs_poll(xtcpd_state_t *s)
+{
+  return (s->s.connect_request | s->s.send_request | s->s.abort_request | s->s.close_request);
+}
+
+static int uip_conn_needs_poll(struct uip_conn *uip_conn)
+{
+  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_conn->appstate);
+  return needs_poll(s);
+}
+
+static int uip_udp_conn_needs_poll(struct uip_udp_conn *uip_udp_conn)
+{
+  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conn->appstate);
+  return needs_poll(s);
+}
+
+void xtcpd_check_connection_poll(chanend mac_tx)
+{
+	for (int i = 0; i < UIP_CONNS; i++) {
+		if (uip_conn_needs_poll(&uip_conns[i])) {
+			uip_poll_conn(&uip_conns[i]);
+			if (uip_len > 0) {
+				uip_arp_out( NULL);
+				xtcp_tx_buffer(mac_tx);
+			}
+		}
+	}
+
+	for (int i = 0; i < UIP_UDP_CONNS; i++) {
+		if (uip_udp_conn_needs_poll(&uip_udp_conns[i])) {
+			uip_udp_periodic(i);
+			if (uip_len > 0) {
+				uip_arp_out(&uip_udp_conns[i]);
+				xtcp_tx_buffer(mac_tx);
+			}
+		}
+	}
+}
+
+void xtcp_process_incoming_packet(chanend mac_tx)
+{
+	if (BUF->type == htons(UIP_ETHTYPE_IP)) {
+		uip_arp_ipin();
+		uip_input();
+		if (uip_len > 0) {
+			if (uip_udpconnection())
+				uip_arp_out( uip_udp_conn);
+			else
+				uip_arp_out( NULL);
+			xtcp_tx_buffer(mac_tx);
+		}
+	} else if (BUF->type == htons(UIP_ETHTYPE_ARP)) {
+		uip_arp_arpin();
+
+		if (uip_len > 0) {
+			xtcp_tx_buffer(mac_tx);
+		}
+		for (int i = 0; i < UIP_UDP_CONNS; i++) {
+			uip_udp_arp_event(i);
+			if (uip_len > 0) {
+				uip_arp_out(&uip_udp_conns[i]);
+				xtcp_tx_buffer(mac_tx);
+			}
+		}
+	}
+}
+
+void xtcp_process_udp_acks(chanend mac_tx)
+{
+	for (int i = 0; i < UIP_UDP_CONNS; i++) {
+		if (uip_udp_conn_has_ack(&uip_udp_conns[i])) {
+			uip_udp_ackdata(i);
+			if (uip_len > 0) {
+				uip_arp_out(&uip_udp_conns[i]);
+				xtcp_tx_buffer(mac_tx);
+			}
+		}
+	}
+}
+
+void xtcp_process_periodic_timer(chanend mac_tx)
+{
+#if UIP_IGMP
+	igmp_periodic();
+	if(uip_len > 0) {
+		xtcp_tx_buffer(mac_tx);
+	}
+#endif
+	for (int i = 0; i < UIP_UDP_CONNS; i++) {
+		uip_udp_periodic(i);
+		if (uip_len > 0) {
+			uip_arp_out(&uip_udp_conns[i]);
+			xtcp_tx_buffer(mac_tx);
+		}
+	}
+
+	for (int i = 0; i < UIP_CONNS; i++) {
+		uip_periodic(i);
+		if (uip_len > 0) {
+			uip_arp_out( NULL);
+			xtcp_tx_buffer(mac_tx);
+		}
+	}
+}
 
 void dhcpc_configured(const struct dhcpc_state *s) {
 #ifdef XTCP_VERBOSE_DEBUG

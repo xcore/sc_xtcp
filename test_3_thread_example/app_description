@@ -1,0 +1,11 @@
+This demonstrates the TCP server being used with the two thread ethernet implementation.  The
+thread assignment is:
+
+- TCP server thread
+- Ethernet service thread
+- Ethernet MII thread
+
+
+See the app_2_thread_example for a two thread version of ethernet+TCP
+
+
