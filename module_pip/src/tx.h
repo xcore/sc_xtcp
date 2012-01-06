@@ -86,9 +86,10 @@ void txClear();
  */
 void txPrint();
 
-extern short txbuf[];      // THis is not good - for checksum only. TODO.
-
 /** Function that passes the current packet onto the MII layer and waits
  * for it to be transmitted.
  */
 void doTx(chanend cOut);
+
+
+extern short txbuf[];      // THis is not good - for checksum only. TODO.

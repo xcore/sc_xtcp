@@ -56,7 +56,7 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
 
 #if defined(PIP_TCP)
     if (ipType == PIP_IPTYPE_TCP) {
-        pipIncomingTCP(packet, contentOffset, srcIP, dstIP);
+        pipIncomingTCP(packet, contentOffset, srcIP, dstIP, totalLength - 4 * headerLength);
         return;
     }
 #endif

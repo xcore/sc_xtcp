@@ -16,8 +16,11 @@
  *
  * \param dstIP  Destination IP address from IP header (the address of this
  *               host if all is well, or some sort of multicast address), in host order.
+ *
+ * \param length Number of bytes of IPv4 payload, that is the total length of TCP header
+ *               and TCP data.
  */
-void pipIncomingTCP(unsigned short packet[], int offset, int srcIP, int dstIP);
+void pipIncomingTCP(unsigned short packet[], int offset, int srcIP, int dstIP, int length);
 
 /** Function that initialises the TCP stack. To be called once prior to
  * calling any other functions. It sets up the various timers needed to

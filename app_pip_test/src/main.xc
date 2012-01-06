@@ -4,6 +4,7 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #include <platform.h>
+#include <print.h>
 #include "miiDriver.h"
 #include "mii.h"
 #include "pipServer.h"
@@ -40,8 +41,42 @@ on stdcore[1]: smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
 on stdcore[1]: clock clk_smi = XS1_CLKBLK_5;
 
 static void httpServer(streaming chanend tcpStack) {
-    pipApplicationAccept(tcpStack, 0);
-    pipApplicationClose(tcpStack, 0);
+    unsigned char buf[12];
+    int l, total;
+    timer t;
+    int t0, t1;
+    while(1) {
+        total = 0;
+        pipApplicationAccept(tcpStack, 0);
+        l = pipApplicationRead(tcpStack, 0, buf, 10);
+        t :> t0;
+        while(l = pipApplicationRead(tcpStack, 0, buf, 10)) {
+            total += l;
+            buf[l] = '.';
+            buf[l+1] = 0;
+            printstr(buf);
+            pipApplicationWrite(tcpStack, 0, buf, l);
+        t :> t0;
+            for(int i = 0; i < 1000; i++) {
+                pipApplicationWrite(tcpStack, 0, "==========\r\n=        =\r\n=        =\r\n=        =\r\n==========\r\n", 60);
+            }
+        t :> t1;
+                printstr("Sent 60000 bytes in ");
+                printint((t1-t0)/100);
+                printstr(" us");
+#if 0
+            if (total > 1000) {
+                t :> t1;
+                printstr("Received ");
+                printint(total);
+                printstr(" bytes in ");
+                printint((t1-t0)/100);
+                printstr(" us");
+            }
+#endif
+        }
+        pipApplicationClose(tcpStack, 0);
+    }
 }
 
 int main(void) {
