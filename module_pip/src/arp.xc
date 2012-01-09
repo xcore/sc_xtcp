@@ -89,7 +89,7 @@ void pipIncomingARP(unsigned short packet[], int offset) {
 }
 
 // TODO: initialise timeout, and repeat timeout of ARP entries.
-void pipArpTimeOut() {
+void pipTimeOutARP() {
     for(int i = 1; i < ARPENTRIES; i++) {
         if (pipArpTable[i].macAddr[7] > 0) {
             pipArpTable[i].macAddr[7]--;

@@ -41,7 +41,7 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
 #endif
 
 #ifdef PIP_DHCP
-    pipDhcpInit();
+    pipInitDHCP();
     doTx(cOut);
 #endif
 

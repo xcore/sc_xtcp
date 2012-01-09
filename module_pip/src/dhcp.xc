@@ -26,7 +26,7 @@ unsigned getIntUnaligned(unsigned short packet[], int offset) {
     return x;
 }
 
-void pipDhcpCreate(int firstMessage,
+void pipCreateDHCP(int firstMessage,
                   unsigned proposedIP,
                   unsigned serverIP) {
     int length = 244;
@@ -99,7 +99,7 @@ void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         i += (packet, unsigned char[])[i+1] + 2;
     }
     if (messageType == 2) {
-        pipDhcpCreate(0, proposedIP, serverIP);
+        pipCreateDHCP(0, proposedIP, serverIP);
     } else if (messageType == 5) {
         if (renewalTime == 0) {
             renewalTime = (leaseTime >> 1);
@@ -115,21 +115,21 @@ void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
 }
 
 
-void pipDhcpInit() {
+void pipInitDHCP() {
     timer t;
     t :> xid;
     myIP = 0;
     mySubnetIP = 0;
-    pipDhcpCreate(1, 0, 0);
+    pipCreateDHCP(1, 0, 0);
     pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, 1);
     interval *= 2;
 }
 
-void pipDhcpTimeOutT1() {
-    pipDhcpCreate(0, myIP, serverIP);
+void pipTimeOutDHCPT1() {
+    pipCreateDHCP(0, myIP, serverIP);
 }
 
-void pipDhcpTimeOutT2() {
-    pipDhcpInit();
+void pipTimeOutDHCPT2() {
+    pipInitDHCP();
 }
 

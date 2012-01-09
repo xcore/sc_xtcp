@@ -31,7 +31,7 @@ void pipInitTCP();
 /** Function to be called when the Timewait-timer expires. Normally called
  * from the main timer.
  */
-void pipTimeoutTimewaitTCP();
+void pipTimeoutTCPTimewait();
 
 /** Function to be called to process an application request to the TCP
  * stack. The streaming channel end connects to the application. THis

@@ -40,20 +40,20 @@ static void numberZeroTimedOut() {
     switch(timerNumber) {
 #ifdef PIP_DHCP
     case PIP_DHCP_TIMER_T1:
-        pipDhcpTimeOutT1();
+        pipTimeOutDHCPT1();
         break;
     case PIP_DHCP_TIMER_T2:
-        pipDhcpTimeOutT2();
+        pipTimeOutDHCPT2();
         break;
 #endif
 #ifdef PIP_ARP
     case PIP_ARP_TIMER:
-        pipArpTimeOut();
+        pipTimeOutARP();
         break;
 #endif
 #ifdef PIP_TCP
     case PIP_TCP_TIMER_TIMEWAIT:
-        pipTimeoutTimewaitTCP();
+        pipTimeoutTCPTimewait();
         break;
 #endif
     }
