@@ -1,14 +1,11 @@
 import socket,sys,time,random,struct
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-sock.connect((sys.argv[1], 100))
-
-print "Connected"
-
 n = 0
 
 for i in range(0,99999):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.connect((sys.argv[1], 101))
+
     msg = struct.pack('I', n)
 
     for j in range(0,300):

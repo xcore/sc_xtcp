@@ -17,7 +17,7 @@ for i in range(0,99999):
     sock.send(msg[0:])
 
     n = n + 1
-    #time.sleep(2.0)
+    time.sleep(2.0)
 
 print "Done"
 sock.close()

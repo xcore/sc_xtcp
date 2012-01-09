@@ -1,8 +1,7 @@
 import socket,sys,time,random,struct
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-sock.connect((sys.argv[1], 100))
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect((sys.argv[1], 102))
 
 print "Connected"
 
