@@ -48,7 +48,6 @@ static void httpServer(streaming chanend tcpStack) {
     while(1) {
         total = 0;
         pipApplicationAccept(tcpStack, 0);
-        l = pipApplicationRead(tcpStack, 0, buf, 10);
         t :> t0;
         while(l = pipApplicationRead(tcpStack, 0, buf, 10)) {
             total += l;
@@ -57,8 +56,9 @@ static void httpServer(streaming chanend tcpStack) {
             printstr(buf);
             pipApplicationWrite(tcpStack, 0, buf, l);
         t :> t0;
-            for(int i = 0; i < 1000; i++) {
-                pipApplicationWrite(tcpStack, 0, "==========\r\n=        =\r\n=        =\r\n=        =\r\n==========\r\n", 60);
+            for(int i = 0; i < 5; i++) {
+//                pipApplicationWrite(tcpStack, 0, "==========\r\n=        =\r\n=        =\r\n=        =\r\n==========\r\n", 60);
+                pipApplicationWrite(tcpStack, 0, "0123456789abcdefg\r\n", 19);
             }
         t :> t1;
                 printstr("Sent 60000 bytes in ");

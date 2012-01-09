@@ -24,7 +24,8 @@
 
 #define TCPCONNECTIONS 10
 
-#define BUFFERSIZE   512
+//#define BUFFERSIZE   512
+#define BUFFERSIZE   16
 
 struct queue {
     int rd, wr, free, length;
