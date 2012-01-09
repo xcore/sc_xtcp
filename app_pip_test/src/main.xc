@@ -56,9 +56,9 @@ static void httpServer(streaming chanend tcpStack) {
             printstr(buf);
             pipApplicationWrite(tcpStack, 0, buf, l);
         t :> t0;
-            for(int i = 0; i < 5; i++) {
-//                pipApplicationWrite(tcpStack, 0, "==========\r\n=        =\r\n=        =\r\n=        =\r\n==========\r\n", 60);
-                pipApplicationWrite(tcpStack, 0, "0123456789abcdefg\r\n", 19);
+            for(int i = 0; i < 1000; i++) {
+                pipApplicationWrite(tcpStack, 0, "==========\r\n=        =\r\n=        =\r\n=        =\r\n==========\r\n", 60);
+//                pipApplicationWrite(tcpStack, 0, "0123456789abcdefg\r\n", 19);
             }
         t :> t1;
                 printstr("Sent 60000 bytes in ");

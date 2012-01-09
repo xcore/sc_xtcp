@@ -24,8 +24,7 @@
 
 #define TCPCONNECTIONS 10
 
-//#define BUFFERSIZE   512
-#define BUFFERSIZE   16
+#define BUFFERSIZE   1024
 
 struct queue {
     int rd, wr, free, length;
@@ -275,6 +274,9 @@ static void loadOutgoingData(struct tcpConnection &conn) {
     conn.outgoingSequenceNumber += i;
 }
 
+int lextra = 0;
+int lack = 0;
+
 void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, unsigned dstIP, unsigned totalLength) {
     int srcPortRev        = packet[offset+0];
     int dstPortRev        = packet[offset+1];
@@ -387,12 +389,15 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
             int newAckNumber = byterev(ackNumberRev);
             int extraBytes = newAckNumber - tcpConnections[opened].incomingAckLast;
             // TODO: check on ack and reject if not in range.
+            lack = tcpConnections[opened].incomingAckLast;
+            lextra = extraBytes;
             tcpConnections[opened].incomingAckLast = newAckNumber;
             tcpConnections[opened].tx.free += extraBytes;
             if (tcpConnections[opened].tx.free == extraBytes) {
                 if (tcpConnections[opened].appStatus == APP_WRITING) {
                     copyDataFromWrite2(tcpConnections[opened], tcpConnections[opened].appWaiting);
                     tcpConnections[opened].appStatus = APP_NOT_WAITING;
+                    loadOutgoingData(tcpConnections[opened]);
                 }
             }
 
@@ -643,7 +648,7 @@ int pipApplicationRead(streaming chanend stack, unsigned connection,
 
 int pipApplicationWrite(streaming chanend stack, unsigned connection,
                        unsigned char buffer[], unsigned maxBytes) {
-    int ack, actualBytes, bytesWritten = 0;
+    int ack, actualBytes, bytesWritten = 0, start = 0;
     while(maxBytes > 0) {
         stack <: PIP_TCP_WRITE;
         stack <: connection;
@@ -661,10 +666,11 @@ int pipApplicationWrite(streaming chanend stack, unsigned connection,
             stack <: maxBytes;
             stack :> actualBytes;
             for(int i = 0; i < actualBytes; i++) {
-                stack <: buffer[i];
+                stack <: buffer[start + i];
             }
             maxBytes -= actualBytes;
             bytesWritten += actualBytes;
+            start += actualBytes;
             break;
         case PIP_TCP_ERROR_CT:
             return -1;
