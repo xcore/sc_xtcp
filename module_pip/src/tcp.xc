@@ -264,7 +264,7 @@ static void loadOutgoingData(struct tcpConnection &conn) {
     conn.streamSequenceNumber += i;
 }
 
-void pipIncomingTCP(unsigned short packet[], int offset, int srcIP, int dstIP, int totalLength) {
+void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, unsigned dstIP, unsigned totalLength) {
     int srcPortRev        = packet[offset+0];
     int dstPortRev        = packet[offset+1];
     int sequenceNumberRev = packet[offset+3]<<16 | packet[offset+2];
@@ -277,6 +277,7 @@ void pipIncomingTCP(unsigned short packet[], int offset, int srcIP, int dstIP, i
 
     int opened = -1;
     int openable = -1;
+
     for(int i = 0; i < TCPCONNECTIONS; i++) {
         if (dstPortRev == tcpConnections[i].dstPortRev) {
             if (tcpConnections[i].opened &&
@@ -573,22 +574,22 @@ void pipApplicationTCP(streaming chanend app, int cmd) {
 }
 
 
-void pipApplicationAccept(streaming chanend stack, int connection) {
+void pipApplicationAccept(streaming chanend stack, unsigned connection) {
     int ack;
     stack <: PIP_TCP_ACCEPT;
     stack <: connection;
     ack = sinct(stack);
 }
 
-void pipApplicationClose(streaming chanend stack, int connection) {
+void pipApplicationClose(streaming chanend stack, unsigned connection) {
     int ack;
     stack <: PIP_TCP_CLOSE;
     stack <: connection;
     ack = sinct(stack);
 }
 
-int pipApplicationRead(streaming chanend stack, int connection,
-                       unsigned char buffer[], int maxBytes) {
+int pipApplicationRead(streaming chanend stack, unsigned connection,
+                       unsigned char buffer[], unsigned maxBytes) {
     int ack, actualBytes;
     stack <: PIP_TCP_READ;
     stack <: connection;
@@ -619,8 +620,8 @@ int pipApplicationRead(streaming chanend stack, int connection,
     return -1;
 }
 
-int pipApplicationWrite(streaming chanend stack, int connection,
-                       unsigned char buffer[], int maxBytes) {
+int pipApplicationWrite(streaming chanend stack, unsigned connection,
+                       unsigned char buffer[], unsigned maxBytes) {
     int ack, actualBytes, bytesWritten = 0;
     while(maxBytes > 0) {
         stack <: PIP_TCP_WRITE;

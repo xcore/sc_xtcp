@@ -29,7 +29,7 @@ void pipInitARP() {
     pipSetTimeOut(PIP_ARP_TIMER, 1, 0, 0); // 1 s clock
 }
 
-void pipARPStoreEntry(int ipAddress, unsigned char macAddress[], int offset) {
+void pipARPStoreEntry(unsigned ipAddress, unsigned char macAddress[], unsigned offset) {
     int min = pipArpTable[1].macAddr[7];
     int minEntry = 1;
     for(int i = 1; i < ARPENTRIES; i++) {
@@ -57,8 +57,8 @@ void pipARPStoreEntry(int ipAddress, unsigned char macAddress[], int offset) {
 }
 
 
-void pipCreateARP(int reply, int tpa, unsigned char tha[], int offset) {
-    int zero = 7;
+void pipCreateARP(unsigned reply, unsigned tpa, unsigned char tha[], unsigned offset) {
+    unsigned zero = 7;
     txInt(32, 0);
     txInt(zero, 0x00080100);  // Fill in hw type (1) and proto type (0x800)
     txInt(zero+2, 0x01000406 + reply * 0x01000000);  // Fill in hw size, proto size
@@ -69,11 +69,10 @@ void pipCreateARP(int reply, int tpa, unsigned char tha[], int offset) {
     pipOutgoingEthernet(tha, offset, PIP_ETHTYPE_ARP_REV);
 }
 
-void pipIncomingARP(unsigned short packet[], int offset) {
+void pipIncomingARP(unsigned short packet[], unsigned offset) {
     int oper = packet[offset + 3];
-    int tpa = getIntUnaligned(packet, 2*offset + 24);
-    int spa = getIntUnaligned(packet, 2*offset + 14);
-    int localAddress; // TODO.
+    unsigned tpa = getIntUnaligned(packet, 2*offset + 24);
+    unsigned spa = getIntUnaligned(packet, 2*offset + 14);
 
     if (oper == 256) {             // REQUEST
         if (tpa == myIP) {         // for us.

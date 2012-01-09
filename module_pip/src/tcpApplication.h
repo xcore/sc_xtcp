@@ -11,7 +11,7 @@
  * \param connection Number of the connection to accept on.
  *
  */
-void pipApplicationAccept(streaming chanend stack, int connection);
+void pipApplicationAccept(streaming chanend stack, unsigned connection);
 
 /** Function that an application can call close a TCP stream. The streams
  * are pre-allocated and numbered.
@@ -21,9 +21,7 @@ void pipApplicationAccept(streaming chanend stack, int connection);
  * \param connection Number of the connection to close.
  *
  */
-void pipApplicationClose(streaming chanend stack, int connection);
-
-
+void pipApplicationClose(streaming chanend stack, unsigned connection);
 
 /** Function that an application can call to read from a TCP stream. The streams
  * are pre-allocated and numbered. The function blocks if there is no data available,
@@ -38,8 +36,8 @@ void pipApplicationClose(streaming chanend stack, int connection);
  * \param maxBytes   Maximum number of bytes to read.
  *
  */
-int pipApplicationRead(streaming chanend stack, int connection,
-                       unsigned char buffer[], int maxBytes);
+int pipApplicationRead(streaming chanend stack, unsigned connection,
+                       unsigned char buffer[], unsigned maxBytes);
 
 /** Function that an application can call to write to a TCP stream. The
  * streams are pre-allocated and numbered. The function blocks until either
@@ -54,7 +52,7 @@ int pipApplicationRead(streaming chanend stack, int connection,
  * \param nBytes     Number of bytes to write.
  *
  * \returns The number of bytes transmitted. Normally nBytes, unless the
- * TCP stream was prematurely closed.
+ * TCP stream was prematurely closed, in which case a partial number is returned.
  */
-int pipApplicationWrite(streaming chanend stack, int connection,
-                       unsigned char buffer[], int nBytes);
+int pipApplicationWrite(streaming chanend stack, unsigned connection,
+                       unsigned char buffer[], unsigned nBytes);

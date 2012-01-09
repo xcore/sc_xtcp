@@ -17,7 +17,21 @@
  * \param dstIP  Destination IP address from IP header (the address of this
  *               host if all is well, or some sort of multicast address), in host order.
  */
-void pipIncomingUDP(unsigned short packet[], int offset, int srcIP, int dstIP);
+void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned srcIP, unsigned dstIP);
 
-
-void pipOutgoingUDP(int ipDst, int srcPort, int dstPort, int length);
+/** Function that prepends a UDP header in front of the current packet. The
+ * UDP header will transmit to the given IP address and port, from the
+ * given source port. The UDP packet contains length data bytes (note this
+ * excludes the header, so pass 0 for an empty datagram). Note that if no
+ * ARP entry is present, the current packet id destroyed and an ARP packet
+ * is sent instead.
+ *
+ * \param dstIP   Destination IP address, in host order.
+ *
+ * \param srcPort Port number where the data came from
+ *
+ * \param dstPort Port number where the data goes to
+ *
+ * \param length  number of bytes in the datagram
+ */
+void pipOutgoingUDP(unsigned dstIP, unsigned srcPort, unsigned dstPort, unsigned length);

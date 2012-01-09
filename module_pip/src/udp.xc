@@ -13,20 +13,18 @@
 
 // RFC 0768
 
-void pipIncomingUDP(unsigned short packet[], int offset, int srcIP, int dstIP) {
-
-    int srcPort =     byterev(packet[offset+0]) >> 16;
+void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned srcIP, unsigned dstIP) {
+    // int srcPort =     byterev(packet[offset+0]) >> 16;  // Not used at present
     int dstPort =     byterev(packet[offset+1]) >> 16;
     int totalLength = byterev(packet[offset+2]) >> 16;
     int chkSum;
-    // ignore +3, it is the checksum.
     
     chkSum = onesChecksum(0x0011 + totalLength + onesAdd(srcIP, dstIP),
                           packet, offset, totalLength);
     if (chkSum != 0) {
         printstr("Bad checksum ");
         printhexln(chkSum);
-//        return; /* bad chksum */ TODO
+        return; /* ignore packet with bad chksum */
     }
 
     
@@ -34,13 +32,13 @@ void pipIncomingUDP(unsigned short packet[], int offset, int srcIP, int dstIP) {
 
 #if defined(PIP_DHCP)
     if (dstPort == 0x0044) {
-        pipDhcpIncoming(packet, srcIP, dstIP, offset + 4, totalLength - 8);
+        pipIncomingDHCP(packet, srcIP, dstIP, offset + 4, totalLength - 8);
     }
 #endif
 
 }
 
-void pipOutgoingUDP(int dstIP, int srcPort, int dstPort, int length) {
+void pipOutgoingUDP(unsigned dstIP, unsigned srcPort, unsigned dstPort, unsigned length) {
     int totalLength = length + 8;
     int chkSum;
     txShort(17, shortrev(srcPort));             // Store source port

@@ -17,7 +17,7 @@ void pipInitDHCP();
  *
  * \param length length of the total packet in bytes.
  */
-void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, int offset, int length);
+void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, int offset, int length);
 
 /** Function that creates a DHCP message.
  * 

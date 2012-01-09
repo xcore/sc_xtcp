@@ -6,7 +6,7 @@
 #define ARPENTRIES 10
 
 struct arp {
-    int ipAddress;
+    unsigned int  ipAddress;
     unsigned char macAddr[8];     // last two bytes are flags
 };
 
@@ -24,7 +24,7 @@ void pipInitARP();
  * 
  * \param offset points to the ARP header in the packet.
  */
-void pipIncomingARP(unsigned short packet[], int offset);
+void pipIncomingARP(unsigned short packet[], unsigned offset);
 
 /** Function that is called to signal a timeout on ARP - typically to
  * remove some ARP entries. Called from timer.xc, set by pipInitARP() and
@@ -45,7 +45,7 @@ void pipTimeOutARP();
  * \param offset     start index of address inside the macAddress
  *                   array
  */
-void pipCreateARP(int reply, int ipAddress, unsigned char macAddress[], int offset);
+void pipCreateARP(unsigned reply, unsigned ipAddress, unsigned char macAddress[], unsigned offset);
 
 /** Function that stores an arp entry
  *
@@ -57,4 +57,4 @@ void pipCreateARP(int reply, int ipAddress, unsigned char macAddress[], int offs
  * \param offset     start index of address inside the macAddress
  *                   array
  */
-void pipARPStoreEntry(int ipAddress, unsigned char macAddress[], int offset);
+void pipARPStoreEntry(unsigned ipAddress, unsigned char macAddress[], unsigned offset);

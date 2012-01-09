@@ -58,7 +58,7 @@ void pipCreateDHCP(int firstMessage,
     pipOutgoingUDP(0xFFFFFFFF, DHCP_CLIENT_PORT, DHCP_SERVER_PORT, length);
 }
 
-void pipDhcpIncoming(unsigned short packet[], unsigned srcIP, unsigned dstIP, int offset, int length) {
+void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, int offset, int length) {
     unsigned leaseTime;
     unsigned renewalTime;
     unsigned rebindTime;
