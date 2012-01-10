@@ -13,6 +13,11 @@ The stack is based on the open-source stack uIP with modifications to
 work efficiently on XMOS architecture and communicate between threads
 using XC channels.
 
+The TCP stack interfaces to the 5-thread XMOS ethernet stack via a pair
+of channels.  Alternatively, an integrated 2-thread Ethernet plus TCP/IP
+is available for use in resource limited applications.
+
+
 Component Summary
 +++++++++++++++++
 

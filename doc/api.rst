@@ -53,6 +53,8 @@ Server API
 
 .. doxygenfunction:: uip_server
 
+.. doxygenfunction:: uipSingleServer
+
 .. _sec_client_api:
 
 Client API
