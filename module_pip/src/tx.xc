@@ -26,39 +26,44 @@ void doTx(chanend cOut) {
     }
 }
 
+void adjustBufLength(int offset) {
+    if (offset > txbufLength) {
+        txbufLength = offset;
+    }
+}
+
 void txInt(int offset, int x) {
     txbuf[offset] = x;
     txbuf[offset+1] = x >> 16;
-    offset = offset * 2 + 4;
-    if (offset > txbufLength) txbufLength = offset;
+    adjustBufLength(offset * 2 + 4);
 }
 
 void txShort(int offset, int x) {
     txbuf[offset] = x;
-    offset = offset * 2 + 2;
-    if (offset > txbufLength) txbufLength = offset;
+    adjustBufLength(offset * 2 + 2);
+}
+
+void txShortRev(int offset, int x) {
+    txShort(offset, ((unsigned)byterev(x))>>16);
 }
 
 void txByte(int offset, int x) {
     (txbuf, unsigned char[])[offset] = x;
-    offset = offset + 1;
-    if (offset > txbufLength) txbufLength = offset;
+    adjustBufLength(offset + 1);
 }
 
 void txData(int offset, char data[], int dataOffset, int n) {
     for(int i = 0; i < n; i++) {
         (txbuf, unsigned char[])[i+offset*2] = data[i+dataOffset];
     }
-    offset = offset * 2 + n;
-    if (offset > txbufLength) txbufLength = offset;
+    adjustBufLength(offset * 2 + n);
 }
 
 void txShortZeroes(int offset, int len) {
     for(int i = 0; i < len; i++) {
         txbuf[offset+i] = 0;
     }
-    offset = (offset + len) * 2;
-    if (offset > txbufLength) txbufLength = offset;
+    adjustBufLength((offset + len) * 2);
 }
 
 void txClear() {
@@ -76,6 +81,3 @@ void txPrint() {
     printstr("\n");
 }
 
-unsigned shortrev(unsigned x) {
-    return ((unsigned)byterev(x))>>16;
-}

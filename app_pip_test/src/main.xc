@@ -7,6 +7,7 @@
 #include <print.h>
 #include "miiDriver.h"
 #include "mii.h"
+//#include "xscope.h"
 #include "pipServer.h"
 #include "tcpApplication.h"
 
@@ -54,9 +55,10 @@ static void httpServer(streaming chanend tcpStack) {
             buf[l] = '.';
             buf[l+1] = 0;
             printstr(buf);
+            if (l & 1) break;
             pipApplicationWrite(tcpStack, 0, buf, l);
         t :> t0;
-            for(int i = 0; i < 1000; i++) {
+            for(int i = 0; i < 1 + 0 * 1000; i++) {
                 pipApplicationWrite(tcpStack, 0, "==========\r\n=        =\r\n=        =\r\n=        =\r\n==========\r\n", 60);
 //                pipApplicationWrite(tcpStack, 0, "0123456789abcdefg\r\n", 19);
             }

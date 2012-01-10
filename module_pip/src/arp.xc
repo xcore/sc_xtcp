@@ -9,6 +9,7 @@
 #include <xclib.h>
 #include "arp.h"
 #include "ipv4.h"
+#include "rx.h"
 #include "tx.h"
 #include "ethernet.h"
 #include "timer.h"
@@ -17,7 +18,6 @@ struct arp pipArpTable[ARPENTRIES] = {
     {0xFFFFFFFF, {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 1, 0xff}},
 };
 
-extern unsigned getIntUnaligned(unsigned short packet[], int offset);
 
 static void macCopy(unsigned char to[], unsigned char from[], int offset) {
     for(int i = 0; i < 6; i++) {
@@ -37,9 +37,6 @@ void pipARPStoreEntry(unsigned ipAddress, unsigned char macAddress[], unsigned o
             macCopy(pipArpTable[i].macAddr, macAddress, offset);
             pipArpTable[i].macAddr[6] = 1;
             pipArpTable[i].macAddr[7] = 0xfe;
-//            printstr("Refreshed ARP ");
-//            printintln(i);
-//            printhexln(ipAddress);
             return;
         }
         if (pipArpTable[i].macAddr[7] < min) {
@@ -51,9 +48,6 @@ void pipARPStoreEntry(unsigned ipAddress, unsigned char macAddress[], unsigned o
     macCopy(pipArpTable[minEntry].macAddr, macAddress, offset);
     pipArpTable[minEntry].macAddr[6] = 1;
     pipArpTable[minEntry].macAddr[7] = 0xfe;
-    printstr("Added ARP ");
-    printintln(minEntry);
-    printhexln(ipAddress);
 }
 
 
@@ -81,9 +75,6 @@ void pipIncomingARP(unsigned short packet[], unsigned offset) {
         }
     } else if (oper == 512) {      // REPLY
         pipARPStoreEntry(spa, (packet, unsigned char[]), 2*offset + 8);
-    } else {
-        printstr("Unkown arp ");
-        printintln(oper);
     }
 }
 

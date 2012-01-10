@@ -1,7 +1,6 @@
-TARGET = XP-DSC-BLDC
+TARGET = XP-ETHERNET-TEST
 APP_NAME =
-XCC_FLAGS = -Os -g -report -lxscope \
-            -DPIP_ICMP -DPIP_DHCP -DPIP_UDP -DPIP_ARP -DPIP_TCP
+XCC_FLAGS = -Os -g -report -DPIP_DHCP -DPIP_UDP -DPIP_ARP
 USED_MODULES = module_pip module_mii_singlethread
 
 

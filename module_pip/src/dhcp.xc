@@ -1,6 +1,7 @@
 #include <xclib.h>
 #include <print.h>
 #include "dhcp.h"
+#include "rx.h"
 #include "tx.h"
 #include "udp.h"
 #include "ethernet.h"
@@ -15,17 +16,6 @@ static int interval = 4;
 
 unsigned myIP, serverIP, mySubnetIP;
 
-// TODO: share with other files.
-// TODO: make all unaligned - saves code.
-
-unsigned getIntUnaligned(unsigned short packet[], int offset) {
-    unsigned x = (packet, unsigned char[])[offset] << 24 |
-        (packet, unsigned char[])[offset+1] << 16 |
-        (packet, unsigned char[])[offset+2] << 8 |
-        (packet, unsigned char[])[offset+3] << 0;
-    return x;
-}
-
 void pipCreateDHCP(int firstMessage,
                   unsigned proposedIP,
                   unsigned serverIP) {
@@ -39,7 +29,7 @@ void pipCreateDHCP(int firstMessage,
 
     txInt(zero, 0x00060102);             // Fill Hop, Hlen, HType, OP.
     txInt(zero + 2, xid);                // Fill XID
-    txShort(zero + 4, shortrev(seconds));// Seconds since we started
+    txShortRev(zero + 4, seconds);       // Seconds since we started
     txShort(zero + 5, 0x0080);           // Flags: broadcase
     txShortZeroes(zero + 6, 112);        // Set all addr values to 0, chaddr, sname, file
     txData(zero+14, myMacAddress, 0, 6);   // FIll in mac address
@@ -65,18 +55,11 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
     unsigned proposedIP;
     unsigned subnet, messageType;
 
-    if (packet[offset+118] != 0x8263 ||
-        packet[offset+119] != 0x6353) {
-        printstr("Illegal magic number ");
-        printhexln(packet[offset+118]);
-        printhexln(packet[offset+119]);
-        return;
+    if (packet[offset+118] != 0x8263 || packet[offset+119] != 0x6353) {
+        return;                                  // incorrect magic cookie
     }
     if ((packet[offset+2] | packet[offset+3]<<16) != xid) {
-        printstr("Illegal XID ");
-        printhexln(packet[offset+2] | packet[offset+3]<<16);
-        printhexln(xid);
-        return;
+        return;                                  // incorrect XID
     }
     proposedIP = getIntUnaligned(packet, offset*2 + 16);
     subnet = 0;
@@ -111,6 +94,7 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, 1);
         myIP = proposedIP;
         mySubnetIP = subnet;
+        printstr("Got an IP address\n");
     }
 }
 

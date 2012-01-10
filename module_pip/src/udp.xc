@@ -22,11 +22,8 @@ void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned srcIP, un
     chkSum = onesChecksum(0x0011 + totalLength + onesAdd(srcIP, dstIP),
                           packet, offset, totalLength);
     if (chkSum != 0) {
-        printstr("Bad checksum ");
-        printhexln(chkSum);
         return; /* ignore packet with bad chksum */
     }
-
     
     // Check destination port, set packet ready for appropriate packet handler.
 
@@ -41,9 +38,9 @@ void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned srcIP, un
 void pipOutgoingUDP(unsigned dstIP, unsigned srcPort, unsigned dstPort, unsigned length) {
     int totalLength = length + 8;
     int chkSum;
-    txShort(17, shortrev(srcPort));             // Store source port
-    txShort(18, shortrev(dstPort));             // Store source port
-    txShort(19, shortrev(totalLength));         // Total length, including header.
+    txShortRev(17, srcPort);               // Store source port
+    txShortRev(18, dstPort);               // Store source port
+    txShortRev(19, totalLength);           // Total length, including header.
     txShort(20, 0);                        // Total length, including header.
     chkSum = onesChecksum(0x0011 + totalLength + onesAdd(myIP, dstIP), (txbuf, unsigned short[]), 17, totalLength);
     txShort(20, chkSum);                        // Total length, including header.

@@ -6,6 +6,7 @@
 #include <xs1.h>
 #include <xclib.h>
 #include <print.h>
+#include <stdio.h>
 #include "tcp.h"
 #include "tcpApplication.h"
 #include "tx.h"
@@ -24,28 +25,30 @@
 
 #define TCPCONNECTIONS 10
 
-#define BUFFERSIZE   1024
-
-struct queue {
-    int rd, wr, free, length;
-    char buffer[BUFFERSIZE];
-};
+#define BUFFERSIZERX   256               // Must be a power of 2.
+#define BUFFERSIZETX   512               // Must be a power of 2.
 
 struct tcpConnection {
     unsigned short srcPortRev, dstPortRev;
     int srcIP, dstIP;
-    short maxSegmentSize;
-    char opened;
-    char state;
-    int outgoingSequenceNumber;     // Sequence number that we are transmitting (ours)
-    int outgoingAckNumber;          // Ack number that we are transmitting (their sequence number)
-    int incomingAckLast;            // Last ack that we received.
-                                  // TODO: we should keep state associated with appWaiting
-                                  // In particular whether app is waiting close/reading/writing.
+    int maxSegmentSize;
+    int state;
+    int sndNXT;                   // Sequence number that we are transmitting (ours)
+    int sndUNA;                   // Last ack that we received.
+    int rcvNXT;                   // Data that has been acknowledged
+    int rcvWND;                   // Our receive window
+    int sndWND;                   // Their receive window
     int appWaiting;               // This contains a streaming chanend if the app is waiting.
-    int appStatus;                // THis contains one of APP_CLOSING, APP_READING, APP_ACCEPTING, APP_NOT_WAITING;
+    int appStatus;                // This contains one of APP_CLOSING, APP_READING, etc
     int ackRequired;
-    struct queue rx, tx;
+    struct rxqueue {
+        int rd, wr, free, length;
+        char buffer[BUFFERSIZERX];
+    } rx;
+    struct txqueue {
+        int rd, wr, free, length;
+        char buffer[BUFFERSIZETX];
+    } tx;
 };
 
 struct tcpConnection tcpConnections[TCPCONNECTIONS] = {
@@ -90,14 +93,15 @@ void pipOutgoingTCP(struct tcpConnection &conn, int length, int flags) {
     }
     txShort(zero+0, conn.dstPortRev);             // Store source port, already reversed
     txShort(zero+1, conn.srcPortRev);             // Store dst port, already reversed
-    txInt(zero+2, byterev(conn.outgoingSequenceNumber)); // Sequence number, reversed
+    txInt(zero+2, byterev(conn.sndNXT)); // Sequence number, reversed
     if (flags & ACK) {
-        txInt(zero+4, byterev(conn.outgoingAckNumber)); // Ack number, reversed
+        txInt(zero+4, byterev(conn.rcvNXT)); // Ack number, reversed
     } else {
         txInt(zero+4, 0); // Ack number, reversed
     }
     txShort(zero+6, flags<<8 | 0x50);             // Store dst port, already reversed
-    txShort(zero+7, byterev(conn.rx.free > 255 ? 256 : conn.rx.free)>>16);   // Number of bytes free in window.
+    conn.rcvWND = (conn.rx.free > BUFFERSIZERX/2-1) ? BUFFERSIZERX/2 : conn.rx.free;
+    txShort(zero+7, byterev(conn.rcvWND)>>16);    // Number of bytes free in window.
     txInt(zero+8, 0);                             // checksum, urgent pointer
     chkSum = onesChecksum(0x0006 + totalLength + onesAdd(myIP, conn.srcIP), (txbuf, unsigned short[]), 17, totalLength);
     txShort(zero+8, chkSum);                      // checksum.
@@ -123,11 +127,12 @@ static void appSendClose(struct tcpConnection & conn) {
     conn.appStatus = APP_NOT_WAITING;
 }
 
-static void goTimewait(struct tcpConnection & conn) {
-    conn.state = TIMEWAIT;
-    if (conn.appWaiting) {
-        appSendAcknowledge(conn);
-    }
+static void appSendError(struct tcpConnection & conn) {
+#if PIP_TCP_ERROR_CT != 5
+#error "PIP_TCP_CLOSED_CT must be 5"
+#endif
+    asm("outct res[%0], 5" :: "r" (conn.appWaiting));
+    conn.appStatus = APP_NOT_WAITING;
 }
 
 void pipInitTCP() {
@@ -142,7 +147,6 @@ void pipTimeoutTCPTimewait() {
         case TIMEWAIT1: tcpConnections[i].state = TIMEWAIT2; break;
         case TIMEWAIT2:
             tcpConnections[i].state = CLOSED;
-            tcpConnections[i].opened = 0;
             if (tcpConnections[i].appWaiting) {
                 appSendAcknowledge(tcpConnections[i]);
             }
@@ -152,19 +156,19 @@ void pipTimeoutTCPTimewait() {
     pipSetTimeOut(PIP_TCP_TIMER_TIMEWAIT, 0, 10*1000*100, 0); // 10 ms clock
 }
 
-static void bounceRST(int dstPortRev, int srcPortRev, int srcIP, int ackNumberRev, int sequenceNumberRev, int incorporateACK) {
+static void bounceRST(int dstPortRev, int srcPortRev, int srcIP, int segACKRev, int sequenceNumberRev, int incorporateACK) {
     struct tcpConnection pseudoConnection;
     int flags;
     pseudoConnection.dstPortRev = dstPortRev;
     pseudoConnection.srcPortRev = srcPortRev;
     pseudoConnection.srcIP = srcIP;
     if (incorporateACK) {
-        pseudoConnection.outgoingAckNumber = 0;
-        pseudoConnection.outgoingSequenceNumber = byterev(ackNumberRev);
+        pseudoConnection.rcvNXT = 0;
+        pseudoConnection.sndNXT = byterev(segACKRev);
         flags = RST;
     } else {
-        pseudoConnection.outgoingSequenceNumber = 0;
-        pseudoConnection.outgoingAckNumber = byterev(sequenceNumberRev)+0;//todo LEN
+        pseudoConnection.sndNXT = 0;
+        pseudoConnection.rcvNXT = byterev(sequenceNumberRev)+0;//todo LEN
         flags = ACK | RST;
     }
     pipOutgoingTCP(pseudoConnection, 0, flags);
@@ -174,7 +178,7 @@ static void copyDataForRead(struct tcpConnection &conn, streaming chanend app) {
     int bytesToSend, maxLength;
     soutct(app, PIP_TCP_ACK_CT);
     app :> maxLength;
-    bytesToSend = BUFFERSIZE - conn.rx.free;
+    bytesToSend = BUFFERSIZERX - conn.rx.free;
     if (bytesToSend > maxLength) {
         bytesToSend = maxLength;
     }
@@ -182,7 +186,7 @@ static void copyDataForRead(struct tcpConnection &conn, streaming chanend app) {
     app <: bytesToSend;
     for(int i = 0; i < bytesToSend; i++) {
         app <: conn.rx.buffer[conn.rx.rd];
-        conn.rx.rd = (conn.rx.rd + 1) & (BUFFERSIZE - 1);
+        conn.rx.rd = (conn.rx.rd + 1) & (BUFFERSIZERX - 1);
     }
 }
 
@@ -191,7 +195,7 @@ static void copyDataForRead2(struct tcpConnection &conn, int app) {
     int bytesToSend, maxLength;
     asm("outct res[%0], 3" :: "r" (app));
     asm("in %0, res[%1]" : "=r" (maxLength) : "r" (app));
-    bytesToSend = BUFFERSIZE - conn.rx.free;
+    bytesToSend = BUFFERSIZERX - conn.rx.free;
     if (bytesToSend > maxLength) {
         bytesToSend = maxLength;
     }
@@ -199,7 +203,7 @@ static void copyDataForRead2(struct tcpConnection &conn, int app) {
     asm("out res[%0], %1" :: "r" (app), "r" (bytesToSend));
     for(int i = 0; i < bytesToSend; i++) {
         asm("outt res[%0], %1" :: "r" (app), "r" (conn.rx.buffer[conn.rx.rd]));
-        conn.rx.rd = (conn.rx.rd + 1) & (BUFFERSIZE - 1);
+        conn.rx.rd = (conn.rx.rd + 1) & (BUFFERSIZERX - 1);
     }
 }
 
@@ -211,14 +215,14 @@ static void storeIncomingData(struct tcpConnection &conn, unsigned short packet[
             break;
         }
         conn.rx.buffer[conn.rx.wr] = (packet, unsigned char[])[offset * 2 + i];
-        conn.rx.wr = (conn.rx.wr + 1) & (BUFFERSIZE - 1);
+        conn.rx.wr = (conn.rx.wr + 1) & (BUFFERSIZERX - 1);
         conn.rx.free--;
     }
-    if (conn.appStatus == APP_READING && conn.rx.free != BUFFERSIZE) {
+    if (conn.appStatus == APP_READING && conn.rx.free != BUFFERSIZERX) {
         copyDataForRead2(conn, conn.appWaiting);
         conn.appStatus = APP_NOT_WAITING;
     }
-    conn.outgoingAckNumber += i;
+    conn.rcvNXT += i;
 }
 
 static void copyDataFromWrite(struct tcpConnection &conn, streaming chanend app) {
@@ -233,7 +237,7 @@ static void copyDataFromWrite(struct tcpConnection &conn, streaming chanend app)
     app <: bytesRequested;
     for(int i = 0; i < bytesRequested; i++) {
         app :> conn.tx.buffer[conn.tx.wr];
-        conn.tx.wr = (conn.tx.wr + 1) & (BUFFERSIZE - 1);
+        conn.tx.wr = (conn.tx.wr + 1) & (BUFFERSIZETX - 1);
     }
 }
 
@@ -250,82 +254,69 @@ static void copyDataFromWrite2(struct tcpConnection &conn, unsigned app) {
     asm("out res[%0],%1" :: "r" (app), "r" (bytesRequested));
     for(int i = 0; i < bytesRequested; i++) {
         asm("int %0, res[%1]" : "=r" (conn.tx.buffer[conn.tx.wr]) : "r" (app));
-        conn.tx.wr = (conn.tx.wr + 1) & (BUFFERSIZE - 1);
+        conn.tx.wr = (conn.tx.wr + 1) & (BUFFERSIZETX - 1);
     }
 }
 
 static void loadOutgoingData(struct tcpConnection &conn) {
     int i;
-    int length = 256;                    // Should be based on remote window.
+    int length = conn.sndWND;
     int offset = 27;
-    if (length > conn.tx.length) { // Cannot send more data then we have
+    if (length > conn.tx.length) {      // Cannot send more data then we have
         length = conn.tx.length ;
     }
     conn.tx.length -= length;
     for(i = 0; i < length; i++) {
         txByte(offset * 2 + i, conn.tx.buffer[conn.tx.rd]);
-        conn.tx.rd = (conn.tx.rd + 1) & (BUFFERSIZE - 1);
+        conn.tx.rd = (conn.tx.rd + 1) & (BUFFERSIZETX - 1);
     }
-    if (conn.appStatus == APP_WRITING && conn.tx.free != BUFFERSIZE) {
+    if (conn.appStatus == APP_WRITING && conn.tx.free != BUFFERSIZETX) {
         copyDataForRead2(conn, conn.appWaiting);
         conn.appStatus = APP_NOT_WAITING;
     }
     pipOutgoingTCP(conn, i, PSH|ACK);
-    conn.outgoingSequenceNumber += i;
+    conn.sndNXT += i;
 }
 
-int lextra = 0;
-int lack = 0;
-
 void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, unsigned dstIP, unsigned totalLength) {
-    int srcPortRev        = packet[offset+0];
-    int dstPortRev        = packet[offset+1];
-    int sequenceNumberRev = packet[offset+3]<<16 | packet[offset+2];
-    int ackNumberRev      = packet[offset+5]<<16 | packet[offset+4];
-    int dataOffset        = packet[offset+6] >> 4 & 0xF;
-    int flags             = packet[offset+6] >> 8;
-    int tcpOffset         = offset + dataOffset * 2;
-    int window            = packet[offset+8];
-    int length            = totalLength - dataOffset*4;
+    int srcPortRev = packet[offset+0];
+    int dstPortRev = packet[offset+1];
+    int segSEQRev  = packet[offset+3]<<16 | packet[offset+2];
+    int segSEQ     = byterev(segSEQRev);
+    int segACKRev  = packet[offset+5]<<16 | packet[offset+4];
+    int segACK     = byterev(segACKRev);
+    int dataOffset = packet[offset+6] >> 4 & 0xF;
+    int flags      = packet[offset+6] >> 8;
+    int tcpOffset  = offset + dataOffset * 2;
+    int window     = byterev(packet[offset+8]) >> 16;
+    int length     = totalLength - dataOffset*4;
 
     int opened = -1;
-    int openable = -1;
+    int extraBytes;
 
     for(int i = 0; i < TCPCONNECTIONS; i++) {
         if (dstPortRev == tcpConnections[i].dstPortRev) {
-            if (tcpConnections[i].opened &&
+            if (tcpConnections[i].state      != CLOSED &&
                 tcpConnections[i].srcPortRev == srcPortRev &&
                 tcpConnections[i].srcIP      == srcIP &&
                 tcpConnections[i].dstIP      == dstIP) { // Found the open stream.
                 opened = i;
                 break;
             }
-            if (openable == -1 && !tcpConnections[i].opened) {
-                openable = i;
+            if (tcpConnections[i].state      == LISTEN) {
+                tcpConnections[i].srcPortRev = srcPortRev;
+                tcpConnections[i].srcIP = srcIP;
+                tcpConnections[i].dstIP = dstIP;
+                opened = i;
+                break;
             }
         }
     }
     if (opened == -1) {
-        if (openable == -1) {               // Reject this connection; nobody listening.
-            if (!(flags & RST)) {
-                bounceRST(dstPortRev, srcPortRev, srcIP, ackNumberRev, sequenceNumberRev, !(flags & ACK));
-            }
-            return;
+        if (!(flags & RST)) {
+            bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, !(flags & ACK));
         }
-        opened = openable;
-        tcpConnections[opened].opened = 1;
-        tcpConnections[opened].srcPortRev = srcPortRev;
-        tcpConnections[opened].srcIP = srcIP;
-        tcpConnections[opened].dstIP = dstIP;
-        tcpConnections[opened].state = LISTEN;
-        tcpConnections[opened].rx.rd = 0;
-        tcpConnections[opened].rx.wr = 0;
-        tcpConnections[opened].rx.free = BUFFERSIZE;
-        tcpConnections[opened].rx.length = 0;
-        tcpConnections[opened].tx.rd = 0;
-        tcpConnections[opened].tx.wr = 0;
-        tcpConnections[opened].tx.free = BUFFERSIZE;
-        tcpConnections[opened].tx.length = 0;
+        return;
     }
 
     switch(tcpConnections[opened].state) {
@@ -336,140 +327,194 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
             return;
         }
         if (flags & ACK) {
-            bounceRST(dstPortRev, srcPortRev, srcIP, ackNumberRev, sequenceNumberRev, !(flags & ACK));
+            bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, !(flags & ACK));
             return;
         }
         if (flags & SYN) {
             timer t;
             int t0;
             t :> t0;
-            tcpConnections[opened].outgoingAckNumber = byterev(sequenceNumberRev) + 1;
-            tcpConnections[opened].outgoingSequenceNumber = t0;
-            tcpConnections[opened].incomingAckLast = t0;
+            tcpConnections[opened].tx.free--;
+            tcpConnections[opened].rcvNXT = segSEQ + 1;
+            tcpConnections[opened].sndNXT = t0;
+            tcpConnections[opened].sndUNA = t0 - 1;
             pipOutgoingTCP(tcpConnections[opened], 0, SYN|ACK);
-            tcpConnections[opened].outgoingSequenceNumber++;
+            tcpConnections[opened].sndNXT++;
             tcpConnections[opened].state = SYNRCVD;
             return;
         }
         break;
     case SYNSENT:                    // Only relevant if we open a connection.
+        tcpConnections[opened].sndWND = window;
         error("SYNSENT", flags);
         break;
+//    case TIMEWAIT:
     case SYNRCVD:
-        if (flags & ACK) {
-            if(byterev(ackNumberRev) -  tcpConnections[opened].incomingAckLast != 1) {
-                // TODO: just drop or send RST?
+    case ESTAB:
+    case FINWAIT1:
+    case FINWAIT2:
+    case CLOSEWAIT:
+    case CLOSING:
+    case LASTACK:
+        printf("segSEQ: %08x, rcvNXT: %08x, state %d\n", segSEQ, tcpConnections[opened].rcvNXT,
+               tcpConnections[opened].state);
+        if (segSEQ != tcpConnections[opened].rcvNXT) {
+            printstr("Ignore, out of order packet\n");
+            pipOutgoingTCP(tcpConnections[opened], 0, ACK);           // Out of order - reject.
+            return;
+        }
+
+        // 2. Deal with RST.
+        if (flags & RST) {
+            switch(tcpConnections[opened].state) {
+            case SYNRCVD:
+                if (tcpConnections[opened].appStatus == APP_ACCEPTING) {
+                    appSendClose(tcpConnections[opened]);
+                }
+                break;
+            case ESTAB:
+            case FINWAIT1:
+            case FINWAIT2:
+            case CLOSEWAIT:
+                if (tcpConnections[opened].appWaiting) {
+                    appSendError(tcpConnections[opened]);
+                }
+                break;
+            case CLOSING:
+            case LASTACK:
+//            case TIMEWAIT:
+                break;
+            }
+            tcpConnections[opened].state = CLOSED;
+            return;
+        }
+        // 3 Check security and precedence - not required.
+
+        // 4. Check the SYN bit.
+
+        if (flags & SYN) {
+            if (tcpConnections[opened].appWaiting) {
+                appSendError(tcpConnections[opened]);
+            }
+            tcpConnections[opened].state = CLOSED;
+            return;
+        }
+
+        // 5. Check the ACK field
+
+        if (!(flags & ACK)) {
+            return;
+        }
+
+        tcpConnections[opened].sndWND = window;
+
+        if (tcpConnections[opened].state == SYNRCVD) {
+            if(tcpConnections[opened].sndUNA - segACK > 0 ||
+               segACK - tcpConnections[opened].sndNXT > 0) {
+                bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, 1);
+                // TODO: set to CLOSED?
                 return;
             }
-            tcpConnections[opened].incomingAckLast++;
+            tcpConnections[opened].sndWND = window;
+            tcpConnections[opened].sndUNA++;
             tcpConnections[opened].state = ESTAB;
             if (tcpConnections[opened].appStatus == APP_ACCEPTING) {
                 appSendAcknowledge(tcpConnections[opened]);
             }
-            // Note or check sequence numbers?
-            // TODO: must check sequence number and dump duplicate SYNRCVD.
+        }
+
+        if (tcpConnections[opened].state == LASTACK) {
+            if (tcpConnections[opened].tx.free == BUFFERSIZETX + 1) {
+                tcpConnections[opened].state  = CLOSED;
+                if (tcpConnections[opened].appStatus == APP_CLOSING) {
+                    appSendAcknowledge(tcpConnections[opened]);
+                }
+            }
             return;
         }
-        error("SYNRCVD", flags);
-        break;
-    case ESTAB:
-         // TODO: verify for duplicates and out of order packets.
-        storeIncomingData(tcpConnections[opened], packet, tcpOffset, length);
-        if (flags & FIN) {
-            tcpConnections[opened].outgoingAckNumber++;
+
+        printf("sndUNA: %08x, segACK: %08x\n", tcpConnections[opened].sndUNA, segACK);
+        if(tcpConnections[opened].sndUNA - segACK > 0) {
+            printstr("Ignoring duplicate ACK\n");
+            return; // Duplicate ACK can be ignored.
+        }
+        if (segACK - tcpConnections[opened].sndNXT > 0) {
             pipOutgoingTCP(tcpConnections[opened], 0, ACK);
-            tcpConnections[opened].state = CLOSEWAIT;
+            return;
+        }
+
+        extraBytes = segACK - tcpConnections[opened].sndUNA;
+        tcpConnections[opened].sndUNA = segACK;
+        tcpConnections[opened].tx.free += extraBytes;
+
+        if (tcpConnections[opened].tx.free == extraBytes) {
+            if (tcpConnections[opened].appStatus == APP_WRITING) {
+                copyDataFromWrite2(tcpConnections[opened], tcpConnections[opened].appWaiting);
+                tcpConnections[opened].appStatus = APP_NOT_WAITING;
+                loadOutgoingData(tcpConnections[opened]);
+            }
+        }
+        if (tcpConnections[opened].state == FINWAIT1) {
+            printf("FINWAIT1: txfree: %d\n", tcpConnections[opened].tx.free);
+            if (tcpConnections[opened].tx.free == BUFFERSIZETX + 1) {
+                tcpConnections[opened].state = FINWAIT2;
+                return;
+            }
+        } else if (tcpConnections[opened].state == CLOSING) {
+            tcpConnections[opened].state = TIMEWAIT;
+            appSendAcknowledge(tcpConnections[opened]);     // Acknowledge the close.
+            return;
+        }
+
+
+        // 7 Process the data.
+
+        if (length != 0) {
+            storeIncomingData(tcpConnections[opened], packet, tcpOffset, length);
+            if (tcpConnections[opened].ackRequired) {
+                pipOutgoingTCP(tcpConnections[opened], 0, ACK);
+            } else {
+                tcpConnections[opened].ackRequired = 1;
+            }
+        }
+
+        // 8 Check the FIN bit
+
+        if (flags & FIN) {
+            switch(tcpConnections[opened].state) {
+            case SYNRCVD:
+            case ESTAB:
+                tcpConnections[opened].rcvNXT ++;
+                pipOutgoingTCP(tcpConnections[opened], 0, ACK);
+                tcpConnections[opened].state = CLOSEWAIT;
+                break;
+            case FINWAIT1:
+                tcpConnections[opened].state = CLOSING;
+                break;
+            case FINWAIT2:
+                tcpConnections[opened].rcvNXT ++;
+                pipOutgoingTCP(tcpConnections[opened], 0, ACK);
+                tcpConnections[opened].state = TIMEWAIT;
+                break;
+            }
             if (tcpConnections[opened].appStatus == APP_WRITING ||
                 tcpConnections[opened].appStatus == APP_READING) {
                 appSendClose(tcpConnections[opened]);
             }
             return;
         }
-        if (flags & ACK) {
-            int newAckNumber = byterev(ackNumberRev);
-            int extraBytes = newAckNumber - tcpConnections[opened].incomingAckLast;
-            // TODO: check on ack and reject if not in range.
-            lack = tcpConnections[opened].incomingAckLast;
-            lextra = extraBytes;
-            tcpConnections[opened].incomingAckLast = newAckNumber;
-            tcpConnections[opened].tx.free += extraBytes;
-            if (tcpConnections[opened].tx.free == extraBytes) {
-                if (tcpConnections[opened].appStatus == APP_WRITING) {
-                    copyDataFromWrite2(tcpConnections[opened], tcpConnections[opened].appWaiting);
-                    tcpConnections[opened].appStatus = APP_NOT_WAITING;
-                    loadOutgoingData(tcpConnections[opened]);
-                }
-            }
-
-            // TODO
-            if (length == 0) return;
-        }
-        if (tcpConnections[opened].ackRequired || 1) {
-            pipOutgoingTCP(tcpConnections[opened], 0, ACK);
-        } else {
-            tcpConnections[opened].ackRequired = 1;
-        }
-        if (flags & ~FIN) {
-            error("ESTAB", flags);
-        }
-        break;
-    case FINWAIT1:
-        if (flags & FIN) {
-            tcpConnections[opened].outgoingAckNumber++;      // TODO
-            pipOutgoingTCP(tcpConnections[opened], 0, ACK);
-            tcpConnections[opened].state = CLOSING;
-            return;
-        }
-        if (flags & ACK) {
-            tcpConnections[opened].state = FINWAIT2;
-            return;
-        }
-        error("FINWAIT1", flags);
-        break;
-    case FINWAIT2:
-        if (flags & FIN) {
-            tcpConnections[opened].outgoingAckNumber++;      // TODO
-            pipOutgoingTCP(tcpConnections[opened], 0, ACK);
-            goTimewait(tcpConnections[opened]);
-            return;
-        }
-        error("FINWAIT2", flags);
-        break;
-    case CLOSING:
-        if (flags & ACK) {
-            tcpConnections[opened].state = TIMEWAIT;
-            if (tcpConnections[opened].appStatus == APP_CLOSING) {
-                appSendAcknowledge(tcpConnections[opened]);
-            }
-            return;
-        }
-        error("CLOSING", flags);
         break;
     case TIMEWAIT:
     case TIMEWAIT0:
     case TIMEWAIT1:
     case TIMEWAIT2:
         if (flags & FIN) {    // This is a result of a missed packet.
-            tcpConnections[opened].outgoingAckNumber++;      // TODO
+            tcpConnections[opened].rcvNXT++;      // TODO
             pipOutgoingTCP(tcpConnections[opened], 0, ACK);
             tcpConnections[opened].state = TIMEWAIT;
             return;
         }
         error("TIMEWAIT", flags);
-        break;
-    case CLOSEWAIT:
-        error("CLOSEWAIT", flags);
-        break;
-    case LASTACK:
-        if (flags & ACK) {
-            tcpConnections[opened].state  = CLOSED;
-            tcpConnections[opened].opened = 0;
-            if (tcpConnections[opened].appStatus == APP_CLOSING) {
-                appSendAcknowledge(tcpConnections[opened]);
-            }
-            return;
-        }
-        error("CLOSING", flags);
         break;
     }
 }
@@ -481,6 +526,22 @@ static void setAppWaiting(struct tcpConnection &conn, streaming chanend app, int
     conn.appStatus = appStatus;
 }
 
+ 
+static void doAccept(struct tcpConnection &conn, streaming chanend app) {
+    conn.state = LISTEN;
+    conn.rx.rd = 0;
+    conn.rx.wr = 0;
+    conn.rx.free = BUFFERSIZERX;
+    conn.rx.length = 0;
+    conn.tx.rd = 0;
+    conn.tx.wr = 0;
+    conn.tx.free = BUFFERSIZETX;
+    conn.tx.length = 0;
+    conn.rcvWND = BUFFERSIZERX/2;
+    conn.sndWND = 0;
+    setAppWaiting(conn, app, APP_ACCEPTING);
+}
+
 static void doClose(struct tcpConnection &conn, streaming chanend app) {
     switch(conn.state) {
     case CLOSED:
@@ -488,15 +549,14 @@ static void doClose(struct tcpConnection &conn, streaming chanend app) {
         return;
     case SYNSENT:
     case LISTEN:
-        conn.opened = 0;
         conn.state = CLOSED;
         soutct(app, PIP_TCP_ACK_CT); 
         return;
     case SYNRCVD:
     case ESTAB:
         conn.state = FINWAIT1;
-        pipOutgoingTCP(conn, 0, FIN);
-        conn.outgoingSequenceNumber++;
+        pipOutgoingTCP(conn, 0, FIN|ACK);
+        conn.sndNXT++;
         setAppWaiting(conn, app, APP_CLOSING);
         return;
     case LASTACK:
@@ -510,8 +570,8 @@ static void doClose(struct tcpConnection &conn, streaming chanend app) {
         return;
     case CLOSEWAIT:
         conn.state = LASTACK;
-        pipOutgoingTCP(conn, 0, FIN);
-        conn.outgoingSequenceNumber++;
+        pipOutgoingTCP(conn, 0, FIN|ACK);
+        conn.sndNXT++;
         setAppWaiting(conn, app, APP_CLOSING);
         return;
     }
@@ -534,7 +594,7 @@ static void doRead(struct tcpConnection &conn, streaming chanend app) {
         soutct(app, PIP_TCP_ERROR_CT);
         return;
     case ESTAB:
-        if (conn.rx.free != BUFFERSIZE) {
+        if (conn.rx.free != BUFFERSIZERX) {
             copyDataForRead(conn, app);
         } else {
             setAppWaiting(conn, app, APP_READING);
@@ -585,7 +645,7 @@ void pipApplicationTCP(streaming chanend app, int cmd) {
     app :> connectionNumber;
     switch(cmd) {
     case PIP_TCP_ACCEPT:
-        setAppWaiting(tcpConnections[connectionNumber], app, APP_ACCEPTING);
+        doAccept(tcpConnections[connectionNumber], app);
         break;
     case PIP_TCP_CLOSE:
         doClose(tcpConnections[connectionNumber], app);

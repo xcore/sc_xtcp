@@ -21,16 +21,26 @@ void txInt(int offset, int x);
 
 /** Function to store a short 16-bit integer at the given offset in the
  * output packet that is currently under construction. The offset has to be
- * specified in 16-bit entities, eg, 6 refers to a short integer at bytes 12,
- * and 13 in the packet. Note that the integer is stored LSB first,
- * and that most values are to be converted to byte order first using a
- * byterev() and downshift.
+ * specified in 16-bit entities, eg, 6 refers to a short integer at bytes
+ * 12, and 13 in the packet. Note that the integer is stored LSB first,
+ * most values should be stored in reverse order, using txShortRev().
  *
  * \param offset Offset in the packet measured in 16-bit words.
  *
  * \param x      Integer to store.
  */
 void txShort(int offset, int x);
+
+/** Function to store a short 16-bit integer at the given offset in the
+ * output packet that is currently under construction. The offset has to be
+ * specified in 16-bit entities, eg, 6 refers to a short integer at bytes 12,
+ * and 13 in the packet. The integer is stored MSB first, in network order.
+ *
+ * \param offset Offset in the packet measured in 16-bit words.
+ *
+ * \param x      Integer to store.
+ */
+void txShortRev(int offset, int x);
 
 /** Function to store zeroes at the given offset in the output packet that
  * is currently under construction. The offset and length have to be
@@ -67,14 +77,6 @@ void txByte(int offset, int x);
  * \param n      Number of bytes to copy.
  */
 void txData(int offset, char data[], int dataOffset, int n);
-
-/** Function to revert a short value.
- *
- * \param x the value to byte-reverse; should be less than 0x10000.
- *
- * \returns x with its least and one-but-least significant byte swapped.
- */
-unsigned shortrev(unsigned x);
 
 /** Function to clear the packet that is currently under construction. Only
  * called from the ARP layer as a way to replace the current IP packet with

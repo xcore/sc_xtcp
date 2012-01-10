@@ -11,6 +11,7 @@
 #include "icmp.h"
 #include "igmp.h"
 #include "checksum.h"
+#include "rx.h"
 #include "tx.h"
 #include "arp.h"
 #include "ethernet.h"
@@ -20,25 +21,18 @@
 // TODO: Must be doing defragmentation somewhere.
 // TODO: Must support datagrams of at least 576 octets.
 
-unsigned int getReversedInt(unsigned short packet[], int offset) {
-    unsigned int x = packet[offset+1] << 16 | packet[offset];
-    return byterev(x);
-}
-
 void pipIncomingIPv4(unsigned short packet[], int offset) {
     int ipType = (packet, unsigned char[])[offset * 2 + 9];
     int headerLength = (packet, unsigned char[])[offset * 2] & 0xF; // # words
     int totalLength = byterev(packet[offset + 1]) >> 16;
     int contentOffset = headerLength * 2 + offset;
 
-    unsigned int srcIP = getReversedInt(packet, offset + 6);
-    unsigned int dstIP = getReversedInt(packet, offset + 8);
+    unsigned int srcIP = getIntUnaligned(packet, 2*offset + 12);
+    unsigned int dstIP = getIntUnaligned(packet, 2*offset + 16);
 
     int chkSum = onesChecksum(0, packet, offset, headerLength * 4);
     
     if (chkSum != 0) {
-        printstr("Bad chksum ");
-        printhexln(chkSum);
         return;        // Bad checksum; drop.
     }
 
@@ -46,8 +40,6 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
         (dstIP >> 24) != 224 && 
         dstIP != 0 &&
         dstIP != myIP) {
-        printstr("Not us ");
-        printhexln(dstIP);
         return;        // dest ip address is not us; drop.
     }
 
@@ -87,7 +79,7 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
 void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
     int totalLength = length + 20;
     txShort(7, 0x0045);                    // IPv4, header length 5, no flags.
-    txShort(8, shortrev(totalLength));     // Length, including header.
+    txShortRev(8, totalLength);            // Length, including header.
     txInt(9, 0x0);                         // Zero id, no flags, no fragment offset.
     txShort(11, 0xff | ipType << 8);       // Set ETH mac dst
     txShort(12, 0);                        // Init checksum
@@ -100,8 +92,7 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
             return;
         }
     }
-    printstr("Missing arp\n");
-    printhexln(ipDst);
+    // Missing ARP - destroy packet and ARP instead.
     txClear();
     pipCreateARP(0, ipDst, pipArpTable[0].macAddr, 0);
 }
