@@ -111,11 +111,11 @@ void udp_server(chanend c_xtcp)
 			  xtcp_close(c_xtcp, conn);
 			  break;
 		  case INCOMING_PORT_CONTINUOUS:
-			  xscope_probe_data(1, (rx_buffer,unsigned[])[0]);
+			  xscope_probe_data(0, (rx_buffer,unsigned[])[0]);
 			  break;
 		  case INCOMING_PORT_TCP:
 			  total_len += response_len;
-			  xscope_probe_data(1, total_len);
+			  xscope_probe_data(0, total_len);
 			  break;
 		  }
 		  break;
@@ -143,9 +143,7 @@ int main(void) {
 	 	on stdcore[0]: {
             char mac_address[6];
 
-            xscope_register(2,
-            		XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i",
-            		XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
+            xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
             xscope_config_io(XSCOPE_IO_BASIC);
 
             ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl, mac_address);
