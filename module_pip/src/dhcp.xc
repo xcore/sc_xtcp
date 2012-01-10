@@ -1,6 +1,7 @@
 #include <xclib.h>
 #include <print.h>
 #include "dhcp.h"
+#include "tftp.h"
 #include "rx.h"
 #include "tx.h"
 #include "udp.h"
@@ -68,7 +69,10 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
     rebindTime = 0;
     serverIP = 0;
     messageType = 0;
-    for(int i = offset * 2 + 240; i < length;) {
+    for(int i = offset * 2 + 240; i < offset * 2 + length;) {
+        if ((packet, unsigned char[])[i] == 255) {
+            break;
+        }
         switch((packet, unsigned char[])[i]) {
         case 0x35: messageType = (packet, unsigned char[])[i+2]; break;
         case 0x36: serverIP    = getIntUnaligned(packet, i+2); break;
@@ -76,6 +80,9 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         case 0x3A: renewalTime = getIntUnaligned(packet, i+2); break;
         case 0x3B: rebindTime  = getIntUnaligned(packet, i+2); break;
         case 0x01: subnet      = getIntUnaligned(packet, i+2); break;
+#ifdef PIP_TFTP
+        case 0x96: pipIpTFTP   = getIntUnaligned(packet, i+2); break;
+#endif
             // TODO: store router(s)
             // TODO: store DNS server(s)
         }
@@ -95,6 +102,9 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         myIP = proposedIP;
         mySubnetIP = subnet;
         printstr("Got an IP address\n");
+#ifdef PIP_TFTP
+        pipInitTFTP();
+#endif
     }
 }
 

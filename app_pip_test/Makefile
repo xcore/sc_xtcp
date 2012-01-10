@@ -1,7 +1,7 @@
 TARGET = XP-DSC-BLDC
 APP_NAME =
 XCC_FLAGS = -Os -g -report -lxscope \
-            -DPIP_ICMP -DPIP_DHCP -DPIP_UDP -DPIP_ARP -DPIP_TCP
+            -DPIP_ICMP -DPIP_DHCP -DPIP_UDP -DPIP_ARP -DPIP_TCP -DPIP_TFTP
 USED_MODULES = module_pip module_mii_singlethread
 
 

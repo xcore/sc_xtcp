@@ -9,12 +9,13 @@
 #include "checksum.h"
 #include "ipv4.h"
 #include "dhcp.h"
+#include "tftp.h"
 #include "tx.h"
 
 // RFC 0768
 
 void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned srcIP, unsigned dstIP) {
-    // int srcPort =     byterev(packet[offset+0]) >> 16;  // Not used at present
+    int srcPort =     byterev(packet[offset+0]) >> 16;  // Not used at present
     int dstPort =     byterev(packet[offset+1]) >> 16;
     int totalLength = byterev(packet[offset+2]) >> 16;
     int chkSum;
@@ -30,6 +31,12 @@ void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned srcIP, un
 #if defined(PIP_DHCP)
     if (dstPort == 0x0044) {
         pipIncomingDHCP(packet, srcIP, dstIP, offset + 4, totalLength - 8);
+    }
+#endif
+
+#if defined(PIP_TFTP)
+    if (dstPort == pipPortTFTP) {
+        pipIncomingTFTP(packet, srcIP, dstIP, srcPort, offset + 4, totalLength - 8);
     }
 #endif
 

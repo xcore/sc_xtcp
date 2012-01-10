@@ -40,23 +40,9 @@ smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
 
 clock clk_smi = XS1_CLKBLK_5;
 
-static void httpServer(streaming chanend tcpStack) {
-    unsigned char buf[12];
-    int l, total;
-    timer t;
-    int t0, t1;
-    while(1) {
-        total = 0;
-    }
-}
-
 int main(void) {
 	streaming chan tcpApps;
 
-	par
-	{
-	 	pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
-	 	httpServer(tcpApps);
-    }
+    pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
     return 0;
 }
