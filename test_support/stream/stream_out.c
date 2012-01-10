@@ -1,12 +1,26 @@
+/*
+  To build this on Windows, open a visual studio (express) C++ command prompt and type:
+
+  cl -D__WIN32__ stream_out.c
+*/
+
+
 #ifndef __WIN32__
+
 #include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+#define SOCKET int
+#define INVALID_SOCKET -1
+
 #else
+
 #define WIN32_LEAN_AND_MEAN
 #include <winsock2.h>
 #pragma comment(lib, "ws2_32.lib")
+
 #endif
 
 int data[1460/4];
@@ -42,7 +56,6 @@ int main(int argc, char *argv[]) {
   s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (s == INVALID_SOCKET) {
     puts("Unable to open socket");
-    printf("%d\n", WSAGetLastError());
     exit(0);
   }
 
