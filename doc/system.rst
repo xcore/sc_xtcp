@@ -33,7 +33,9 @@ file ``uip_single_server.h`` should be included, and the function
 :c:func:`uipSingleServer` used in place of the :c:func:`uip_server` and
 ``ethernet_server`` function from the ethernet repository.  In addition,
 the ``module_mii_singlethread`` should be used instead of ``module_ethernet``
-and ``module_locks`` in the Makefile.
+and ``module_locks`` in the Makefile. Finally, define the constant
+``UIP_USE_SINGLE_THREADED_ETHERNET`` in your application's ``xtcp_client_config.h``
+file.
 
 
 

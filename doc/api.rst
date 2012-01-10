@@ -32,6 +32,10 @@ within that file.
      - The maximum number of UDP or TCP ports the server can listen to
        simultaneously.     
      - 20
+   * - UIP_USE_SINGLE_THREADED_ETHERNET
+     - Defining this, and using the uipSingleServer function in the
+       multithreaded main, will use the two thread TCP plus Ethernet.
+     - Not defined
 
 Data Structures/Types
 ---------------------
