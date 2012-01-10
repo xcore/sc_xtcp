@@ -40,7 +40,7 @@ on stdcore[0]: clock clk_smi = XS1_CLKBLK_5;
 
 
 xtcp_ipconfig_t ipconfig = {
-#if 0
+#if 1
 		{ 192, 168, 0, 10 }, // ip address (eg 192,168,0,2)
 		{ 255, 255, 255, 0 }, // netmask (eg 255,255,255,0)
 		{ 0, 0, 0, 0 } // gateway (eg 192,168,0,1)
@@ -52,18 +52,43 @@ xtcp_ipconfig_t ipconfig = {
 };
 
 #define RX_BUFFER_SIZE 1200
-#define INCOMING_PORT 100
+#define INCOMING_PORT_CONTINUOUS 100
+#define INCOMING_PORT_SINGLE 101
+#define INCOMING_PORT_TCP 102
 
+
+/*
+ *  This thread implements three 'server' like services.
+ *
+ *  On UDP 100 there is a listening port that does not close any connections
+ *  that are opened by remote machines.  One of the test scripts opens a single
+ *  socket to this port, and streams data to it.  This mimics a continuously
+ *  open type UDP connection, for instance a UDP media stream, where the close
+ *  action is as the result of a higher layer connection management action.
+ *
+ *  On UDP 101 there is a listening port that closes the connection every time
+ *  a piece of data is received.  One test script repeatedly opens a socket,
+ *  sends a single piece of data, and then closes the socket.  This mimics a
+ *  discovery type protocol, where units are sending single packet 'here i am'
+ *  messages to each other.
+ *
+ *  On TCP 100, there is a listening socket which does not close the connection.
+ *  The test script opens the connection, streams data into the port, then closes
+ *  it.  This mimics a long term data sink, such as a data logger, or TCP based
+ *  media renderer.
+ */
 void udp_server(chanend c_xtcp)
 {
   xtcp_connection_t conn;
+  unsigned total_len=0;
 
   char rx_buffer[RX_BUFFER_SIZE];
 
   int response_len;
 
-  // Instruct server to listen and create new connections on the incoming port
-  xtcp_listen(c_xtcp, INCOMING_PORT, XTCP_PROTOCOL_UDP);
+  xtcp_listen(c_xtcp, INCOMING_PORT_CONTINUOUS, XTCP_PROTOCOL_UDP);
+  xtcp_listen(c_xtcp, INCOMING_PORT_SINGLE, XTCP_PROTOCOL_UDP);
+  xtcp_listen(c_xtcp, INCOMING_PORT_TCP, XTCP_PROTOCOL_TCP);
 
   while (1) {
 	select {
@@ -77,14 +102,22 @@ void udp_server(chanend c_xtcp)
 		  break;
 
 		case XTCP_NEW_CONNECTION:
-			// This is a new connection to the listening port
-//			printstr("New connection to listening port: ");
-//			printintln(conn.local_port);
 		  break;
 		case XTCP_RECV_DATA:
 		  response_len = xtcp_recv_count(c_xtcp, rx_buffer, RX_BUFFER_SIZE);
-		  printuintln((rx_buffer,unsigned[])[0]);
-		  xscope_probe_data(0, (rx_buffer,unsigned[])[0]);
+		  switch (conn.local_port) {
+		  case INCOMING_PORT_SINGLE:
+			  xscope_probe_data(0, (rx_buffer,unsigned[])[0]);
+			  xtcp_close(c_xtcp, conn);
+			  break;
+		  case INCOMING_PORT_CONTINUOUS:
+			  xscope_probe_data(0, (rx_buffer,unsigned[])[0]);
+			  break;
+		  case INCOMING_PORT_TCP:
+			  total_len += response_len;
+			  xscope_probe_data(0, total_len);
+			  break;
+		  }
 		  break;
 	  case XTCP_REQUEST_DATA:
 	  case XTCP_RESEND_DATA:
