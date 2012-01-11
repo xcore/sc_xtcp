@@ -21,18 +21,20 @@
 
 extern char notifySeen;
 
+
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streaming chanend tcpApps) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
     int b[3200];
     timer t, t2;
     int thetime;
+    struct miiData miiData;
 
     xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
     xscope_config_io(XSCOPE_IO_BASIC);
     printstr("HELLO\n");
 
-    miiBufferInit(cIn, cNotifications, b, 3200);
+    miiBufferInit(miiData, cIn, cNotifications, b, 3200);
     miiOutInit(cOut);
 
     t2 :> thetime;
@@ -53,8 +55,10 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
     while (1) {
         int cmd;
         select {
+#if 1
         case pipTimeOut(t);
-        case inuchar_byref(cNotifications, notifySeen):
+#endif
+        case inuchar_byref(cNotifications, miiData.notifySeen):
             break;
 #ifdef PIP_TCP
         case tcpApps :> cmd:
@@ -63,11 +67,11 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
 #endif
         }
         if (!havePacket) {
-            {a,nBytes,timeStamp} = miiGetInBuffer();
+            {a,nBytes,timeStamp} = miiGetInBuffer(miiData);
             if (a != 0) {
                 pipIncomingEthernetC(a);//TODO, nBytes);
-                miiFreeInBuffer(a);
-                miiRestartBuffer();
+                miiFreeInBuffer(miiData, a);
+                miiRestartBuffer(miiData);
             }
         }
         doTx(cOut);
@@ -83,7 +87,10 @@ void pipServer(clock clk_smi,
     chan cIn, cOut;
     chan notifications;
     par {
-        miiDriver(clk_smi, p_mii_resetn, smi, m, cIn, cOut, 0);
+        {
+            miiInitialise(clk_smi, p_mii_resetn, smi, m);
+            miiDriver(m, cIn, cOut);
+        }
         theServer(cIn, cOut, notifications, tcpApps);
     }
 }

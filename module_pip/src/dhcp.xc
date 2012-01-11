@@ -90,6 +90,8 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
     }
     if (messageType == 2) {
         pipCreateDHCP(0, proposedIP, serverIP);
+        interval = 1;
+        pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, PIP_FUZZ_1S);
     } else if (messageType == 5) {
         if (renewalTime == 0) {
             renewalTime = (leaseTime >> 1);
@@ -97,8 +99,8 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         if (rebindTime == 0) {
             rebindTime = leaseTime - (leaseTime >> 3);
         }
-        pipSetTimeOut(PIP_DHCP_TIMER_T1, renewalTime, 0, 1);
-        pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, 1);
+        pipSetTimeOut(PIP_DHCP_TIMER_T1, renewalTime, 0, PIP_FUZZ_1S);
+        pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, PIP_FUZZ_1S);
         myIP = proposedIP;
         mySubnetIP = subnet;
         printstr("Got an IP address\n");
@@ -115,8 +117,11 @@ void pipInitDHCP() {
     myIP = 0;
     mySubnetIP = 0;
     pipCreateDHCP(1, 0, 0);
-    pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, 1);
+    pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, PIP_FUZZ_1S);
     interval *= 2;
+    if (interval > 60) {
+        interval = 60;
+    }
 }
 
 void pipTimeOutDHCPT1() {

@@ -5,13 +5,15 @@
 
 #include <xs1.h>
 #include <print.h>
+#include <stdio.h>
 #include "timer.h"
 #include "dhcp.h"
 #include "arp.h"
+#include "tftp.h"
 #include "tcp.h"
 
 /* 
- * TImes are represented by a pair of numbers, an epoch and a time value.
+ * Times are represented by a pair of numbers, an epoch and a time value.
  * The time value ticks in 100 MHz reference clocks, the epoch value in
  * 2^30 reference clocks (approx 10.73 seconds). The epochs run out after
  * 1400 years; sufficient for our ethernet stack. 
@@ -46,6 +48,11 @@ static void numberZeroTimedOut() {
         pipTimeOutDHCPT2();
         break;
 #endif
+#ifdef PIP_TFTP
+    case PIP_TFTP_TIMER:
+        pipTimeOutTFTP();
+        break;
+#endif
 #ifdef PIP_ARP
     case PIP_ARP_TIMER:
         pipTimeOutARP();
@@ -72,7 +79,7 @@ select pipTimeOut(timer t) {
 //(timeOut[0].epoch < epoch) => default:                    // We somehow missed an epoch...
 //    numberZeroTimedOut();
 //    break;
-case globalTimer when timerafter(timeOutValue) :> unsigned now:
+case t when timerafter(timeOutValue) :> unsigned now:
     if (!waitingForEpoch) {
         numberZeroTimedOut();
     }
@@ -95,22 +102,34 @@ void pipSetTimeOut(int timerNumber, int secsDelay, int tenNSDelay, int fuzz) {
     unsigned int currentTime, currentEpoch;
     int i;
     unsigned h, l;
+    int done;
 
     globalTimer :> currentTime;
     currentEpoch = epoch;
     if ((epoch & ((1<<(32-EPOCH_BIT))-1)) != (currentTime >> EPOCH_BIT)) {
         currentEpoch++;
     }
-    if (fuzz) {
-        tenNSDelay += (currentTime & 1023) << 16;
-    }
+    tenNSDelay += currentTime & fuzz;
     {h,l} = mac(100000000, secsDelay, currentEpoch >> (32-EPOCH_BIT), tenNSDelay);
     {h,l} = mac(1, currentTime, h, l);
     wakeUpEpoch = h << (32 - EPOCH_BIT) | l >> EPOCH_BIT;
     wakeUp = l;
-
+    done = 0;
     for(i = timeOuts - 1; i >= 0; i--) {
         if (epochAfter(wakeUpEpoch, wakeUp, timeOut[i].epoch, timeOut[i].time)) {
+            break;
+        }
+        if (timeOut[i].timerNumber == timerNumber) {
+            for(int j = i; j < timeOuts-1; j++) {
+                timeOut[j] = timeOut[j+1];
+            }
+            done = 1;
+            for(i--; i >= 0; i--) {
+                if (epochAfter(wakeUpEpoch, wakeUp, timeOut[i].epoch, timeOut[i].time)) {
+                    break;
+                }
+                timeOut[i+1] = timeOut[i];
+            }
             break;
         }
         timeOut[i+1] = timeOut[i];
@@ -118,6 +137,9 @@ void pipSetTimeOut(int timerNumber, int secsDelay, int tenNSDelay, int fuzz) {
     timeOut[i+1].time = wakeUp;               // This may overwrite element zero
     timeOut[i+1].timerNumber = timerNumber;   // if loop terminated
     timeOut[i+1].epoch = wakeUpEpoch;         // This may overwrite element zero
+    if (done) {
+        return;
+    }
     timeOuts++;
     for(; i >=0; i--) {
         if (timeOut[i].timerNumber == timerNumber) {
@@ -129,4 +151,23 @@ void pipSetTimeOut(int timerNumber, int secsDelay, int tenNSDelay, int fuzz) {
         }
     }
     setTimeOutValue();
+}
+
+void pipResetTimeOut(int timerNumber) {
+    for(int i = 0; i < timeOuts; i++) {
+        if (timeOut[i].timerNumber == timerNumber) {
+            for(int j = i; j < timeOuts-1; j++) {
+                timeOut[j] = timeOut[j+1];
+            }
+            timeOuts--;
+            return;
+        }
+    }
+    setTimeOutValue();
+}
+
+void pipPrintTimeOuts() {
+    for(int i = 0; i < timeOuts; i++) {
+        printf("%d: [%d] %08x %08x\n", i, timeOut[i].timerNumber, timeOut[i].epoch, timeOut[i].time);
+    }
 }

@@ -1,2 +1,2 @@
 MODULE_XCC_FLAGS = $(XCC_FLAGS) -Os -Wall -g
-
+XCC_FLAGS_toplevel.xc = $(XCC_FLAGS) -O0 -Wall -g
