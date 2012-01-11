@@ -120,7 +120,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#define UIP_CONF_BUFFER_SIZE     XTCP_CLIENT_BUF_SIZE + UIP_LLH_LEN + UIP_TCPIP_HLEN
+#define UIP_CONF_BUFFER_SIZE     (XTCP_CLIENT_BUF_SIZE + UIP_LLH_LEN + UIP_TCPIP_HLEN)
 
 /**
  * CPU byte order.

@@ -4,7 +4,8 @@ TCP/IP Stack System Description
 Software Architecture
 ---------------------
 
-The following Figure shows the architecture of the TCP/IP stack:
+The following Figure shows the architecture of the TCP/IP stack when
+attaching to an independent Ethernet stack through XC channel:
 
 .. only:: html
 
@@ -21,16 +22,29 @@ The following Figure shows the architecture of the TCP/IP stack:
 
      XTCP software architecture
 
-The server runs in a single thread and connects to the XMOS eThernet
+The server runs in a single thread and connects to the XMOS Ethernet
 MAC component (see [XEth10]_). It can then connect to several client
 threads over XC channels.
+
+
+Alternatively, the TCP/IP server and Ethernet server can be run as
+an integrated system of two threads.  To enable this, the header
+file ``uip_single_server.h`` should be included, and the function
+:c:func:`uipSingleServer` used in place of the :c:func:`uip_server` and
+``ethernet_server`` function from the ethernet repository.  In addition,
+the ``module_mii_singlethread`` should be used instead of ``module_ethernet``
+and ``module_locks`` in the Makefile. Finally, define the constant
+``UIP_USE_SINGLE_THREADED_ETHERNET`` in your application's ``xtcp_client_config.h``
+file.
+
+
 
 IP Configuration
 ----------------
 
 The server will determine its IP configuration based on the arguments
-passed into the :c:func:`uip_server` function. If an address is
-supplied then that address will be used (a static IP address
+passed into the :c:func:`uip_server` or :c:func:`uipSingleServer` function.
+If an address is supplied then that address will be used (a static IP address
 configuration). If no address is supplied then the server will first
 try to find a DHCP server on the network to obtain an address
 automatically. If this fails it will determine a link local address

@@ -47,6 +47,7 @@ extern void igmp_periodic();
 static int txbuf[400];
 static int tx_buf_in_use=0;
 
+#pragma unsafe arrays
 void xcoredev_send(chanend tx)
 {
 	unsigned nWords = (uip_len+3)>>2;
