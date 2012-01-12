@@ -46,7 +46,7 @@ void pipInitTFTP() {
     t :> pipPortTFTP;
     pipPortTFTP = pipPortTFTP % 0xFFFF + 1;
     nextAck = 1;
-    address = 0x10000;
+    address = 0x1B000;            // TODO: MAKE 0x10000
     clientPort = TFTP_SERVER_PORT;
     pipReadTFTP();
 }
@@ -70,10 +70,14 @@ void pipIncomingTFTP(unsigned short packet[], unsigned srcIP, unsigned dstIP,
     int start;
     int base;
     int ourBase = 0x1C000;
-    nextAck = byterev(packet[offset+1])>>16;
-    if (srcPort != clientPort && clientPort == 69) {
-        clientPort = srcPort;
+    if (srcPort != clientPort) {
+        if (clientPort == TFTP_SERVER_PORT) {
+            clientPort = srcPort;
+        } else {
+            return;
+        }
     }
+    nextAck = byterev(packet[offset+1])>>16;
     switch(opcode) {
     case WRQ:
     case RRQ:
@@ -92,9 +96,9 @@ void pipIncomingTFTP(unsigned short packet[], unsigned srcIP, unsigned dstIP,
         }
         pipAcknowledgeTFTP();
         if (length != BLOCKSIZE) {
+            pipResetTimeOut(PIP_TFTP_TIMER);
             if (1 || checksum == 0) {
                 // Go.
-                pipResetTimeOut(PIP_TFTP_TIMER);
             } else {
                 pipInitTFTP();
             }

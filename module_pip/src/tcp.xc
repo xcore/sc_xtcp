@@ -41,6 +41,7 @@ struct tcpConnection {
     int appWaiting;               // This contains a streaming chanend if the app is waiting.
     int appStatus;                // This contains one of APP_CLOSING, APP_READING, etc
     int ackRequired;
+    int timeouts;
     struct rxqueue {
         int rd, wr, free, length;
         char buffer[BUFFERSIZERX];
@@ -136,23 +137,6 @@ static void appSendError(struct tcpConnection & conn) {
 }
 
 void pipInitTCP() {
-    pipSetTimeOut(PIP_TCP_TIMER_TIMEWAIT, 0, 10*1000*100, 0); // 10 ms clock
-}
-
-void pipTimeoutTCPTimewait() {
-    for(int i = 0; i < TCPCONNECTIONS; i++) {
-        switch(tcpConnections[i].state) {
-        case TIMEWAIT:  tcpConnections[i].state = TIMEWAIT0; break;
-        case TIMEWAIT0: tcpConnections[i].state = TIMEWAIT1; break;
-        case TIMEWAIT1: tcpConnections[i].state = TIMEWAIT2; break;
-        case TIMEWAIT2:
-            tcpConnections[i].state = CLOSED;
-            if (tcpConnections[i].appWaiting) {
-                appSendAcknowledge(tcpConnections[i]);
-            }
-            break;
-        }
-    }
     pipSetTimeOut(PIP_TCP_TIMER_TIMEWAIT, 0, 10*1000*100, 0); // 10 ms clock
 }
 
@@ -276,6 +260,48 @@ static void loadOutgoingData(struct tcpConnection &conn) {
     }
     pipOutgoingTCP(conn, i, PSH|ACK);
     conn.sndNXT += i;
+    conn.timeouts = 4;
+}
+
+void pipTimeoutTCPTimewait() {
+    for(int i = 0; i < TCPCONNECTIONS; i++) {
+        switch(tcpConnections[i].state) {
+        case TIMEWAIT:  tcpConnections[i].state = TIMEWAIT0; break;
+        case TIMEWAIT0: tcpConnections[i].state = TIMEWAIT1; break;
+        case TIMEWAIT1: tcpConnections[i].state = TIMEWAIT2; break;
+        case TIMEWAIT2:
+            tcpConnections[i].state = CLOSED;
+            if (tcpConnections[i].appWaiting) {
+                appSendAcknowledge(tcpConnections[i]);
+            }
+            break;
+        case ESTAB:          // TODO: add others.
+        case FINWAIT1:
+        case FINWAIT2:
+        case CLOSEWAIT:
+        case CLOSING:
+        case LASTACK:
+            if (tcpConnections[i].timeouts) {
+                int notAcknowledged = BUFFERSIZETX - (tcpConnections[i].tx.length + tcpConnections[i].tx.free);
+                if (notAcknowledged == 0) {
+                    tcpConnections[i].timeouts = 0;
+                } else {
+                    int t = ++tcpConnections[i].timeouts;
+                    if ((t&(t-1)) == 0) {        // 4, 8, 16, ...
+                        if (t > 255) {
+                            t = 128;
+                        }
+                        tcpConnections[i].sndNXT -= notAcknowledged;
+                        tcpConnections[i].tx.length += notAcknowledged;
+                        tcpConnections[i].tx.rd = (tcpConnections[i].tx.rd - notAcknowledged) & (BUFFERSIZETX - 1);
+                        loadOutgoingData(tcpConnections[i]);
+                    }
+                }
+            }
+            break;
+        }
+    }
+    pipSetTimeOut(PIP_TCP_TIMER_TIMEWAIT, 0, 10*1000*100, 0); // 10 ms clock
 }
 
 void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, unsigned dstIP, unsigned totalLength) {
