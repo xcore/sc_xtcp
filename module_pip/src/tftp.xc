@@ -1,3 +1,8 @@
+// Copyright (c) 2011, XMOS Ltd, All rights reserved
+// This software is freely distributable under a derivative of the
+// University of Illinois/NCSA Open Source License posted in
+// LICENSE.txt and at <http://github.xcore.com/>
+
 #include <xs1.h>
 #include <xclib.h>
 #include <print.h>
@@ -9,7 +14,7 @@
 #include "timer.h"
 
 
-// DHCP: RFC 1350
+// TFTP: RFC xxxx
 
 #define RRQ     1
 #define WRQ     2

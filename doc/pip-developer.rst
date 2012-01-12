@@ -155,6 +155,9 @@ Include the file ``tx.h`` to get access to this module.
 Ethernet
 ````````
 
+This module is used to handle Ethernet traffic.
+Include the file ``ethernet.h`` to get access to this module.
+
 Constants
 +++++++++
 
@@ -175,6 +178,9 @@ API
 
 IPv4
 ````
+
+This module is used to handle IPv4 traffic.
+Include the file ``ipv4.h`` to get access to this module.
 
 Constants
 +++++++++
@@ -200,6 +206,9 @@ API
 ARP
 ```
 
+This module is used to handle ARP traffic.
+Include the file ``arp.h`` to get access to this module.
+
 Constants
 +++++++++
 
@@ -224,3 +233,71 @@ API
 .. doxygenfunction:: pipCreateARP
 .. doxygenfunction:: pipARPStoreEntry
 
+
+TCP
+```
+
+These functions are used to handle TCP traffic.
+Include the file ``tcp.h`` to get access to this module.
+
+.. doxygenfunction:: pipInitTCP
+.. doxygenfunction:: pipIncomingTCP
+.. doxygenfunction:: pipTimeoutTCPTimewait
+.. doxygenfunction:: pipApplicationTCP
+
+UDP
+```
+
+These functions are used to handle UDP traffic.
+Include the file ``udp.h`` to get access to this module.
+
+.. doxygenfunction:: pipIncomingUDP
+.. doxygenfunction:: pipOutgoingUDP
+
+ICMP
+````
+
+These functions are used to handle ICMP traffic.
+Include the file ``icmp.h`` to get access to this module.
+
+.. doxygenfunction:: pipIncomingICMP
+
+DHCP
+````
+
+These functions are used to handle DHCP traffic. If TFTP is enabled, then a
+call to TFTP will be made once an address has been acquired.
+Include the file ``dhcp.h`` to get access to this module.
+
+
+.. doxygenfunction:: pipInitDHCP
+.. doxygenfunction:: pipIncomingDHCP
+.. doxygenfunction:: pipCreateDHCP
+.. doxygenfunction:: pipTimeOutDHCPT1
+.. doxygenfunction:: pipTimeOutDHCPT2
+
+
+TFTP
+````
+
+This module is used to handle TFTP traffic.
+Include the file ``tftp.h`` to get access to this module.
+
+
+Constants
++++++++++
+
+.. doxygendefine:: TFTP_SERVER_PORT
+
+Global variables
+++++++++++++++++
+
+.. doxygenvariable:: pipPortTFTP
+.. doxygenvariable:: pipIpTFTP
+
+API
++++
+
+.. doxygenfunction:: pipInitTFTP
+.. doxygenfunction:: pipIncomingTFTP
+.. doxygenfunction:: pipTimeOutTFTP
