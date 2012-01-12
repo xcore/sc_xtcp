@@ -115,6 +115,9 @@ void pipSetTimeOut(int timerNumber, int secsDelay, int tenNSDelay, int fuzz) {
     wakeUpEpoch = h << (32 - EPOCH_BIT) | l >> EPOCH_BIT;
     wakeUp = l;
     done = 0;
+
+// TODO: simplify code by first calling reset!!
+
     for(i = timeOuts - 1; i >= 0; i--) {
         if (epochAfter(wakeUpEpoch, wakeUp, timeOut[i].epoch, timeOut[i].time)) {
             break;
