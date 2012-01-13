@@ -17,6 +17,7 @@ Key Features
    * DHCP
    * mDNS
    * Example of HTTP server and Telnet
+   * TFTP server
 
 Firmware Overview
 =================
