@@ -49,8 +49,6 @@
 #include <xccompat.h>
 #include "xcoredev.h"
 
-#include <xscope.h>
-
 #define BUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 
@@ -92,7 +90,6 @@ uip_split_output(chanend mac_tx)
 			BUF->len[1] = uip_len & 0xff;
 #endif
 
-			xscope_probe(0);
 			/* Recalculate the TCP checksum. */
 			BUF->tcpchksum = 0;
 			BUF->tcpchksum = ~(uip_tcpchksum());
@@ -102,8 +99,6 @@ uip_split_output(chanend mac_tx)
 			BUF->ipchksum = 0;
 			BUF->ipchksum = ~(uip_ipchksum());
 #endif
-			xscope_probe(1);
-
 			uip_len += UIP_LLH_LEN;
 
 			/* Transmit the first packet. */
@@ -123,8 +118,6 @@ uip_split_output(chanend mac_tx)
 			BUF->len[0] = uip_len >> 8;
 			BUF->len[1] = uip_len & 0xff;
 #endif
-
-			xscope_probe(2);
 
 			/* Sadly we must copy the packet contents down to the bottom of the packet.
 			 *
@@ -146,8 +139,6 @@ uip_split_output(chanend mac_tx)
 			BUF->seqno[2] = uip_acc32[2];
 			BUF->seqno[3] = uip_acc32[3];
 
-			xscope_probe(3);
-
 			/* Recalculate the TCP checksum. */
 			BUF->tcpchksum = 0;
 			BUF->tcpchksum = ~(uip_tcpchksum());
@@ -158,12 +149,9 @@ uip_split_output(chanend mac_tx)
 			BUF->ipchksum = ~(uip_ipchksum());
 #endif
 
-			xscope_probe(4);
-
 			/* Transmit the second packet. */
 			uip_len += UIP_LLH_LEN;
 			xcoredev_send(mac_tx);
-			xscope_probe(5);
 		} else {
 			// We didn't compute the checksum earlier
 			BUF->tcpchksum = 0;
