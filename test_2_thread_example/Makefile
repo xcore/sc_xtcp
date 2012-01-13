@@ -22,7 +22,7 @@ XCC_FLAGS = -g -O3 -lxscope
 
 # The USED_MODULES variable lists other module used by the application. 
 
-USED_MODULES = module_xtcp module_mii_singlethread module_mii_singlethread_server
+USED_MODULES = module_xtcp module_mii_singlethread
 
 USE_XTCP_MAC_CUSTOM_FILTER = 1
 

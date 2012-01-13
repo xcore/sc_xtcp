@@ -16,9 +16,7 @@
 
 #define PORT_ETH_RST_N_MDIO  XS1_PORT_1P
 
-on stdcore[0]: port otp_data = XS1_PORT_32B; 		// OTP_DATA_PORT
-on stdcore[0]: out port otp_addr = XS1_PORT_16C;	// OTP_ADDR_PORT
-on stdcore[0]: port otp_ctrl = XS1_PORT_16D;		// OTP_CTRL_PORT
+on stdcore[0]: struct otp_ports p = { XS1_PORT_32B, XS1_PORT_16C, XS1_PORT_16D };
 
 on stdcore[0]: mii_interface_t mii =
   {
@@ -149,7 +147,7 @@ int main(void) {
             xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
             xscope_config_io(XSCOPE_IO_BASIC);
 
-            ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl, mac_address);
+            ethernet_getmac_otp(p, mac_address);
 
 	 		// Bring PHY out of reset
 	 		p_reset <: 0x2;
