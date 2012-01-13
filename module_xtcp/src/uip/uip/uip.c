@@ -299,6 +299,7 @@ void uip_add32(u8_t *op32, u16_t op16) {
 
 #if ! UIP_ARCH_CHKSUM
 /*---------------------------------------------------------------------------*/
+/*
 static u16_t chksum(u16_t sum, const u8_t *data, u16_t len) {
 	u16_t t;
 	const u8_t *dataptr;
@@ -307,11 +308,11 @@ static u16_t chksum(u16_t sum, const u8_t *data, u16_t len) {
 	dataptr = data;
 	last_byte = data + len - 1;
 
-	while (dataptr < last_byte) { /* At least two more bytes */
+	while (dataptr < last_byte) {
 		t = (dataptr[0] << 8) + dataptr[1];
 		sum += t;
 		if (sum < t) {
-			sum++; /* carry */
+			sum++;
 		}
 		dataptr += 2;
 	}
@@ -320,13 +321,36 @@ static u16_t chksum(u16_t sum, const u8_t *data, u16_t len) {
 		t = (dataptr[0] << 8) + 0;
 		sum += t;
 		if (sum < t) {
-			sum++; /* carry */
+			sum++;
 		}
 	}
 
-	/* Return sum in host byte order. */
 	return sum;
 }
+*/
+
+/* Alternative faster checksum computation */
+
+static int onesReduce(unsigned int sum, int carry) {
+    sum = (sum & 0xffff) + (sum >> 16) + carry;
+    return (sum & 0xffff) + (sum >> 16);
+}
+
+static u16_t chksum(u16_t sum, const u8_t *byte_data, u16_t lengthInBytes) {
+    int i;
+    short* data = (short*)byte_data;
+    unsigned s = sum;
+    for(i = 0; i < (lengthInBytes>>1); i++) {
+        s += byterev(data[i]) >> 16;
+    }
+    if (lengthInBytes & 1) {
+        s += byte_data[2*i] << 8;
+    }
+    sum = onesReduce(s, 0);
+    return sum;
+}
+
+
 /*---------------------------------------------------------------------------*/
 u16_t uip_chksum(u16_t *data, u16_t len) {
 	return htons(chksum(0, (u8_t *) data, len));

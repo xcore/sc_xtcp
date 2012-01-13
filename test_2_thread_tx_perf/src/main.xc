@@ -88,7 +88,7 @@ void udp_server(chanend c_xtcp)
   int response_len;
   static unsigned send_count = 0;
 
-  for (unsigned i=0; i<(sizeof(tx_buffer)+3)/4; ++i) (tx_buffer,unsigned[])[i] = 0;
+  for (unsigned i=0; i<(sizeof(tx_buffer)+3)/4; ++i) (tx_buffer,unsigned[])[i] = i;
 
   xtcp_listen(c_xtcp, INCOMING_PORT_UDP, XTCP_PROTOCOL_UDP);
   xtcp_listen(c_xtcp, INCOMING_PORT_TCP, XTCP_PROTOCOL_TCP);
@@ -154,7 +154,13 @@ int main(void) {
 	 	on stdcore[0]: {
             char mac_address[6];
 
-            xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
+            xscope_register(6,
+            		XSCOPE_DISCRETE, "0", XSCOPE_UINT, "i",
+            		XSCOPE_DISCRETE, "1", XSCOPE_UINT, "i",
+            		XSCOPE_DISCRETE, "2", XSCOPE_UINT, "i",
+            		XSCOPE_DISCRETE, "3", XSCOPE_UINT, "i",
+            		XSCOPE_DISCRETE, "4", XSCOPE_UINT, "i",
+            		XSCOPE_DISCRETE, "5", XSCOPE_UINT, "i");
             xscope_config_io(XSCOPE_IO_BASIC);
 
             ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl, mac_address);

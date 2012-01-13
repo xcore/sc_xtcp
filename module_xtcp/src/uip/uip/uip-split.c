@@ -43,12 +43,14 @@
 
 #include "uip-split.h"
 #include "uip.h"
-//#include "uip-fw.h"
+
 #include "uip_arch.h"
 
 #include <xccompat.h>
 #include "xcoredev.h"
-#include <print.h>
+
+#include <xscope.h>
+
 #define BUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 
@@ -72,14 +74,10 @@ uip_split_output(chanend mac_tx)
 	if (BUF->proto == UIP_PROTO_TCP && uip_len + UIP_TCPIP_HLEN > (UIP_BUFSIZE)/ 2) {
 
 		tcplen = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
-		/* Split the segment in two. If the original packet length was
-		 odd, we make the second packet one byte larger.
-		 */
-
-		len1 = len2 = tcplen / 2;
-		if (len1 + len2 < tcplen) {
-			++len2;
-		}
+		/* Split the segment in two, making sure the first segment is an
+		 * integer number of words */
+		len1 = (tcplen / 2) & ~3;
+		len2 = tcplen - len1;
 
 		/* Create the first packet. This is done by altering the length
 		 field of the IP header and updating the checksums. */
@@ -93,13 +91,17 @@ uip_split_output(chanend mac_tx)
 		BUF->len[1] = uip_len & 0xff;
 #endif
 
-		/* Recalculate the TCP checksum. */BUF->tcpchksum = 0;
+		xscope_probe(0);
+		/* Recalculate the TCP checksum. */
+		BUF->tcpchksum = 0;
 		BUF->tcpchksum = ~(uip_tcpchksum());
 
 #if !UIP_CONF_IPV6
-		/* Recalculate the IP checksum. */BUF->ipchksum = 0;
+		/* Recalculate the IP checksum. */
+		BUF->ipchksum = 0;
 		BUF->ipchksum = ~(uip_ipchksum());
 #endif
+		xscope_probe(1);
 
 		uip_len += UIP_LLH_LEN;
 
@@ -109,7 +111,7 @@ uip_split_output(chanend mac_tx)
 		/* Now, create the second packet. To do this, it is not enough to
 		 just alter the length field, but we must also update the TCP
 		 sequence number and point the uip_appdata to a new place in
-		 memory. This place is detemined by the length of the first
+		 memory. This place is determined by the length of the first
 		 packet (len1). */
 		uip_len = len2 + UIP_TCPIP_HLEN;
 #if UIP_CONF_IPV6
@@ -121,8 +123,21 @@ uip_split_output(chanend mac_tx)
 		BUF->len[1] = uip_len & 0xff;
 #endif
 
-		/*    uip_appdata += len1;*/
-		memcpy(uip_appdata, (u8_t *) uip_appdata + len1, len2);
+		xscope_probe(2);
+
+		/* Sadly we must copy the packet contents down to the bottom of the packet.
+		 *
+		 * We know that the data sections are on a short word boundary, and not
+		 * on a word boundary
+		 */
+		((u16_t*)uip_appdata)[0] = ((u16_t *)(uip_appdata + len1))[0];
+		{
+			unsigned* dst = (unsigned*)(uip_appdata+2);
+			unsigned* src = (unsigned*)(uip_appdata+2 + len1);
+			for (unsigned i=0; i<(len2/4+1); ++i) {
+				dst[i] = src[i];
+			}
+		}
 
 		uip_add32(BUF->seqno, len1);
 		BUF->seqno[0] = uip_acc32[0];
@@ -130,17 +145,24 @@ uip_split_output(chanend mac_tx)
 		BUF->seqno[2] = uip_acc32[2];
 		BUF->seqno[3] = uip_acc32[3];
 
-		/* Recalculate the TCP checksum. */BUF->tcpchksum = 0;
+		xscope_probe(3);
+
+		/* Recalculate the TCP checksum. */
+		BUF->tcpchksum = 0;
 		BUF->tcpchksum = ~(uip_tcpchksum());
 
 #if !UIP_CONF_IPV6
-		/* Recalculate the IP checksum. */BUF->ipchksum = 0;
+		/* Recalculate the IP checksum. */
+		BUF->ipchksum = 0;
 		BUF->ipchksum = ~(uip_ipchksum());
 #endif
+
+		xscope_probe(4);
 
 		/* Transmit the second packet. */
 		uip_len += UIP_LLH_LEN;
 		xcoredev_send(mac_tx);
+		xscope_probe(5);
 	} else {
 		xcoredev_send(mac_tx);
 	}

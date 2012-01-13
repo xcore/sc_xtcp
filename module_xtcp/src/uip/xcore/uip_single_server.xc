@@ -21,8 +21,6 @@
 #include "miiDriver.h"
 #include "miiClient.h"
 
-extern char notifySeen;
-
 extern int uip_static_ip;
 extern xtcp_ipconfig_t uip_static_ipconfig;
 
@@ -43,18 +41,41 @@ extern void uip_arp_timer(void);
 extern void autoip_periodic();
 extern void igmp_periodic();
 
-// The transmit packet buffer
-static int txbuf[400];
-static int tx_buf_in_use=0;
-
 #pragma unsafe arrays
 void xcoredev_send(chanend tx)
 {
+#if 1
+	static int txbuf0[1520/4];
+	static int txbuf1[1520/4];
+	static int tx_buf_in_use=0;
+	static int n=0;
+
+	unsigned nWords = (uip_len+3)>>2;
+	switch (n) {
+	case 0:
+		for (unsigned i=0; i<nWords; ++i) { txbuf0[i] = uip_buf32[i]; }
+		if (tx_buf_in_use) miiOutPacketDone(tx);
+	    miiOutPacket(tx, txbuf0, 0, (uip_len<60)?60:uip_len);
+	    n = 1;
+		break;
+	case 1:
+		for (unsigned i=0; i<nWords; ++i) { txbuf1[i] = uip_buf32[i]; }
+		if (tx_buf_in_use) miiOutPacketDone(tx);
+	    miiOutPacket(tx, txbuf1, 0, (uip_len<60)?60:uip_len);
+	    n = 0;
+		break;
+	}
+    tx_buf_in_use=1;
+#else
+    static int txbuf[1520/4];
+    static int tx_buf_in_use=0;
+
 	unsigned nWords = (uip_len+3)>>2;
 	if (tx_buf_in_use) miiOutPacketDone(tx);
 	for (unsigned i=0; i<nWords; ++i) { txbuf[i] = uip_buf32[i]; }
     miiOutPacket(tx, txbuf, 0, (uip_len<60)?60:uip_len);
     tx_buf_in_use=1;
+#endif
 }
 
 #pragma unsafe arrays
@@ -78,12 +99,15 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 	timer tmr;
 	unsigned timeout, autoip_timer=0, arp_timer=0;
 
+	// Control structure for MII LLD
+	struct miiData miiData;
+
 	// The Receive packet buffer
     int b[3200];
 
     uip_server_init(xtcp, num_xtcp, ipconfig, mac_address);
 
-    miiBufferInit(mac_rx, cNotifications, b, 3200);
+    miiBufferInit(miiData, mac_rx, cNotifications, b, 3200);
     miiOutInit(mac_tx);
 
     tmr :> timeout;
@@ -129,16 +153,16 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 			break;
 
 
-        case inuchar_byref(cNotifications, notifySeen):
+        case inuchar_byref(cNotifications, miiData.notifySeen):
 			do {
-				{address,length,timeStamp} = miiGetInBuffer();
+				{address,length,timeStamp} = miiGetInBuffer(miiData);
 				if (address != 0) {
 					static unsigned pcnt=1;
 					uip_len = length;
 					copy_packet(uip_buf32, address, length);
 					xtcp_process_incoming_packet(mac_tx);
-		            miiFreeInBuffer(address);
-		            miiRestartBuffer();
+		            miiFreeInBuffer(miiData, address);
+		            miiRestartBuffer(miiData);
 				}
 			} while (address!=0);
 
