@@ -67,105 +67,111 @@
 // until the other end times out of the 300ms delay before sending us an ACK.
 void
 uip_split_output(chanend mac_tx)
- {
+{
 	u16_t tcplen, len1, len2;
 
 	/* We only try to split maximum sized TCP segments. */
-	if (BUF->proto == UIP_PROTO_TCP && uip_len + UIP_TCPIP_HLEN > (UIP_BUFSIZE)/ 2) {
+	if (BUF->proto == UIP_PROTO_TCP) {
+		if (uip_len + UIP_TCPIP_HLEN > (UIP_BUFSIZE) / 2) {
 
-		tcplen = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
-		/* Split the segment in two, making sure the first segment is an
-		 * integer number of words */
-		len1 = (tcplen / 2) & ~3;
-		len2 = tcplen - len1;
+			tcplen = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
+			/* Split the segment in two, making sure the first segment is an
+			 * integer number of words */
+			len1 = (tcplen / 2) & ~3;
+			len2 = tcplen - len1;
 
-		/* Create the first packet. This is done by altering the length
-		 field of the IP header and updating the checksums. */
-		uip_len = len1 + UIP_TCPIP_HLEN;
+			/* Create the first packet. This is done by altering the length
+			 field of the IP header and updating the checksums. */
+			uip_len = len1 + UIP_TCPIP_HLEN;
 #if UIP_CONF_IPV6
-		/* For IPv6, the IP length field does not include the IPv6 IP header length. */
-		BUF->len[0] = ((uip_len - UIP_IPH_LEN) >> 8);
-		BUF->len[1] = ((uip_len - UIP_IPH_LEN) & 0xff);
+			/* For IPv6, the IP length field does not include the IPv6 IP header length. */
+			BUF->len[0] = ((uip_len - UIP_IPH_LEN) >> 8);
+			BUF->len[1] = ((uip_len - UIP_IPH_LEN) & 0xff);
 #else
-		BUF->len[0] = uip_len >> 8;
-		BUF->len[1] = uip_len & 0xff;
+			BUF->len[0] = uip_len >> 8;
+			BUF->len[1] = uip_len & 0xff;
 #endif
 
-		xscope_probe(0);
-		/* Recalculate the TCP checksum. */
-		BUF->tcpchksum = 0;
-		BUF->tcpchksum = ~(uip_tcpchksum());
+			xscope_probe(0);
+			/* Recalculate the TCP checksum. */
+			BUF->tcpchksum = 0;
+			BUF->tcpchksum = ~(uip_tcpchksum());
 
 #if !UIP_CONF_IPV6
-		/* Recalculate the IP checksum. */
-		BUF->ipchksum = 0;
-		BUF->ipchksum = ~(uip_ipchksum());
+			/* Recalculate the IP checksum. */
+			BUF->ipchksum = 0;
+			BUF->ipchksum = ~(uip_ipchksum());
 #endif
-		xscope_probe(1);
+			xscope_probe(1);
 
-		uip_len += UIP_LLH_LEN;
+			uip_len += UIP_LLH_LEN;
 
-		/* Transmit the first packet. */
-		xcoredev_send(mac_tx);
+			/* Transmit the first packet. */
+			xcoredev_send(mac_tx);
 
-		/* Now, create the second packet. To do this, it is not enough to
-		 just alter the length field, but we must also update the TCP
-		 sequence number and point the uip_appdata to a new place in
-		 memory. This place is determined by the length of the first
-		 packet (len1). */
-		uip_len = len2 + UIP_TCPIP_HLEN;
+			/* Now, create the second packet. To do this, it is not enough to
+			 just alter the length field, but we must also update the TCP
+			 sequence number and point the uip_appdata to a new place in
+			 memory. This place is determined by the length of the first
+			 packet (len1). */
+			uip_len = len2 + UIP_TCPIP_HLEN;
 #if UIP_CONF_IPV6
-		/* For IPv6, the IP length field does not include the IPv6 IP header length. */
-		BUF->len[0] = ((uip_len - UIP_IPH_LEN) >> 8);
-		BUF->len[1] = ((uip_len - UIP_IPH_LEN) & 0xff);
+			/* For IPv6, the IP length field does not include the IPv6 IP header length. */
+			BUF->len[0] = ((uip_len - UIP_IPH_LEN) >> 8);
+			BUF->len[1] = ((uip_len - UIP_IPH_LEN) & 0xff);
 #else
-		BUF->len[0] = uip_len >> 8;
-		BUF->len[1] = uip_len & 0xff;
+			BUF->len[0] = uip_len >> 8;
+			BUF->len[1] = uip_len & 0xff;
 #endif
 
-		xscope_probe(2);
+			xscope_probe(2);
 
-		/* Sadly we must copy the packet contents down to the bottom of the packet.
-		 *
-		 * We know that the data sections are on a short word boundary, and not
-		 * on a word boundary
-		 */
-		((u16_t*)uip_appdata)[0] = ((u16_t *)(uip_appdata + len1))[0];
-		{
-			unsigned* dst = (unsigned*)(uip_appdata+2);
-			unsigned* src = (unsigned*)(uip_appdata+2 + len1);
-			for (unsigned i=0; i<(len2/4+1); ++i) {
-				dst[i] = src[i];
+			/* Sadly we must copy the packet contents down to the bottom of the packet.
+			 *
+			 * We know that the data sections are on a short word boundary, and not
+			 * on a word boundary
+			 */
+			((u16_t*) uip_appdata)[0] = ((u16_t *) (uip_appdata + len1))[0];
+			{
+				unsigned* dst = (unsigned*) (uip_appdata + 2);
+				unsigned* src = (unsigned*) (uip_appdata + 2 + len1);
+				for (unsigned i = 0; i < (len2 / 4 + 1); ++i) {
+					dst[i] = src[i];
+				}
 			}
-		}
 
-		uip_add32(BUF->seqno, len1);
-		BUF->seqno[0] = uip_acc32[0];
-		BUF->seqno[1] = uip_acc32[1];
-		BUF->seqno[2] = uip_acc32[2];
-		BUF->seqno[3] = uip_acc32[3];
+			uip_add32(BUF->seqno, len1);
+			BUF->seqno[0] = uip_acc32[0];
+			BUF->seqno[1] = uip_acc32[1];
+			BUF->seqno[2] = uip_acc32[2];
+			BUF->seqno[3] = uip_acc32[3];
 
-		xscope_probe(3);
+			xscope_probe(3);
 
-		/* Recalculate the TCP checksum. */
-		BUF->tcpchksum = 0;
-		BUF->tcpchksum = ~(uip_tcpchksum());
+			/* Recalculate the TCP checksum. */
+			BUF->tcpchksum = 0;
+			BUF->tcpchksum = ~(uip_tcpchksum());
 
 #if !UIP_CONF_IPV6
-		/* Recalculate the IP checksum. */
-		BUF->ipchksum = 0;
-		BUF->ipchksum = ~(uip_ipchksum());
+			/* Recalculate the IP checksum. */
+			BUF->ipchksum = 0;
+			BUF->ipchksum = ~(uip_ipchksum());
 #endif
 
-		xscope_probe(4);
+			xscope_probe(4);
 
-		/* Transmit the second packet. */
-		uip_len += UIP_LLH_LEN;
-		xcoredev_send(mac_tx);
-		xscope_probe(5);
+			/* Transmit the second packet. */
+			uip_len += UIP_LLH_LEN;
+			xcoredev_send(mac_tx);
+			xscope_probe(5);
+		} else {
+			// We didn't compute the checksum earlier
+			BUF->tcpchksum = 0;
+			BUF->tcpchksum = ~(uip_tcpchksum());
+			xcoredev_send(mac_tx);
+		}
 	} else {
 		xcoredev_send(mac_tx);
 	}
-
 }
 /*-----------------------------------------------------------------------------*/

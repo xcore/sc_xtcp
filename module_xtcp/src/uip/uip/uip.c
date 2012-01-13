@@ -1935,9 +1935,7 @@ void uip_process(u8_t flag) {
 
 	BUF->urgp[0] = BUF->urgp[1] = 0;
 
-	/* Calculate TCP checksum. */
-	BUF->tcpchksum = 0;
-	BUF->tcpchksum = ~(uip_tcpchksum());
+	/* The TCP checksum is calculated later, in the uip_split_output function */
 
 	ip_send_nolen:
 
