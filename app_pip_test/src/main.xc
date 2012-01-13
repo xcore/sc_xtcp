@@ -7,6 +7,7 @@
 #include <print.h>
 #include "miiDriver.h"
 #include "mii.h"
+#include "getmac.h"
 //#include "xscope.h"
 #include "pipServer.h"
 #include "tcpApplication.h"
@@ -40,6 +41,10 @@ on stdcore[1]: smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
 #endif
 
 on stdcore[1]: clock clk_smi = XS1_CLKBLK_5;
+
+on stdcore[1]: port otp_data = XS1_PORT_32B; 		// OTP_DATA_PORT
+on stdcore[1]: out port otp_addr = XS1_PORT_16C;	// OTP_ADDR_PORT
+on stdcore[1]: port otp_ctrl = XS1_PORT_16D;		// OTP_CTRL_PORT
 
 static void httpServer(streaming chanend tcpStack) {
     unsigned char buf[12];
@@ -86,7 +91,11 @@ int main(void) {
 
 	par
 	{
-	 	on stdcore[1]: pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
+	 	on stdcore[1]: {
+	 		ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl, myMacAddress);
+	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
+	 	}
+
 	 	on stdcore[1]: httpServer(tcpApps);
     }
     return 0;

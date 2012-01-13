@@ -8,3 +8,5 @@ void pipServer(clock clk_smi,
                smi_interface_t &smi,
                mii_interface_t &m,
                streaming chanend tcpApps);
+
+extern unsigned char myMacAddress[6];
