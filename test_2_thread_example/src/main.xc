@@ -54,6 +54,9 @@ xtcp_ipconfig_t ipconfig = {
 #define INCOMING_PORT_SINGLE 101
 #define INCOMING_PORT_TCP 102
 
+// This prevents all of the shutdown code being compiled in, saving ...
+void __libc_done() { }
+void _exit_unlocked() { }
 
 /*
  *  This thread implements three 'server' like services.
