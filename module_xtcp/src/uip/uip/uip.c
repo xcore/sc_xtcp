@@ -412,22 +412,15 @@ uip_udpchksum(void)
 #endif /* UIP_ARCH_CHKSUM */
 /*---------------------------------------------------------------------------*/
 void uip_init(void) {
-	for (c = 0; c < UIP_LISTENPORTS; ++c) {
-		uip_listenports[c] = 0;
-		uip_udp_listenports[c] = 0;
-	}
-	for (c = 0; c < UIP_CONNS; ++c) {
-		uip_conns[c].tcpstateflags = UIP_CLOSED;
-	}
+	memset(uip_listenports, 0, sizeof(uip_listenports));
+	memset(uip_udp_listenports, 0, sizeof(uip_listenports));
+	memset(uip_conns, 0, sizeof(uip_conns));
 #if UIP_ACTIVE_OPEN
 	lastport = 1024;
 #endif /* UIP_ACTIVE_OPEN */
 
 #if UIP_UDP
-	for(c = 0; c < UIP_UDP_CONNS; ++c) {
-		uip_udp_conns[c].lport = 0;
-		uip_udp_conns[c].rport = 0;
-	}
+	memset(uip_udp_conns, 0, sizeof(uip_udp_conns));
 #endif /* UIP_UDP */
 }
 

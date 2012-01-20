@@ -29,7 +29,7 @@ void uip_log(char m[]) {
 #endif
 
 #ifdef XTCP_VERBOSE_DEBUG
-void uip_printip4(const uip_ipaddr_t ip4) {
+__attribute__ ((noinline)) void uip_printip4(const uip_ipaddr_t ip4) {
 	printint(uip_ipaddr1(ip4));
 	printstr(".");
 	printint(uip_ipaddr2(ip4));
@@ -52,12 +52,10 @@ void xtcp_tx_buffer(chanend mac_tx) {
 
 void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, unsigned char mac_address[6])
 {
-	uip_ipaddr_t ipaddr;
-
 	if (ipconfig != NULL)
 		memcpy(&uip_static_ipconfig, ipconfig, sizeof(xtcp_ipconfig_t));
 
-	memcpy(&uip_ethaddr.addr[0], mac_address, 6);
+	memcpy(&uip_ethaddr, mac_address, 6);
 
 	uip_init();
 
@@ -65,47 +63,29 @@ void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, un
 	igmp_init();
 #endif
 
-	if (ipconfig != NULL && (ipconfig->ipaddr[0] != 0 || ipconfig->ipaddr[1]
-			!= 0 || ipconfig->ipaddr[2] != 0 || ipconfig->ipaddr[3] != 0)) {
+	if (ipconfig != NULL && (*((int*)ipconfig->ipaddr) != 0)) {
 		uip_static_ip = 1;
-		uip_ipaddr(ipaddr, ipconfig->ipaddr[0], ipconfig->ipaddr[1],
-						ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
 	}
 
 	if (ipconfig == NULL)
 	{
+		uip_ipaddr_t ipaddr;
 		uip_ipaddr(ipaddr, 0, 0, 0, 0);
-	}
+		uip_sethostaddr(ipaddr);
+		uip_setdraddr(ipaddr);
+		uip_setnetmask(ipaddr);
+	} else {
 
-	if (ipconfig != NULL)
-	{
-		uip_ipaddr(ipaddr, ipconfig->ipaddr[0], ipconfig->ipaddr[1],
-				ipconfig->ipaddr[2], ipconfig->ipaddr[3]);
+		uip_sethostaddr(ipconfig->ipaddr);
+		uip_setdraddr(ipconfig->gateway);
+		uip_setnetmask(ipconfig->netmask);
+
 #ifdef XTCP_VERBOSE_DEBUG
-		printstr("Address: ");uip_printip4(ipaddr);printstr("\n");
+		printstr("Address: ");uip_printip4(uip_hostaddr);printstr("\n");
+		printstr("Gateway: ");uip_printip4(uip_draddr);printstr("\n");
+		printstr("Netmask: ");uip_printip4(uip_netmask);printstr("\n");
 #endif
 	}
-	uip_sethostaddr(ipaddr);
-
-	if (ipconfig != NULL)
-	{
-		uip_ipaddr(ipaddr, ipconfig->gateway[0], ipconfig->gateway[1],
-				ipconfig->gateway[2], ipconfig->gateway[3]);
-#ifdef XTCP_VERBOSE_DEBUG
-		printstr("Gateway: ");uip_printip4(ipaddr);printstr("\n");
-#endif
-	}
-	uip_setdraddr(ipaddr);
-
-	if (ipconfig != NULL)
-	{
-		uip_ipaddr(ipaddr, ipconfig->netmask[0], ipconfig->netmask[1],
-				ipconfig->netmask[2], ipconfig->netmask[3]);
-#ifdef XTCP_VERBOSE_DEBUG
-		printstr("Netmask: ");uip_printip4(ipaddr);printstr("\n");
-#endif
-	}
-	uip_setnetmask(ipaddr);
 
 	{
 		int hwsum = mac_address[0] + mac_address[1] + mac_address[2]
@@ -256,6 +236,7 @@ void uip_linkup() {
 		uip_xtcp_down();
 
 	if (uip_static_ip) {
+#if UIP_CONF_IPV6
 		uip_ipaddr_t ipaddr;
 		uip_ipaddr(ipaddr,
 				uip_static_ipconfig.ipaddr[0],
@@ -275,6 +256,11 @@ void uip_linkup() {
 				uip_static_ipconfig.netmask[2],
 				uip_static_ipconfig.netmask[3]);
 		uip_setnetmask(ipaddr);
+#else
+		uip_sethostaddr(uip_static_ipconfig.ipaddr);
+		uip_setdraddr(uip_static_ipconfig.gateway);
+		uip_setnetmask(uip_static_ipconfig.netmask);
+#endif
 		uip_xtcp_up();
 	} else {
 		dhcp_done = 0;

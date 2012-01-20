@@ -218,6 +218,7 @@ static void send_conn_and_complete(chanend c,
   chkct(c, XS1_CT_END);
 }
 
+#pragma unsafe arrays
 int xtcpd_service_client0(chanend xtcp, int i, int waiting_link)
 {
   int activity = 1;
@@ -261,6 +262,7 @@ int xtcpd_service_client0(chanend xtcp, int i, int waiting_link)
   return activity;
 }
 
+#pragma unsafe arrays
 void xtcpd_service_clients(chanend xtcp[], int num_xtcp){
     int activity = 1;
     while (activity) {
@@ -271,6 +273,7 @@ void xtcpd_service_clients(chanend xtcp[], int num_xtcp){
   }	
 }
 
+#pragma unsafe arrays
 void xtcpd_service_clients_until_ready(int waiting_link,
                                        chanend xtcp[], 
                                        int num_xtcp)
@@ -327,7 +330,7 @@ void xtcpd_recv(chanend xtcp[],
   return;
 }
 
-
+#pragma unsafe arrays
 int xtcpd_send(chanend c,        
                xtcp_event_type_t event,
                xtcpd_state_t &s,
@@ -361,6 +364,7 @@ void xtcpd_send_config_event(chanend c,
 
 
 
+#pragma unsafe arrays
 void xtcpd_server_init() {
   for (int i=0;i<MAX_XTCP_CLIENTS;i++) {
     notified[i] = 0;
@@ -368,6 +372,7 @@ void xtcpd_server_init() {
   }
 }
 
+#pragma unsafe arrays
 void xtcpd_queue_event(chanend c, int linknum, int event)
 {
   pending_event[linknum] = event;
