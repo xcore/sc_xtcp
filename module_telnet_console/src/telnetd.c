@@ -10,8 +10,7 @@
 #include "telnetd.h"
 #include "telnet_protocol.h"
 
-
-// Structure to hold HTTP state
+// Structure to hold Telnet state
 typedef struct telnetd_state_t {
   int active;
   int index;
@@ -36,21 +35,58 @@ enum parse_state {
   PARSING_EOL
 };
 
-// Initiate the HTTP state
+/* Declaration of callback function */
+void (*application_callback)(xtcp_connection_t *conn, char data);
+
+/* Default call back function, in case application does not
+ * require to provide a call back */
+void default_callback(xtcp_connection_t *conn, char data)
+{
+	;
+}
+
+/* Declaration to register a callback function */
+void register_callback(void (*fnCallBack)(xtcp_connection_t *, char ))
+{
+	application_callback = fnCallBack;
+}
+
+/* Initiate the telnet state and listen on configured telnet port */
 void telnetd_init(chanend tcp_svr)
 {
   int i;
-  // Listen on the http port
+  // Listen on the telnet port
   xtcp_listen(tcp_svr, TELNETD_PORT, XTCP_PROTOCOL_TCP);
-  
+
   for ( i = 0; i < NUM_TELNETD_CONNECTIONS; i++ )
     {
       connection_states[i].active = 0;
       connection_states[i].index = i;
     }
+  register_callback(default_callback);
 }
 
+/* Initiate telnet state and register default callback function */
+void telnetd_init_conn(chanend tcp_svr)
+{
+  int i;
 
+  for ( i = 0; i < NUM_TELNETD_CONNECTIONS; i++ )
+    {
+      connection_states[i].active = 0;
+      connection_states[i].index = i;
+    }
+
+  register_callback(default_callback);
+}
+
+/* invoke application registered callback function */
+void application_callback_handler(xtcp_connection_t *conn,
+								  char data,
+								  void (*fnAppCallBack)(xtcp_connection_t *, char))
+{
+	fnAppCallBack(conn, data);
+}
 
 // Parses a HTTP request for a GET
 static void parse_telnet_stream(chanend tcp_svr,
@@ -134,6 +170,8 @@ static void parse_telnet_stream(chanend tcp_svr,
               !(data[i] & 0x80)) {
             hs->line_buf_in[hs->inptr] = data[i];
             hs->inptr++;
+            /* Invoke application registered call back function */
+            application_callback_handler(conn, data[i],application_callback);
           }
           break;
         }
@@ -156,9 +194,11 @@ static void parse_telnet_stream(chanend tcp_svr,
   }
 }
 
-
-
-// Receive a HTTP request
+// Receive a telnet request
+/* This stack value must be manually changed */
+/* This pragma provides a stack bound to any application function that is
+ * registered as a callback function */
+#pragma stackfunction 100
 void telnetd_recv(chanend tcp_svr, xtcp_connection_t *conn)
 {
 	struct telnetd_state_t *hs = (struct telnetd_state_t *) conn->appstate;
@@ -169,7 +209,7 @@ void telnetd_recv(chanend tcp_svr, xtcp_connection_t *conn)
 	len = xtcp_recv(tcp_svr, data);
 
 	// Otherwise we have data, so parse it
-        parse_telnet_stream(tcp_svr, conn, hs, &data[0], len);
+	parse_telnet_stream(tcp_svr, conn, hs, &data[0], len);
 }
 
 
@@ -345,4 +385,29 @@ int telnetd_send(chanend tcp_svr,
   return success;
 }
 
+/* Retreive connection index from list of connection states */
+int fetch_connection_state_index(int conn_id)
+{
+	int i;
 
+	/* identify i (telnet connection_state) from channel_id and conn_id */
+	for (i=0;i<NUM_TELNETD_CONNECTIONS;i++)
+	{
+		if ((connection_states[i].conn_id == conn_id) &&
+				(connection_states[i].active))
+		{
+			return connection_states[i].index;
+		}
+	}
+	return -1;
+}
+
+/* Send some data back for a Telnet request */
+void telnet_buffered_send_handler(chanend tcp_svr, xtcp_connection_t *conn)
+{
+	struct telnetd_state_t *st =
+			(struct telnetd_state_t *) conn->appstate;
+	xtcp_buffered_send_handler(tcp_svr, conn, &st->bufinfo);
+
+	return;
+}
