@@ -24,25 +24,25 @@ struct arp_hdr {
   u16_t dipaddr[2];
 };
 
-struct ethip_hdr {
-  struct uip_eth_hdr ethhdr;
-  /* IP header. */
-  u8_t vhl,
-    tos,
-    len[2],
-    ipid[2],
-    ipoffset[2],
-    ttl,
-    proto;
-  u16_t ipchksum;
-  u16_t srcipaddr[2],
-    destipaddr[2];
-};
-
 #define ARP_REQUEST 1
 #define ARP_REPLY   2
 
 #define ARP_HWTYPE_ETH 1
+
+static struct arp_hdr autoip_arp_pkt = {
+		{ { { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff } },
+		  { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+		    HTONS(UIP_ETHTYPE_ARP) },
+		HTONS(ARP_HWTYPE_ETH),
+		HTONS(UIP_ETHTYPE_IP),
+		6,
+		4,
+		HTONS(ARP_REQUEST),
+		{ { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+		{ 0x0000, 0x0000 },
+		{ { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+		{ 0x0000, 0x0000 }
+};
 
 // Values taken from RFC 3927
 
@@ -81,22 +81,28 @@ struct autoip_state_t {
 
 #define BUF   ((struct arp_hdr *)&uip_buf[0])
 
-static unsigned int a=1664525;
-static unsigned int c=1013904223;
+#if UIP_USE_AUTOIP
 
-#define RAND(x) do {x = a*x+c;} while (0)
+static const unsigned int a=1664525;
+static const unsigned int c=1013904223;
 
 static struct autoip_state_t my_autoip_state;
-
 static struct autoip_state_t *autoip_state = &my_autoip_state;
 
-void autoip_init(int seed) 
+__attribute__ ((noinline))
+static void rand(struct autoip_state_t* s)
+{
+	s->rand = a*s->rand+c;
+}
+
+__attribute__ ((noinline))
+void autoip_init(int seed)
 {
   autoip_state->state = DISABLED;
   autoip_state->probes_sent = 0;
   autoip_state->announces_sent = 0;
   autoip_state->num_conflicts = 0;
-  autoip_state->limit_rate = 0;  
+  autoip_state->limit_rate = 0;
   autoip_state->seed = seed;
   autoip_state->rand = seed;
 }
@@ -106,36 +112,28 @@ static void random_timer_set(struct uip_timer *t,
                       int b)
 { 
   long long x;
-  RAND(autoip_state->rand);
+  rand(autoip_state);
   x = autoip_state->rand * (b-a);
   x = x >> 32;
   timer_set(t, a + x);
 }                     
 
+__attribute__ ((noinline))
 static void create_arp_packet() 
 {
-  memset(BUF->ethhdr.dest.addr, 0xff, 6);
-  memset(BUF->dhwaddr.addr, 0x00, 6);
-  memcpy(BUF->ethhdr.src.addr, uip_ethaddr.addr, 6);
-  memcpy(BUF->shwaddr.addr, uip_ethaddr.addr, 6);
+	memcpy(BUF, &autoip_arp_pkt, sizeof(autoip_arp_pkt));
+	memcpy(BUF->ethhdr.src.addr, uip_ethaddr.addr, 6);
+	memcpy(BUF->shwaddr.addr, uip_ethaddr.addr, 6);
   
-  BUF->opcode = HTONS(ARP_REQUEST); /* ARP request. */
-  BUF->hwtype = HTONS(ARP_HWTYPE_ETH);
-  BUF->protocol = HTONS(UIP_ETHTYPE_IP);
-  BUF->hwlen = 6;
-  BUF->protolen = 4;
-  BUF->ethhdr.type = HTONS(UIP_ETHTYPE_ARP); 
-  uip_appdata = &uip_buf[UIP_TCPIP_HLEN + UIP_LLH_LEN];    
-  uip_len = sizeof(struct arp_hdr);
-
+	uip_appdata = &uip_buf[UIP_TCPIP_HLEN + UIP_LLH_LEN];
+	uip_len = sizeof(struct arp_hdr);
 }
 
 static void send_probe() 
 {
   create_arp_packet();
   uip_ipaddr_copy(BUF->dipaddr, autoip_state->ipaddr);
-  BUF->sipaddr[0] = 0;
-  BUF->sipaddr[1] = 0;
+
   autoip_state->probes_sent++;
   random_timer_set(&autoip_state->timer,
                    PROBE_MIN * CLOCK_SECOND,
@@ -162,7 +160,7 @@ void autoip_periodic()
       {
         int r1,r2;
         if (!autoip_state->limit_rate || timer_expired(&autoip_state->timer)) {
-          RAND(autoip_state->rand);          
+          rand(autoip_state);
           r1 = autoip_state->rand & 0xff;
           r2 = (autoip_state->rand & 0xff00) >> 8;
           uip_ipaddr(&(autoip_state->ipaddr),169,254,r1,r2);
@@ -239,20 +237,17 @@ void autoip_arp_in()
 
 void autoip_start() 
 {
-  //  printstr("ipv4ll allocation started\n");
   if (autoip_state->state == DISABLED) {
-    autoip_state->rand = autoip_state->seed;
-    RAND(autoip_state->rand);
+	autoip_init(autoip_state->seed);
+    rand(autoip_state);
     autoip_state->state = NO_ADDRESS;
-    autoip_state->probes_sent = 0;
-    autoip_state->announces_sent = 0;
-    autoip_state->num_conflicts = 0;
-    autoip_state->limit_rate = 0;  
   }
 }
 
 void autoip_stop() 
 {
-  //  printstr("ipv4ll allocation stopped\n");
   autoip_state->state = DISABLED;
 }
+
+#endif
+

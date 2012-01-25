@@ -100,6 +100,8 @@ struct dhcp_msg {
 #define DHCP_OPTION_REQ_LIST     55
 #define DHCP_OPTION_END         255
 
+#if UIP_USE_DHCP
+
 static u8_t xid[4];
 static unsigned int rand_seed;
 static unsigned int rand_startup;
@@ -150,7 +152,7 @@ add_end(u8_t *optptr)
   return optptr;
 }
 /*---------------------------------------------------------------------------*/
-static void
+__attribute__ ((noinline)) static void
 create_msg(register struct dhcp_msg *m)
 {
   m->op = DHCP_REQUEST;
@@ -160,18 +162,16 @@ create_msg(register struct dhcp_msg *m)
   memcpy(m->xid, xid, sizeof(m->xid));
   m->secs = 0;
   m->flags = HTONS(BOOTP_BROADCAST); /*  Broadcast bit. */
-  /*  uip_ipaddr_copy(m->ciaddr, uip_hostaddr);*/
+
   memcpy(m->ciaddr, uip_hostaddr, sizeof(m->ciaddr));
-  memset(m->yiaddr, 0, sizeof(m->yiaddr));
-  memset(m->siaddr, 0, sizeof(m->siaddr));
-  memset(m->giaddr, 0, sizeof(m->giaddr));
-  memcpy(m->chaddr, s.mac_addr, s.mac_len);
-  memset(&m->chaddr[s.mac_len], 0, sizeof(m->chaddr) - s.mac_len);
+
 #ifndef UIP_CONF_DHCP_LIGHT
-  memset(m->sname, 0, sizeof(m->sname));
-  memset(m->file, 0, sizeof(m->file));
+  memset(m->yiaddr, 0, sizeof(m->yiaddr)+sizeof(m->siaddr)+sizeof(m->giaddr)+sizeof(m->chaddr)+sizeof(m->sname)+sizeof(m->file));
+#else
+  memset(m->yiaddr, 0, sizeof(m->yiaddr)+sizeof(m->siaddr)+sizeof(m->giaddr)+sizeof(m->chaddr));
 #endif
 
+  memcpy(m->chaddr, s.mac_addr, s.mac_len);
   memcpy(m->options, magic_cookie, sizeof(magic_cookie));
 }
 /*---------------------------------------------------------------------------*/
@@ -326,12 +326,12 @@ PT_THREAD(handle_dhcp(void))
         
         } while (!timer_expired(&s.timer));
         
-    #ifdef UIP_USE_AUTOIP
+#if UIP_USE_AUTOIP
         if (s.ticks == CLOCK_SECOND * 4)
         {
             autoip_start();
         }
-    #endif
+#endif
         
         if (s.ticks < CLOCK_SECOND * 60)
         {
@@ -490,3 +490,6 @@ dhcpc_request(void)
   }
 }
 /*---------------------------------------------------------------------------*/
+
+#endif
+

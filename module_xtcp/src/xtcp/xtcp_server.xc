@@ -22,6 +22,7 @@ static void handle_xtcp_cmd(chanend c,
 {
   switch (cmd) 
     {
+#ifndef XTCP_EXCLUDE_LISTEN
     case XTCP_CMD_LISTEN: {
       int port_number;
       xtcp_protocol_t protocol;
@@ -32,6 +33,8 @@ static void handle_xtcp_cmd(chanend c,
       xtcpd_listen(i, port_number, protocol);
       break;
     }
+#endif
+#ifndef XTCP_EXCLUDE_UNLISTEN
     case XTCP_CMD_UNLISTEN: {
       int port_number;
       slave {
@@ -40,6 +43,8 @@ static void handle_xtcp_cmd(chanend c,
       xtcpd_unlisten(i, port_number);
       break;
     }
+#endif
+#ifndef XTCP_EXCLUDE_CONNECT
     case XTCP_CMD_CONNECT: {
       int port_number;
       xtcp_ipaddr_t ipaddr;
@@ -53,6 +58,8 @@ static void handle_xtcp_cmd(chanend c,
       }
       break;
     }
+#endif
+#ifndef XTCP_EXCLUDE_BIND_REMOTE
     case XTCP_CMD_BIND_REMOTE : {
       xtcp_ipaddr_t ipaddr;
       int port_number;
@@ -64,6 +71,8 @@ static void handle_xtcp_cmd(chanend c,
       xtcpd_bind_remote(i, conn_id, ipaddr, port_number);
       break;
     }
+#endif
+#ifndef XTCP_EXCLUDE_BIND_LOCAL
     case XTCP_CMD_BIND_LOCAL : {
       int port_number;
       slave {
@@ -72,9 +81,14 @@ static void handle_xtcp_cmd(chanend c,
       xtcpd_bind_local(i, conn_id, port_number);
       break;
     }
-    case XTCP_CMD_INIT_SEND: 
+#endif
+#ifndef XTCP_EXCLUDE_INIT_SEND
+    case XTCP_CMD_INIT_SEND: {
       xtcpd_init_send(i, conn_id);
-      break;    
+      break;
+    }
+#endif
+#ifndef XTCP_EXCLUDE_SET_APPSTATE
     case XTCP_CMD_SET_APPSTATE: {
       xtcp_appstate_t appstate;
       slave {
@@ -83,12 +97,19 @@ static void handle_xtcp_cmd(chanend c,
       xtcpd_set_appstate(i, conn_id, appstate);
       break;
     }
-    case XTCP_CMD_ABORT:
+#endif
+#ifndef XTCP_EXCLUDE_ABORT
+    case XTCP_CMD_ABORT: {
       xtcpd_abort(i, conn_id);
       break;
+    }
+#endif
+#ifndef XTCP_EXCLUDE_CLOSE
     case XTCP_CMD_CLOSE: 
       xtcpd_close(i, conn_id);
       break;
+#endif
+#ifndef XTCP_EXCLUDE_SET_POLL_INTERVAL
     case XTCP_CMD_SET_POLL_INTERVAL: {
       int poll_interval;
       slave {
@@ -97,6 +118,8 @@ static void handle_xtcp_cmd(chanend c,
       xtcpd_set_poll_interval(i, conn_id, poll_interval);
       }
       break;
+#endif
+#ifndef XTCP_EXCLUDE_JOIN_GROUP
     case XTCP_CMD_JOIN_GROUP: {
       xtcp_ipaddr_t ipaddr;
       slave {
@@ -108,6 +131,8 @@ static void handle_xtcp_cmd(chanend c,
       xtcpd_join_group(ipaddr);
       }
       break;
+#endif
+#ifndef XTCP_EXCLUDE_LEAVE_GROUP
     case XTCP_CMD_LEAVE_GROUP: {
       xtcp_ipaddr_t ipaddr;
       slave {
@@ -119,8 +144,9 @@ static void handle_xtcp_cmd(chanend c,
       xtcpd_leave_group(ipaddr);
       }
       break;    
-    case XTCP_CMD_GET_MAC_ADDRESS: 
-      {
+#endif
+#ifndef XTCP_EXCLUDE_GET_MAC_ADDRESS
+    case XTCP_CMD_GET_MAC_ADDRESS: {
         unsigned char mac_addr[6];
         xtcpd_get_mac_address(mac_addr);
         c <: mac_addr[0];
@@ -131,7 +157,9 @@ static void handle_xtcp_cmd(chanend c,
         c <: mac_addr[5];
       }
       break;
-    case XTCP_CMD_GET_IPCONFIG: 
+#endif
+#ifndef XTCP_EXCLUDE_GET_IPCONFIG
+    case XTCP_CMD_GET_IPCONFIG: {
       {        
         xtcp_ipconfig_t ipconfig;
         xtcpd_get_ipconfig(ipconfig);
@@ -147,23 +175,34 @@ static void handle_xtcp_cmd(chanend c,
         }
       }
       break;
-    case XTCP_CMD_ACK_RECV:
+    }
+#endif
+#ifndef XTCP_EXCLUDE_ACK_RECV
+    case XTCP_CMD_ACK_RECV: {
       xtcpd_ack_recv(conn_id);      
       break;
-    case XTCP_CMD_ACK_RECV_MODE:     
+    }
+#endif
+#ifndef XTCP_EXCLUDE_ACK_RECV_MODE
+    case XTCP_CMD_ACK_RECV_MODE: {
       xtcpd_ack_recv_mode(conn_id);      
       break;
-    case XTCP_CMD_PAUSE:
+    }
+#endif
+#ifndef XTCP_EXCLUDE_PAUSE
+    case XTCP_CMD_PAUSE: {
       xtcpd_pause(conn_id);      
       break;
-    case XTCP_CMD_UNPAUSE:
+    }
+#endif
+#ifndef XTCP_EXCLUDE_UNPAUSE
+    case XTCP_CMD_UNPAUSE: {
       xtcpd_unpause(conn_id);      
       break;
     }
+#endif
+    }
 }
-
-
-
 
 static void send_conn_and_complete(chanend c, 
                                    xtcp_connection_t &conn)
@@ -176,6 +215,7 @@ static void send_conn_and_complete(chanend c,
   chkct(c, XS1_CT_END);
 }
 
+#pragma unsafe arrays
 int xtcpd_service_client0(chanend xtcp, int i, int waiting_link)
 {
   int activity = 1;
@@ -219,6 +259,7 @@ int xtcpd_service_client0(chanend xtcp, int i, int waiting_link)
   return activity;
 }
 
+#pragma unsafe arrays
 void xtcpd_service_clients(chanend xtcp[], int num_xtcp){
     int activity = 1;
     while (activity) {
@@ -229,6 +270,7 @@ void xtcpd_service_clients(chanend xtcp[], int num_xtcp){
   }	
 }
 
+#pragma unsafe arrays
 void xtcpd_service_clients_until_ready(int waiting_link,
                                        chanend xtcp[], 
                                        int num_xtcp)
@@ -285,7 +327,7 @@ void xtcpd_recv(chanend xtcp[],
   return;
 }
 
-
+#pragma unsafe arrays
 int xtcpd_send(chanend c,        
                xtcp_event_type_t event,
                xtcpd_state_t &s,
@@ -319,6 +361,7 @@ void xtcpd_send_config_event(chanend c,
 
 
 
+#pragma unsafe arrays
 void xtcpd_server_init() {
   for (int i=0;i<MAX_XTCP_CLIENTS;i++) {
     notified[i] = 0;
@@ -326,6 +369,7 @@ void xtcpd_server_init() {
   }
 }
 
+#pragma unsafe arrays
 void xtcpd_queue_event(chanend c, int linknum, int event)
 {
   pending_event[linknum] = event;

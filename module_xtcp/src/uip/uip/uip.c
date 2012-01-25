@@ -20,7 +20,6 @@
  */
 
 /**
- * \file
  * The uIP TCP/IP stack code.
  * \author Adam Dunkels <adam@dunkels.com>
  */
@@ -90,6 +89,7 @@
 #include "uip_arch.h"
 #include <print.h>
 
+#include <xclib.h>
 
 void uip_ipaddr_copy(void *dest, const void *src)
 {
@@ -270,64 +270,53 @@ void uip_log(char *msg);
 #define UIP_LOG(m)
 #endif /* UIP_LOGGING == 1 */
 
-#if ! UIP_ARCH_ADD32
+
+
+
+/* Useful operations on 4-byte words misaligned by 2 */
+
+static void xtcp_swap_words(u8_t* a, u8_t* b)
+{
+	short c;
+
+	c = *(short*)(&a[0]);
+	*(short*)(&a[0]) = *(short*)(&b[0]);
+	*(short*)(&b[0]) = (short)c;
+
+	c = *(short*)(&a[2]);
+	*(short*)(&a[2]) = *(short*)(&b[2]);
+	*(short*)(&b[2]) = (short)c;
+}
+
+static void xtcp_increment_word(u8_t* a)
+{
+	unsigned s = ((*(short*)(&a[2])) << 16) + *(short*)(&a[0]);
+	s = byterev(byterev(s)+1);
+	*(short*)(&a[0]) = (short)s;
+	*(short*)(&BUF->ackno[2]) = (short)(s >> 16);
+}
+
+__attribute__ ((noinline))
+void xtcp_copy_word(u8_t*d, u8_t* s)
+{
+	*(short*)(&d[0]) = *(short*)(&s[0]);
+	*(short*)(&d[2]) = *(short*)(&s[2]);
+}
+
+__attribute__ ((noinline))
+static int xtcp_compare_words(u8_t* a, u8_t* b)
+{
+	return (*(short*)(&a[0]) == *(short*)(&b[0])) &&
+		   (*(short*)(&a[2]) == *(short*)(&b[2]));
+}
+
+__attribute__ ((noinline))
 void uip_add32(u8_t *op32, u16_t op16) {
-	uip_acc32[3] = op32[3] + (op16 & 0xff);
-	uip_acc32[2] = op32[2] + (op16 >> 8);
-	uip_acc32[1] = op32[1];
-	uip_acc32[0] = op32[0];
-
-	if (uip_acc32[2] < (op16 >> 8)) {
-		++uip_acc32[1];
-		if (uip_acc32[1] == 0) {
-			++uip_acc32[0];
-		}
-	}
-
-	if (uip_acc32[3] < (op16 & 0xff)) {
-		++uip_acc32[2];
-		if (uip_acc32[2] == 0) {
-			++uip_acc32[1];
-			if (uip_acc32[1] == 0) {
-				++uip_acc32[0];
-			}
-		}
-	}
+	  unsigned int *res = (unsigned int *)uip_acc32;
+	  unsigned int x = ((*(unsigned short*)(&op32[2])) << 16) + *(unsigned short*)(&op32[0]);
+	  x = byterev(x);
+	  *res = byterev(x + op16);
 }
-
-#endif /* UIP_ARCH_ADD32 */
-
-#if ! UIP_ARCH_CHKSUM
-/*---------------------------------------------------------------------------*/
-/*
-static u16_t chksum(u16_t sum, const u8_t *data, u16_t len) {
-	u16_t t;
-	const u8_t *dataptr;
-	const u8_t *last_byte;
-
-	dataptr = data;
-	last_byte = data + len - 1;
-
-	while (dataptr < last_byte) {
-		t = (dataptr[0] << 8) + dataptr[1];
-		sum += t;
-		if (sum < t) {
-			sum++;
-		}
-		dataptr += 2;
-	}
-
-	if (dataptr == last_byte) {
-		t = (dataptr[0] << 8) + 0;
-		sum += t;
-		if (sum < t) {
-			sum++;
-		}
-	}
-
-	return sum;
-}
-*/
 
 /* Alternative faster checksum computation */
 
@@ -409,25 +398,18 @@ uip_udpchksum(void)
 	return upper_layer_chksum(UIP_PROTO_UDP);
 }
 #endif /* UIP_UDP_CHECKSUMS */
-#endif /* UIP_ARCH_CHKSUM */
+
 /*---------------------------------------------------------------------------*/
 void uip_init(void) {
-	for (c = 0; c < UIP_LISTENPORTS; ++c) {
-		uip_listenports[c] = 0;
-		uip_udp_listenports[c] = 0;
-	}
-	for (c = 0; c < UIP_CONNS; ++c) {
-		uip_conns[c].tcpstateflags = UIP_CLOSED;
-	}
+	memset(uip_listenports, 0, sizeof(uip_listenports));
+	memset(uip_udp_listenports, 0, sizeof(uip_listenports));
+	memset(uip_conns, 0, sizeof(uip_conns));
 #if UIP_ACTIVE_OPEN
 	lastport = 1024;
 #endif /* UIP_ACTIVE_OPEN */
 
 #if UIP_UDP
-	for(c = 0; c < UIP_UDP_CONNS; ++c) {
-		uip_udp_conns[c].lport = 0;
-		uip_udp_conns[c].rport = 0;
-	}
+	memset(uip_udp_conns, 0, sizeof(uip_udp_conns));
 #endif /* UIP_UDP */
 }
 
@@ -715,10 +697,7 @@ uip_reass(void)
 /*---------------------------------------------------------------------------*/
 static void uip_add_rcv_nxt(u16_t n) {
 	uip_add32(uip_conn->rcv_nxt, n);
-	uip_conn->rcv_nxt[0] = uip_acc32[0];
-	uip_conn->rcv_nxt[1] = uip_acc32[1];
-	uip_conn->rcv_nxt[2] = uip_acc32[2];
-	uip_conn->rcv_nxt[3] = uip_acc32[3];
+	xtcp_copy_word(uip_conn->rcv_nxt, uip_acc32);
 }
 /*---------------------------------------------------------------------------*/
 void uip_process(u8_t flag) {
@@ -751,13 +730,7 @@ void uip_process(u8_t flag) {
 		}
 #endif /* UIP_REASSEMBLY */
 		/* Increase the initial sequence number. */
-		if (++iss[3] == 0) {
-			if (++iss[2] == 0) {
-				if (++iss[1] == 0) {
-					++iss[0];
-				}
-			}
-		}
+		xtcp_increment_word(iss);
 
 		/* Reset the length variables. */
 		uip_len = 0;
@@ -815,7 +788,7 @@ void uip_process(u8_t flag) {
 						goto tcp_send_synack;
 
 #if UIP_ACTIVE_OPEN
-						case UIP_SYN_SENT:
+					case UIP_SYN_SENT:
 						/* In the SYN_SENT state, we retransmit out SYN. */
 						BUF->flags = 0;
 						goto tcp_send_syn;
@@ -1229,9 +1202,7 @@ void uip_process(u8_t flag) {
 		}
 	}
 
-	//  UIP_LOG("udp: no matching connection found");
-	//  printintln(HTONS(UDPBUF->srcport));
-	//  printintln(HTONS(UDPBUF->destport));
+	// No matching connection found
 	goto drop;
 
 	udp_found:
@@ -1334,32 +1305,13 @@ void uip_process(u8_t flag) {
 	BUF->tcpoffset = 5 << 4;
 
 	/* Flip the seqno and ackno fields in the TCP header. */
-	c = BUF->seqno[3];
-	BUF->seqno[3] = BUF->ackno[3];
-	BUF->ackno[3] = c;
-
-	c = BUF->seqno[2];
-	BUF->seqno[2] = BUF->ackno[2];
-	BUF->ackno[2] = c;
-
-	c = BUF->seqno[1];
-	BUF->seqno[1] = BUF->ackno[1];
-	BUF->ackno[1] = c;
-
-	c = BUF->seqno[0];
-	BUF->seqno[0] = BUF->ackno[0];
-	BUF->ackno[0] = c;
+	xtcp_swap_words(BUF->seqno, BUF->ackno);
 
 	/* We also have to increase the sequence number we are
 	 acknowledging. If the least significant byte overflowed, we need
 	 to propagate the carry to the other bytes as well. */
-	if (++BUF->ackno[3] == 0) {
-		if (++BUF->ackno[2] == 0) {
-			if (++BUF->ackno[1] == 0) {
-				++BUF->ackno[0];
-			}
-		}
-	}
+	xtcp_increment_word(BUF->ackno);
+
 
 	/* Swap port numbers. */
 	tmp16 = BUF->srcport;
@@ -1415,17 +1367,11 @@ void uip_process(u8_t flag) {
 	uip_ipaddr_copy(uip_connr->ripaddr, BUF->srcipaddr);
 	uip_connr->tcpstateflags = UIP_SYN_RCVD;
 
-	uip_connr->snd_nxt[0] = iss[0];
-	uip_connr->snd_nxt[1] = iss[1];
-	uip_connr->snd_nxt[2] = iss[2];
-	uip_connr->snd_nxt[3] = iss[3];
+	xtcp_copy_word(uip_connr->snd_nxt, iss);
 	uip_connr->len = 1;
 
 	/* rcv_nxt should be the seqno from the incoming packet + 1. */
-	uip_connr->rcv_nxt[3] = BUF->seqno[3];
-	uip_connr->rcv_nxt[2] = BUF->seqno[2];
-	uip_connr->rcv_nxt[1] = BUF->seqno[1];
-	uip_connr->rcv_nxt[0] = BUF->seqno[0];
+	xtcp_copy_word(uip_connr->rcv_nxt, BUF->seqno);
 	uip_add_rcv_nxt(1);
 
 	/* Parse the TCP MSS option, if present. */
@@ -1511,10 +1457,7 @@ void uip_process(u8_t flag) {
 	if (!(((uip_connr->tcpstateflags & UIP_TS_MASK) == UIP_SYN_SENT)
 			&& ((BUF->flags & TCP_CTL) == (TCP_SYN | TCP_ACK)))) {
 		if ((uip_len > 0 || ((BUF->flags & (TCP_SYN | TCP_FIN)) != 0))
-				&& (BUF->seqno[0] != uip_connr->rcv_nxt[0] || BUF->seqno[1]
-						!= uip_connr->rcv_nxt[1] || BUF->seqno[2]
-						!= uip_connr->rcv_nxt[2] || BUF->seqno[3]
-						!= uip_connr->rcv_nxt[3])) {
+				&& (!xtcp_compare_words(BUF->seqno, uip_connr->rcv_nxt))) {
 			goto tcp_send_ack;
 		}
 	}
@@ -1526,14 +1469,9 @@ void uip_process(u8_t flag) {
 	if ((BUF->flags & TCP_ACK) && uip_outstanding(uip_connr)) {
 		uip_add32(uip_connr->snd_nxt, uip_connr->len);
 
-		if (BUF->ackno[0] == uip_acc32[0] && BUF->ackno[1] == uip_acc32[1]
-				&& BUF->ackno[2] == uip_acc32[2] && BUF->ackno[3]
-				== uip_acc32[3]) {
+		if (xtcp_compare_words(BUF->ackno, uip_acc32)) {
 			/* Update sequence number. */
-			uip_connr->snd_nxt[0] = uip_acc32[0];
-			uip_connr->snd_nxt[1] = uip_acc32[1];
-			uip_connr->snd_nxt[2] = uip_acc32[2];
-			uip_connr->snd_nxt[3] = uip_acc32[3];
+			xtcp_copy_word(uip_connr->snd_nxt, uip_acc32);
 
 			/* Do RTT estimation, unless we have done retransmissions. */
 			if (uip_connr->nrtx == 0) {
@@ -1627,10 +1565,7 @@ void uip_process(u8_t flag) {
 				}
 			}
 			uip_connr->tcpstateflags = UIP_ESTABLISHED;
-			uip_connr->rcv_nxt[0] = BUF->seqno[0];
-			uip_connr->rcv_nxt[1] = BUF->seqno[1];
-			uip_connr->rcv_nxt[2] = BUF->seqno[2];
-			uip_connr->rcv_nxt[3] = BUF->seqno[3];
+			xtcp_copy_word(uip_connr->rcv_nxt, BUF->seqno);
 			uip_add_rcv_nxt(1);
 			uip_flags = UIP_CONNECTED | UIP_NEWDATA;
 			uip_connr->len = 0;
@@ -1895,15 +1830,8 @@ void uip_process(u8_t flag) {
 	 reply. Our job is to fill in all the fields of the TCP and IP
 	 headers before calculating the checksum and finally send the
 	 packet. */
-	BUF->ackno[0] = uip_connr->rcv_nxt[0];
-	BUF->ackno[1] = uip_connr->rcv_nxt[1];
-	BUF->ackno[2] = uip_connr->rcv_nxt[2];
-	BUF->ackno[3] = uip_connr->rcv_nxt[3];
-
-	BUF->seqno[0] = uip_connr->snd_nxt[0];
-	BUF->seqno[1] = uip_connr->snd_nxt[1];
-	BUF->seqno[2] = uip_connr->snd_nxt[2];
-	BUF->seqno[3] = uip_connr->snd_nxt[3];
+	xtcp_copy_word(BUF->ackno, uip_connr->rcv_nxt);
+	xtcp_copy_word(BUF->seqno, uip_connr->snd_nxt);
 
 	BUF->proto = UIP_PROTO_TCP;
 

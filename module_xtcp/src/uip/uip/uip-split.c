@@ -49,10 +49,30 @@
 #include <xccompat.h>
 #include "xcoredev.h"
 
+#include <xclib.h>
 #define BUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
 
 /*-----------------------------------------------------------------------------*/
+
+static void
+uip_split_output_send(chanend mac_tx)
+{
+	/* Recalculate the TCP checksum. */
+	BUF->tcpchksum = 0;
+	BUF->tcpchksum = ~(uip_tcpchksum());
+
+#if !UIP_CONF_IPV6
+	/* Recalculate the IP checksum. */
+	BUF->ipchksum = 0;
+	BUF->ipchksum = ~(uip_ipchksum());
+#endif
+	uip_len += UIP_LLH_LEN;
+
+	/* Transmit the first packet. */
+	xcoredev_send(mac_tx);
+}
+
 
 // The purpose of this function is to defeat Neagles Algorithm.  For packets
 // over half of the size of the max frame size (which we assume to be part of
@@ -90,19 +110,7 @@ uip_split_output(chanend mac_tx)
 			BUF->len[1] = uip_len & 0xff;
 #endif
 
-			/* Recalculate the TCP checksum. */
-			BUF->tcpchksum = 0;
-			BUF->tcpchksum = ~(uip_tcpchksum());
-
-#if !UIP_CONF_IPV6
-			/* Recalculate the IP checksum. */
-			BUF->ipchksum = 0;
-			BUF->ipchksum = ~(uip_ipchksum());
-#endif
-			uip_len += UIP_LLH_LEN;
-
-			/* Transmit the first packet. */
-			xcoredev_send(mac_tx);
+			uip_split_output_send(mac_tx);
 
 			/* Now, create the second packet. To do this, it is not enough to
 			 just alter the length field, but we must also update the TCP
@@ -134,24 +142,9 @@ uip_split_output(chanend mac_tx)
 			}
 
 			uip_add32(BUF->seqno, len1);
-			BUF->seqno[0] = uip_acc32[0];
-			BUF->seqno[1] = uip_acc32[1];
-			BUF->seqno[2] = uip_acc32[2];
-			BUF->seqno[3] = uip_acc32[3];
+			xtcp_copy_word(BUF->seqno, uip_acc32);
 
-			/* Recalculate the TCP checksum. */
-			BUF->tcpchksum = 0;
-			BUF->tcpchksum = ~(uip_tcpchksum());
-
-#if !UIP_CONF_IPV6
-			/* Recalculate the IP checksum. */
-			BUF->ipchksum = 0;
-			BUF->ipchksum = ~(uip_ipchksum());
-#endif
-
-			/* Transmit the second packet. */
-			uip_len += UIP_LLH_LEN;
-			xcoredev_send(mac_tx);
+			uip_split_output_send(mac_tx);
 		} else {
 			// We didn't compute the checksum earlier
 			BUF->tcpchksum = 0;

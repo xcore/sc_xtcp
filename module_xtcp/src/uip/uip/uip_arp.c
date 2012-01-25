@@ -70,7 +70,7 @@
 #include <string.h>
 #include <print.h>
 
-#ifdef UIP_USE_AUTOIP
+#if UIP_USE_AUTOIP
 #include "autoip.h"
 #endif
 
@@ -113,8 +113,6 @@ struct arp_entry {
   u8_t time;
 };
 
-static const struct uip_eth_addr broadcast_ethaddr =
-  {{0xff,0xff,0xff,0xff,0xff,0xff}};
 static const u16_t broadcast_ipaddr[2] = {0xffff,0xffff};
 
 static struct arp_entry arp_table[UIP_ARPTAB_SIZE];
@@ -295,7 +293,7 @@ uip_arp_arpin(void)
   }
   uip_len = 0;
   
-#ifdef UIP_USE_AUTOIP
+#if UIP_USE_AUTOIP
   autoip_arp_in();
 #endif  
 
@@ -379,7 +377,7 @@ uip_arp_out(struct uip_udp_conn *conn)
 
   /* First check if destination is a local broadcast. */
   if(uip_ipaddr_cmp(IPBUF->destipaddr, broadcast_ipaddr)) {
-    memcpy(IPBUF->ethhdr.dest.addr, broadcast_ethaddr.addr, 6);
+    memset(IPBUF->ethhdr.dest.addr, 0xFF, 6);
   } else  if(uip_ipaddr_is_multicast(IPBUF->destipaddr)) {
     IPBUF->ethhdr.dest.addr[0] = 0x01;
     IPBUF->ethhdr.dest.addr[1] = 0x00;

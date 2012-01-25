@@ -97,7 +97,12 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
     int address, length, timeStamp;
 
 	timer tmr;
-	unsigned timeout, autoip_timer=0, arp_timer=0;
+	unsigned timeout;
+	unsigned arp_timer=0;
+
+#if UIP_USE_AUTOIP
+	unsigned autoip_timer=0;
+#endif
 
 	// Control structure for MII LLD
 	struct miiData miiData;
@@ -138,9 +143,11 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 			}
 
 			if (++arp_timer == 100) {
+				arp_timer=0;
 				uip_arp_timer();
 			}
 
+#if UIP_USE_AUTOIP
 			if (++autoip_timer == 5) {
 				autoip_timer = 0;
 				autoip_periodic();
@@ -148,6 +155,7 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 					xtcp_tx_buffer(mac_tx);
 				}
 			}
+#endif
 
 			xtcp_process_periodic_timer(mac_tx);
 			break;

@@ -77,6 +77,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 			uip_arp_timer();
 		}
 
+#if UIP_USE_AUTOIP
 		if (timer_expired(&autoip_timer)) {
 			timer_reset(&autoip_timer);
 			autoip_periodic();
@@ -84,6 +85,7 @@ void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
 				xtcp_tx_buffer(mac_tx);
 			}
 		}
+#endif
 
 		if (timer_expired(&periodic_timer)) {
 

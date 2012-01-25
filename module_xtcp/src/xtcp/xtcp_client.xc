@@ -159,11 +159,11 @@ int xtcp_recv_count(chanend c_xtcp, char data[], int count)
 		c_xtcp :> len;
 		rxc = (count < len) ? count : len;
 
-		for (int i=0;i<rxc;i++)
-			c_xtcp :> data[i];
-
-		for (int i=0;i<(len-count);i++)
-			c_xtcp :> char;
+		for (int i=0;i<len;i++) {
+			char c;
+			c_xtcp :> c;
+			if (i<rxc) data[i] = c;
+		}
 	}
 	return len;
 }

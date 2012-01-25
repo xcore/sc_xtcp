@@ -170,6 +170,10 @@ typedef unsigned short uip_stats_t;
 #define UIP_USE_AUTOIP  1
 #endif
 
+#ifndef UIP_USE_DHCP
+#define UIP_USE_DHCP  1
+#endif
+
 #ifndef UIP_IGMP
 #define UIP_IGMP 0
 #endif
