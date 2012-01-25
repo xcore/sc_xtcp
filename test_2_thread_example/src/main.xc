@@ -38,7 +38,7 @@ on stdcore[0]: clock clk_smi = XS1_CLKBLK_5;
 
 
 xtcp_ipconfig_t ipconfig = {
-#if 1
+#if 0
 		{ 192, 168, 0, 10 }, // ip address (eg 192,168,0,2)
 		{ 255, 255, 255, 0 }, // netmask (eg 255,255,255,0)
 		{ 0, 0, 0, 0 } // gateway (eg 192,168,0,1)

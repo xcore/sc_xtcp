@@ -88,10 +88,14 @@ void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, un
 	}
 
 	{
+#if UIP_USE_AUTOIP
 		int hwsum = mac_address[0] + mac_address[1] + mac_address[2]
 				+ mac_address[3] + mac_address[4] + mac_address[5];
 		autoip_init(hwsum + (hwsum << 16) + (hwsum << 24));
+#endif
+#if UIP_USE_DHCP
 		dhcpc_init(uip_ethaddr.addr, 6);
+#endif
 		xtcpd_init(xtcp, num_xtcp);
 	}
 }
@@ -202,18 +206,23 @@ void xtcp_process_periodic_timer(chanend mac_tx)
 	}
 }
 
+#if UIP_USE_DHCP
 void dhcpc_configured(const struct dhcpc_state *s) {
 #ifdef XTCP_VERBOSE_DEBUG
 	printstr("dhcp: ");uip_printip4(s->ipaddr);printstr("\n");
 #endif
+#if UIP_USE_AUTOIP
 	autoip_stop();
+#endif
 	uip_sethostaddr(s->ipaddr);
 	uip_setdraddr(s->default_router);
 	uip_setnetmask(s->netmask);
 	uip_xtcp_up();
 	dhcp_done = 1;
 }
+#endif
 
+#if UIP_USE_AUTOIP
 void autoip_configured(uip_ipaddr_t autoip_ipaddr) {
 	if (!dhcp_done) {
 		uip_ipaddr_t ipaddr;
@@ -230,6 +239,7 @@ void autoip_configured(uip_ipaddr_t autoip_ipaddr) {
 		uip_xtcp_up();
 	}
 }
+#endif
 
 void uip_linkup() {
 	if (get_uip_xtcp_ifstate())
@@ -264,15 +274,29 @@ void uip_linkup() {
 		uip_xtcp_up();
 	} else {
 		dhcp_done = 0;
+#if UIP_USE_DHCP
 		dhcpc_stop();
+#endif
+#if UIP_USE_AUTOIP
+#if UIP_USE_DHCP
 		autoip_stop();
+#else
+		autoip_start();
+#endif
+#endif
+#if UIP_USE_DHCP
 		dhcpc_start();
+#endif
 	}
 }
 
 void uip_linkdown() {
 	dhcp_done = 0;
+#if UIP_USE_DHCP
 	dhcpc_stop();
+#endif
+#if UIP_USE_AUTOIP
 	autoip_stop();
+#endif
 	uip_xtcp_down();
 }

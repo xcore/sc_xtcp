@@ -204,9 +204,6 @@ static void handle_xtcp_cmd(chanend c,
     }
 }
 
-
-
-
 static void send_conn_and_complete(chanend c, 
                                    xtcp_connection_t &conn)
 {

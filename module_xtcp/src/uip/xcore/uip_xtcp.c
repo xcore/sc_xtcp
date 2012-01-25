@@ -3,12 +3,13 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
+#include <string.h>
+
 #include "uip.h"
 #include "xtcp_client.h"
 #include "xtcp_server.h"
 #include "xtcp_server_impl.h"
 #include "timer.h"
-#include <print.h>
 #include "dhcpc.h"
 #include "igmp.h"
 #include "uip_arp.h"
@@ -67,6 +68,7 @@ void xtcpd_init(chanend xtcp_links_init[], int n)
   xtcpd_server_init();
 }
 
+__attribute__ ((noinline))
 static int get_listener_linknum(struct listener_info_t listeners[],
                                 int n,
                                 int local_port)
@@ -108,18 +110,11 @@ void xtcpd_init_state(xtcpd_state_t *s,
     }
   }
 
+  memset(s, 0, sizeof(xtcpd_state_t));
   s->conn.id = guid;  
-  s->conn.appstate = 0;
   s->conn.local_port = HTONS(local_port);
   s->conn.remote_port = HTONS(remote_port);
   s->conn.protocol = protocol;
-  s->s.closed = 0;
-  s->s.send_request = 0;
-  s->s.close_request = 0;
-  s->s.abort_request = 0;
-  s->s.poll_interval = 0;
-  s->s.connect_request = 0;
-  s->s.ack_recv_mode = 0;
   s->s.uip_conn = (int) conn;
   for (i=0;i<4;i++)
     s->conn.remote_addr[i] = remote_addr[i];
@@ -189,30 +184,7 @@ void xtcpd_listen(int linknum, int port_number, xtcp_protocol_t p)
   else {
     register_listener(udp_listeners, linknum, port_number, NUM_UDP_LISTENERS);
     uip_udp_listen(HTONS(port_number));
-#if 0
-    uip_ipaddr_t addr;
-    struct uip_udp_conn *conn;
-    uip_ipaddr(addr, 255,255,255,255);
-    conn = uip_udp_new(&addr, 0);
-    if(conn != NULL)  {
-      xtcpd_state_t *s = (xtcpd_state_t *) &(conn->appstate);
-      //      printstr("Listen: ");
-      //      printintln(conn);
-      //      printintln(&s->s.poll_interval);
-      conn->udpflags ^= UDP_IS_SERVER_CONN;
-      uip_udp_bind(conn, HTONS(port_number));
-      s->s.connect_request = 1;
-      s->linknum = linknum;
-      s->conn.connection_type = XTCP_SERVER_CONNECTION;
-      s->conn.id = guid;
-      guid++;
-      if (guid>MAX_GUID) 
-        guid = 1;
-
-    }
-#endif
   }
-  //  printintln(uip_udp_conns[0].appstate.s.poll_interval);
   return;
 }
 
@@ -361,8 +333,6 @@ void uip_xtcpd_handle_poll(xtcpd_state_t *s)
   else
   if (s->s.connect_request) {    
     if (uip_udpconnection()) {   
-      //      printstr("Connect: ");
-      //      printintln(uip_udp_conn);
       xtcpd_init_state(s,
                        XTCP_PROTOCOL_UDP,
                        (unsigned char *) uip_udp_conn->ripaddr,
@@ -408,8 +378,10 @@ xtcpd_appcall(void)
   
   if (uip_udpconnection() &&
       (uip_udp_conn->lport == HTONS(DHCPC_CLIENT_PORT) ||
-       uip_udp_conn->lport == HTONS(DHCPC_SERVER_PORT))) {   
+       uip_udp_conn->lport == HTONS(DHCPC_SERVER_PORT))) {
+#if UIP_USE_DHCP
     dhcpc_appcall();
+#endif
     return;
   }
 

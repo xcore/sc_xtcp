@@ -100,6 +100,8 @@ struct dhcp_msg {
 #define DHCP_OPTION_REQ_LIST     55
 #define DHCP_OPTION_END         255
 
+#if UIP_USE_DHCP
+
 static u8_t xid[4];
 static unsigned int rand_seed;
 static unsigned int rand_startup;
@@ -324,12 +326,12 @@ PT_THREAD(handle_dhcp(void))
         
         } while (!timer_expired(&s.timer));
         
-    #ifdef UIP_USE_AUTOIP
+#if UIP_USE_AUTOIP
         if (s.ticks == CLOCK_SECOND * 4)
         {
             autoip_start();
         }
-    #endif
+#endif
         
         if (s.ticks < CLOCK_SECOND * 60)
         {
@@ -488,3 +490,6 @@ dhcpc_request(void)
   }
 }
 /*---------------------------------------------------------------------------*/
+
+#endif
+

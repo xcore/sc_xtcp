@@ -90,6 +90,16 @@ within that file.
    * - XTCP_EXCLUDE_UNPAUSE
      - Exclude support for the unpause command from the server, reducing memory footprint
      - Not defined
+   * - UIP_USE_AUTOIP
+     - 1
+     - By defining this as 0, the auto IP application is removed from the code. Do this to save
+       approxmiately 1kB.  Auto IP is a stateless protocol that assigns an IP address to a
+       device.  Typically, if a unit is trying to use DHCP to obtain an address, and a server
+       cannot be found, then auto IP is used to assign an address of the form 169.254.x.y.
+   * - UIP_USE_DHCP
+     - 1
+     - By defining this as 0, the DHCP client is removed from the code. This will save approximately
+       2kB.  DHCP is a protocol for dynamically acquiring an IP address from a centralised DHCP server. 
 
 
 Data Structures/Types
