@@ -297,7 +297,7 @@ static void xtcp_increment_word(u8_t* a)
 }
 
 __attribute__ ((noinline))
-static void xtcp_copy_word(u8_t*d, u8_t* s)
+void xtcp_copy_word(u8_t*d, u8_t* s)
 {
 	*(short*)(&d[0]) = *(short*)(&s[0]);
 	*(short*)(&d[2]) = *(short*)(&s[2]);
@@ -310,48 +310,23 @@ static int xtcp_compare_words(u8_t* a, u8_t* b)
 		   (*(short*)(&a[2]) == *(short*)(&b[2]));
 }
 
-
-#if ! UIP_ARCH_ADD32
+__attribute__ ((noinline))
 void uip_add32(u8_t *op32, u16_t op16) {
-	unsigned s = ((*(short*)(&a[2])) << 16) + *(short*)(&a[0]);
-	s = byterev(byterev(s)+op16);
-	*(short*)(&a[0]) = (short)s;
-	*(short*)(&a[2]) = (short)(s >> 16);
+//	unsigned s = ((*(short*)(&op32[2])) << 16) + *(short*)(&op32[0]);
+//	s = byterev(byterev(s)+op16);
+//	*(unsigned*)(uip_acc32) = s;
+
+	  //  unsigned int *y = (unsigned int *) op32;
+	  unsigned int *res = (unsigned int *)uip_acc32;
+	  unsigned int x = ((*(unsigned short*)(&op32[2])) << 16) + *(unsigned short*)(&op32[0]);
+	  x = byterev(x);
+//	  unsigned int x =
+//	    (op32[0] << 24) |
+//	    (op32[1] << 16) |
+//	    (op32[2] << 8) |
+//	    (op32[3] << 0);
+	  *res = byterev(x + op16);
 }
-
-#endif /* UIP_ARCH_ADD32 */
-
-#if ! UIP_ARCH_CHKSUM
-/*---------------------------------------------------------------------------*/
-/*
-static u16_t chksum(u16_t sum, const u8_t *data, u16_t len) {
-	u16_t t;
-	const u8_t *dataptr;
-	const u8_t *last_byte;
-
-	dataptr = data;
-	last_byte = data + len - 1;
-
-	while (dataptr < last_byte) {
-		t = (dataptr[0] << 8) + dataptr[1];
-		sum += t;
-		if (sum < t) {
-			sum++;
-		}
-		dataptr += 2;
-	}
-
-	if (dataptr == last_byte) {
-		t = (dataptr[0] << 8) + 0;
-		sum += t;
-		if (sum < t) {
-			sum++;
-		}
-	}
-
-	return sum;
-}
-*/
 
 /* Alternative faster checksum computation */
 
@@ -433,7 +408,7 @@ uip_udpchksum(void)
 	return upper_layer_chksum(UIP_PROTO_UDP);
 }
 #endif /* UIP_UDP_CHECKSUMS */
-#endif /* UIP_ARCH_CHKSUM */
+
 /*---------------------------------------------------------------------------*/
 void uip_init(void) {
 	memset(uip_listenports, 0, sizeof(uip_listenports));

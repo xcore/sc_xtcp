@@ -90,21 +90,11 @@
 
 #define UIP_ARCH_ADD32 1
 
-static inline unsigned int byterev(unsigned int x) {
-  asm ("byterev %0, %0":"=r"(x):"0"(x));
-  return x;
-}
+__attribute__ ((noinline))
+void xtcp_copy_word(u8_t*d, u8_t* s);
 
-static inline void uip_add32(u8_t *op32, u16_t op16) {
-  //  unsigned int *y = (unsigned int *) op32;
-  unsigned int *res = (unsigned int *)uip_acc32;
-  unsigned int x =  
-    (op32[0] << 24) | 
-    (op32[1] << 16) |
-    (op32[2] << 8) |
-    (op32[3] << 0);
-  *res = byterev(x + op16);
-}
+__attribute__ ((noinline))
+void uip_add32(u8_t *op32, u16_t op16);
 
 /**
  * Calculate the Internet checksum over a buffer.

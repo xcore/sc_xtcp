@@ -42,20 +42,22 @@ static int prev_ifstate[MAX_XTCP_CLIENTS];
 struct listener_info_t tcp_listeners[NUM_TCP_LISTENERS] = {{0}};
 struct listener_info_t udp_listeners[NUM_UDP_LISTENERS] = {{0}};
 
+
 static struct xtcpd_state_t  *lookup_xtcpd_state(int conn_id) {
   int i=0;
-  for (i=0;i<UIP_CONNS;i++) {
-    xtcpd_state_t *s = (xtcpd_state_t *) &(uip_conns[i].appstate);
-    if (s->conn.id == conn_id) 
-      return s;
-  } 
-  for (i=0;i<UIP_UDP_CONNS;i++) {
-    xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conns[i].appstate);
-    if (s->conn.id == conn_id) 
-      return s;
+  for (i=0;i<((UIP_CONNS>UIP_UDP_CONNS) ? UIP_CONNS : UIP_UDP_CONNS);i++) {
+	  if (i < UIP_CONNS) {
+		  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_conns[i].appstate);
+		  if (s->conn.id == conn_id) return s;
+	  }
+	  if (i < UIP_UDP_CONNS) {
+		    xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conns[i].appstate);
+		    if (s->conn.id == conn_id) return s;
+	  }
   } 
   return NULL;
 }
+
 
 
 void xtcpd_init(chanend xtcp_links_init[], int n)
