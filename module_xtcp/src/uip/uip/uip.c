@@ -312,19 +312,9 @@ static int xtcp_compare_words(u8_t* a, u8_t* b)
 
 __attribute__ ((noinline))
 void uip_add32(u8_t *op32, u16_t op16) {
-//	unsigned s = ((*(short*)(&op32[2])) << 16) + *(short*)(&op32[0]);
-//	s = byterev(byterev(s)+op16);
-//	*(unsigned*)(uip_acc32) = s;
-
-	  //  unsigned int *y = (unsigned int *) op32;
 	  unsigned int *res = (unsigned int *)uip_acc32;
 	  unsigned int x = ((*(unsigned short*)(&op32[2])) << 16) + *(unsigned short*)(&op32[0]);
 	  x = byterev(x);
-//	  unsigned int x =
-//	    (op32[0] << 24) |
-//	    (op32[1] << 16) |
-//	    (op32[2] << 8) |
-//	    (op32[3] << 0);
 	  *res = byterev(x + op16);
 }
 
