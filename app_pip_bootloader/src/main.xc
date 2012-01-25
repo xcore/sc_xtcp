@@ -33,9 +33,9 @@ mii_interface_t mii =
 
 #ifdef PORT_ETH_RST_N
 out port p_mii_resetn = PORT_ETH_RST_N;
-smi_interface_t smi = { PORT_ETH_MDIO, PORT_ETH_MDC, 0 };
+smi_interface_t smi = { 0x1F, PORT_ETH_MDIO, PORT_ETH_MDC };
 #else
-smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
+smi_interface_t smi = { 0x1F, PORT_ETH_RST_N_MDIO, PORT_ETH_MDC };
 #endif
 
 clock clk_smi = XS1_CLKBLK_5;
