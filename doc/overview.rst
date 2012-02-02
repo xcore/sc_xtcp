@@ -48,3 +48,38 @@ Component Summary
  | Component code is maintained by XMOS.                             |
  +-------------------------------------------------------------------+
 
+Resource requirements
+=====================
+
+The resource requirements for the XTCP stack alone are:
+
++--------------------------------------------------+
+| Resource     | Usage                             |
++==============+===================================+
+| Channels     | 1 per client                      |
++--------------------------------------------------+
+| Memory       | Between 20 and 45 KBytes          |
++--------------------------------------------------+
+| Timers       | 2                                 |
++--------------------------------------------------+
+| Clocks       | 0                                 |
++--------------------------------------------------+
+
+When used with the single thread ethernet MII module,
+the combined usage is:
+
++--------------------------------------------------+
+| Resource     | Usage                             |
++==============+===================================+
+| Channels     | 3 plus 1 per client               |
++--------------------------------------------------+
+| Memory       | Between 26 and 50 KBytes          |
++--------------------------------------------------+
+| Timers       | 4                                 |
++--------------------------------------------------+
+| Clocks       | 1                                 |
++--------------------------------------------------+
+
+The memory usage depends on the selection of different options
+at compile time, and on the amount of buffering chosen.
+
