@@ -96,7 +96,7 @@ MEMB(connections, sizeof(struct connection), 16);
  * \param name The name of the memory block (later used with
  * memb_init(), memb_alloc() and memb_free()).
  *
- * \param size The size of each memory chunk, in bytes.
+ * \param structure The type of the structure to allocate memory for
  *
  * \param num The total number of memory chunks in the block.
  *

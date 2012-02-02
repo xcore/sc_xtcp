@@ -32,71 +32,89 @@ within that file.
      - The maximum number of UDP or TCP ports the server can listen to
        simultaneously.     
      - 20
-   * - UIP_USE_SINGLE_THREADED_ETHERNET
+   * - ``UIP_USE_SINGLE_THREADED_ETHERNET``
      - Defining this, and using the uipSingleServer function in the
        multithreaded main, will use the two thread TCP plus Ethernet.
      - Not defined
-   * - XTCP_EXCLUDE_LISTEN
-     - Exclude support for the listen command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_LISTEN``
+     - Exclude support for the listen command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_UNLISTEN
-     - Exclude support for the unlisten command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_UNLISTEN``
+     - Exclude support for the unlisten command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_CONNECT
-     - Exclude support for the connect command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_CONNECT``
+     - Exclude support for the connect command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_BIND_REMOTE
-     - Exclude support for the bind_remote command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_BIND_REMOTE``
+     - Exclude support for the bind_remote command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_BIND_LOCAL
-     - Exclude support for the bind_local command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_BIND_LOCAL``
+     - Exclude support for the bind_local command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_INIT_SEND
-     - Exclude support for the init_send command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_INIT_SEND``
+     - Exclude support for the init_send command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_SET_APPSTATE
-     - Exclude support for the set_appstate command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_SET_APPSTATE``
+     - Exclude support for the set_appstate command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_ABORT
-     - Exclude support for the abort command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_ABORT``
+     - Exclude support for the abort command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_CLOSE
-     - Exclude support for the close command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_CLOSE``
+     - Exclude support for the close command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_SET_POLL_INTERVAL
-     - Exclude support for the set_poll_interval command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_SET_POLL_INTERVAL``
+     - Exclude support for the set_poll_interval command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_JOIN_GROUP
-     - Exclude support for the join_group command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_JOIN_GROUP``
+     - Exclude support for the join_group command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_LEAVE_GROUP
-     - Exclude support for the leave_group command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_LEAVE_GROUP``
+     - Exclude support for the leave_group command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_GET_MAC_ADDRESS
-     - Exclude support for the get_mac_address command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_GET_MAC_ADDRESS``
+     - Exclude support for the get_mac_address command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_GET_IPCONFIG
-     - Exclude support for the get_ipconfig command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_GET_IPCONFIG``
+     - Exclude support for the get_ipconfig command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_ACK_RECV
-     - Exclude support for the ack_recv command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_ACK_RECV``
+     - Exclude support for the ack_recv command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_ACK_RECV_MODE
-     - Exclude support for the ack_recv_mode command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_ACK_RECV_MODE``
+     - Exclude support for the ack_recv_mode command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_PAUSE
-     - Exclude support for the pause command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_PAUSE``
+     - Exclude support for the pause command from the server,
+       reducing memory footprint
      - Not defined
-   * - XTCP_EXCLUDE_UNPAUSE
-     - Exclude support for the unpause command from the server, reducing memory footprint
+   * - ``XTCP_EXCLUDE_UNPAUSE``
+     - Exclude support for the unpause command from the server,
+       reducing memory footprint
      - Not defined
-   * - UIP_USE_AUTOIP
+   * - ``UIP_USE_AUTOIP``
      - 1
      - By defining this as 0, the auto IP application is removed from the code. Do this to save
        approxmiately 1kB.  Auto IP is a stateless protocol that assigns an IP address to a
        device.  Typically, if a unit is trying to use DHCP to obtain an address, and a server
        cannot be found, then auto IP is used to assign an address of the form 169.254.x.y.
-   * - UIP_USE_DHCP
+   * - ``UIP_USE_DHCP``
      - 1
      - By defining this as 0, the DHCP client is removed from the code. This will save approximately
        2kB.  DHCP is a protocol for dynamically acquiring an IP address from a centralised DHCP server. 

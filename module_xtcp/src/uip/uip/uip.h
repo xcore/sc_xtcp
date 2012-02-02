@@ -949,7 +949,7 @@ void uip_ipaddr_copy(void *dest, const void *src);
  * \hideinitializer
  */
 #if !UIP_CONF_IPV6
-int uip_ipaddr_cmp(const void *dest, const void *src);
+int uip_ipaddr_cmp(const void *addr1, const void *addr2);
 #define uip_ipaddr_is_multicast(addr) ((((u16_t *)addr)[0] & 0xff) == 224)
 #else /* !UIP_CONF_IPV6 */
 #define uip_ipaddr_cmp(addr1, addr2) (memcmp(addr1, addr2, sizeof(uip_ip6addr_t)) == 0)

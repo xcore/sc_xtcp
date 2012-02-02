@@ -11,9 +11,9 @@ are:
   * - File
     - Description
   * - ``uip_server.h`` 
-    - Header file containing prototype for :c:func:`uip_server.
+    - Header file containing prototype for :c:func:`uip_server`.
   * - ``uip_single_server.h``
-    - Header file containing prototype for :c:func:`uipSingleServer.
+    - Header file containing prototype for :c:func:`uipSingleServer`.
   * - ``xtcp_client.h``
     - Header file containing the client API described in :ref:`sec_client_api`.
 
