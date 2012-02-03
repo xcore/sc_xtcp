@@ -4,7 +4,6 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.xmos.com http://www.xmos.com">
   <Type>Board</Type>
   <Name>L2 Control Board</Name>
-  <BoardId>0003011X</BoardId>
 
   <Declarations>
     <Declaration>core stdcore[2]</Declaration>
