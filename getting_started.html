@@ -22,6 +22,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <script type="text/javascript" src="_static/xcomment.js"></script>
     <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
     <link rel="up" title="Programming Guide" href="programming.html" />
     <link rel="next" title="Source code structure" href="structure.html" />
@@ -65,10 +66,10 @@ document.getElementById('d1').style.height=h2 + "px";
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>The xtcp component can be found at:</p>
 <blockquote>
-<div><a class="reference external" href="http://www.github.com/xcore/sc_ethernet">http://www.github.com/xcore/sc_ethernet</a></div></blockquote>
+<div><a class="reference external" href="http://www.github.com/xcore/sc_xtcp"><span>http://www.github.com/xcore/sc_xtcp</span></a></div></blockquote>
 <p>To install follow the instructions found on the community wiki at</p>
 <blockquote>
-<div><a class="reference external" href="http://xcore.github.com">http://xcore.github.com</a></div></blockquote>
+<div><a class="reference external" href="http://xcore.github.com"><span>http://xcore.github.com</span></a></div></blockquote>
 </div>
 <div class="section" id="compilation-and-demo-applications">
 <h2>Compilation and Demo Applications<a class="headerlink" href="#compilation-and-demo-applications" title="Permalink to this headline">¶</a></h2>
@@ -76,6 +77,8 @@ document.getElementById('d1').style.height=h2 + "px";
 applications. These all start with the prefix <tt class="docutils literal"><span class="pre">app_</span></tt> and are
 described in the package README. This can be built in the XDE or from
 the command line by executing the command <tt class="docutils literal"><span class="pre">xmake</span> <span class="pre">all</span></tt>.</p>
+<p>An example of the two-thread TCP plus Ethernet implementation can
+be found in the test_2_thread_example.</p>
 </div>
 </div>
 
@@ -89,6 +92,7 @@ the command line by executing the command <tt class="docutils literal"><span cla
 <h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="programming.html">Programming Guide</a><ul class="current">
@@ -105,7 +109,7 @@ the command line by executing the command <tt class="docutils literal"><span cla
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none;margin-bottom: 10px;">
   <h3>Search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" size="18" />

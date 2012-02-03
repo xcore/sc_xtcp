@@ -22,6 +22,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <script type="text/javascript" src="_static/xcomment.js"></script>
     <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" /> 
 
 <script>
@@ -63,6 +64,9 @@ document.getElementById('d1').style.height=h2 + "px";
   <td style="width: 33%" valign="top"><dl>
     <dt><a href="api.html#uip_server">uip_server (C function)</a></dt>
 </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+    <dt><a href="api.html#uipSingleServer">uipSingleServer (C function)</a></dt>
+</dl></td>
 </tr></table>
 
 <h2 id="X">X</h2>
@@ -71,6 +75,13 @@ document.getElementById('d1').style.height=h2 + "px";
     <dt><a href="api.html#xtcp_abort">xtcp_abort (C function)</a></dt>
     <dt><a href="api.html#xtcp_bind_local">xtcp_bind_local (C function)</a></dt>
     <dt><a href="api.html#xtcp_bind_remote">xtcp_bind_remote (C function)</a></dt>
+    <dt><a href="api.html#xtcp_buffered_recv">xtcp_buffered_recv (C function)</a></dt>
+    <dt><a href="api.html#xtcp_buffered_recv_upto">xtcp_buffered_recv_upto (C function)</a></dt>
+    <dt><a href="api.html#xtcp_buffered_send">xtcp_buffered_send (C function)</a></dt>
+    <dt><a href="api.html#xtcp_buffered_send_buffer_remaining">xtcp_buffered_send_buffer_remaining (C function)</a></dt>
+    <dt><a href="api.html#xtcp_buffered_send_handler">xtcp_buffered_send_handler (C function)</a></dt>
+    <dt><a href="api.html#xtcp_buffered_set_rx_buffer">xtcp_buffered_set_rx_buffer (C function)</a></dt>
+    <dt><a href="api.html#xtcp_buffered_set_tx_buffer">xtcp_buffered_set_tx_buffer (C function)</a></dt>
     <dt><a href="api.html#xtcp_close">xtcp_close (C function)</a></dt>
     <dt><a href="api.html#xtcp_complete_send">xtcp_complete_send (C function)</a></dt>
     <dt><a href="api.html#xtcp_connect">xtcp_connect (C function)</a></dt>
@@ -114,16 +125,23 @@ document.getElementById('d1').style.height=h2 + "px";
     <dt><a href="api.html#xtcp_join_multicast_group">xtcp_join_multicast_group (C function)</a></dt>
     <dt><a href="api.html#xtcp_leave_multicast_group">xtcp_leave_multicast_group (C function)</a></dt>
     <dt><a href="api.html#xtcp_listen">xtcp_listen (C function)</a></dt>
+    <dt><a href="api.html#xtcp_pause">xtcp_pause (C function)</a></dt>
     <dt><a href="api.html#xtcp_protocol_t">xtcp_protocol_t (C type)</a></dt>
     <dt><a href="api.html#xtcp_protocol_t.XTCP_PROTOCOL_TCP">xtcp_protocol_t.XTCP_PROTOCOL_TCP (C member)</a></dt>
     <dt><a href="api.html#xtcp_protocol_t.XTCP_PROTOCOL_UDP">xtcp_protocol_t.XTCP_PROTOCOL_UDP (C member)</a></dt>
+    <dt><a href="api.html#xtcp_read">xtcp_read (C function)</a></dt>
     <dt><a href="api.html#xtcp_recv">xtcp_recv (C function)</a></dt>
+    <dt><a href="api.html#xtcp_recv_count">xtcp_recv_count (C function)</a></dt>
     <dt><a href="api.html#xtcp_recvi">xtcp_recvi (C function)</a></dt>
     <dt><a href="api.html#xtcp_send">xtcp_send (C function)</a></dt>
     <dt><a href="api.html#xtcp_sendi">xtcp_sendi (C function)</a></dt>
     <dt><a href="api.html#xtcp_set_connection_appstate">xtcp_set_connection_appstate (C function)</a></dt>
     <dt><a href="api.html#xtcp_set_poll_interval">xtcp_set_poll_interval (C function)</a></dt>
     <dt><a href="api.html#xtcp_unlisten">xtcp_unlisten (C function)</a></dt>
+    <dt><a href="api.html#xtcp_unpause">xtcp_unpause (C function)</a></dt>
+    <dt><a href="api.html#xtcp_wait_for_connection">xtcp_wait_for_connection (C function)</a></dt>
+    <dt><a href="api.html#xtcp_wait_for_ifup">xtcp_wait_for_ifup (C function)</a></dt>
+    <dt><a href="api.html#xtcp_write">xtcp_write (C function)</a></dt>
 </dl></td>
 </tr></table>
 
@@ -138,6 +156,7 @@ document.getElementById('d1').style.height=h2 + "px";
 <h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
@@ -145,7 +164,7 @@ document.getElementById('d1').style.height=h2 + "px";
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none;margin-bottom: 10px;">
   <h3>Search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" size="18" />

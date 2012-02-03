@@ -22,6 +22,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <script type="text/javascript" src="_static/xcomment.js"></script>
     <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
     <link rel="next" title="H/W Development Platforms" href="hw.html" />
     <link rel="prev" title="XMOS TCP/IP STACK" href="index.html" /> 
@@ -70,6 +71,9 @@ ICMP and IGMP protocols.</p>
 <p>The stack is based on the open-source stack uIP with modifications to
 work efficiently on XMOS architecture and communicate between threads
 using XC channels.</p>
+<p>The TCP stack interfaces to the 5-thread XMOS ethernet stack via a pair
+of channels.  Alternatively, an integrated 2-thread Ethernet plus TCP/IP
+is available for use in resource limited applications.</p>
 <div class="section" id="component-summary">
 <h2>Component Summary<a class="headerlink" href="#component-summary" title="Permalink to this headline">¶</a></h2>
 <blockquote>
@@ -118,6 +122,54 @@ Component code is maintained by XMOS.</td>
 </div></blockquote>
 </div>
 </div>
+<div class="section" id="resource-requirements">
+<h1>Resource requirements<a class="headerlink" href="#resource-requirements" title="Permalink to this headline">¶</a></h1>
+<p>The resource requirements for the XTCP stack alone are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head" colspan="2">Resource     | Usage</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td colspan="2">Channels     | 1 per client</td>
+</tr>
+<tr><td colspan="2">Memory       | Between 20 and 45 KBytes</td>
+</tr>
+<tr><td colspan="2">Timers       | 2</td>
+</tr>
+<tr><td colspan="2">Clocks       | 0</td>
+</tr>
+</tbody>
+</table>
+<p>When used with the single thread ethernet MII module,
+the combined usage is:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head" colspan="2">Resource     | Usage</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td colspan="2">Channels     | 3 plus 1 per client</td>
+</tr>
+<tr><td colspan="2">Memory       | Between 26 and 50 KBytes</td>
+</tr>
+<tr><td colspan="2">Timers       | 4</td>
+</tr>
+<tr><td colspan="2">Clocks       | 1</td>
+</tr>
+</tbody>
+</table>
+<p>The memory usage depends on the selection of different options
+at compile time, and on the amount of buffering chosen.</p>
+</div>
 
 
 
@@ -132,6 +184,7 @@ Component code is maintained by XMOS.</td>
 <li class="toctree-l2"><a class="reference internal" href="#component-summary">Component Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#resource-requirements">Resource requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
@@ -139,7 +192,7 @@ Component code is maintained by XMOS.</td>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none;margin-bottom: 10px;">
   <h3>Search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" size="18" />

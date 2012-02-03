@@ -22,6 +22,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <script type="text/javascript" src="_static/xcomment.js"></script>
     <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
     <link rel="up" title="Programming Guide" href="programming.html" />
     <link rel="next" title="API" href="api.html" />
@@ -70,7 +71,7 @@ uses the XMOS TCP/IP component. This can be found in the
 running on different threads on the device. It can be found in the
 file <tt class="docutils literal"><span class="pre">main.xc</span></tt>.</p>
 <p>First the ethernet MAC is run on core 2. Details of the ethernet
-component can be found in <a class="reference internal" href="references.html#xeth10">[XEth10]</a>.</p>
+component can be found in <a class="reference internal" href="references.html#xeth10"><span>[XEth10]</span></a>.</p>
 <div class="highlight-none"><div class="highlight"><pre>		on stdcore[2]:
 		{
 			int mac_address[2];
@@ -92,7 +93,7 @@ component can be found in <a class="reference internal" href="references.html#xe
 		}
 </pre></div>
 </div>
-<p>The TCP/IP server is run using the <a class="reference internal" href="api.html#uip_server" title="uip_server"><tt class="xref c c-func docutils literal"><span class="pre">uip_server()</span></tt></a> function.</p>
+<p>The TCP/IP server is run using the <a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a> function.</p>
 <div class="highlight-none"><div class="highlight"><pre>		on stdcore[3]: uip_server(mac_rx[0], mac_tx[0],
 				xtcp, 1, ipconfig,
 				connect_status);
@@ -154,7 +155,7 @@ httpd_state_t connection_states[NUM_HTTPD_CONNECTIONS];
 <p>The <tt class="docutils literal"><span class="pre">http_init</span></tt> function is called at the start of the
 application. It initializes the connection state array and makes a
 request to accept incoming new TCP connections on port 80 (using the
-<a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_listen()</span></tt></a> function):</p>
+<a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><span>xtcp_listen()</span></a> function):</p>
 <div class="highlight-none"><div class="highlight"><pre>void httpd_init(chanend tcp_svr)
 {
   int i;
@@ -249,7 +250,7 @@ array is searched for a free state structure.</p>
 </div>
 <p>If we can allocate the state structure then the elements of the
 structure are initalizes. The function
-<a class="reference internal" href="api.html#xtcp_set_connection_appstate" title="xtcp_set_connection_appstate"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_set_connection_appstate()</span></tt></a> is then called to associate the
+<a class="reference internal" href="api.html#xtcp_set_connection_appstate" title="xtcp_set_connection_appstate"><span>xtcp_set_connection_appstate()</span></a> is then called to associate the
 state with the connection. This means when a subsequent event is
 signalled on this connection the state can be recovered.</p>
 <div class="highlight-none"><div class="highlight"><pre>  else
@@ -286,9 +287,9 @@ with the connection can be freed up. This is done in the
 <h3>Receiving Data<a class="headerlink" href="#receiving-data" title="Permalink to this headline">¶</a></h3>
 <p>When a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RECV_DATA</span></tt> event occurs the <tt class="docutils literal"><span class="pre">httpd_recv</span></tt>
 function is called. The first thing this function does is call the
-<a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_recv()</span></tt></a> function to place the received data in the
+<a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><span>xtcp_recv()</span></a> function to place the received data in the
 <tt class="docutils literal"><span class="pre">data</span></tt> array. (Note that all TCP/IP clients <em>must</em> call
-<a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_recv()</span></tt></a> directly after receiving this kind of event).</p>
+<a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><span>xtcp_recv()</span></a> directly after receiving this kind of event).</p>
 <div class="highlight-none"><div class="highlight"><pre>void httpd_recv(chanend tcp_svr, xtcp_connection_t *conn)
 {
   struct httpd_state_t *hs = (struct httpd_state_t *) conn-&gt;appstate;
@@ -405,8 +406,8 @@ using the <tt class="docutils literal"><span class="pre">prev_dptr</span></tt> p
 </div>
 <p>If the request is for the next piece of data, then the function first
 checks that we have data left to send. If not, the function
-<a class="reference internal" href="api.html#xtcp_complete_send" title="xtcp_complete_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_complete_send()</span></tt></a> is called to finish the send transaction
-and then the connection is closed down with <a class="reference internal" href="api.html#xtcp_close" title="xtcp_close"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_close()</span></tt></a>
+<a class="reference internal" href="api.html#xtcp_complete_send" title="xtcp_complete_send"><span>xtcp_complete_send()</span></a> is called to finish the send transaction
+and then the connection is closed down with <a class="reference internal" href="api.html#xtcp_close" title="xtcp_close"><span>xtcp_close()</span></a>
 (since HTTP only does one transfer per connection).</p>
 <div class="highlight-none"><div class="highlight"><pre>  if (hs-&gt;dlen == 0 || hs-&gt;dptr == NULL)
     {
@@ -420,7 +421,7 @@ and then the connection is closed down with <a class="reference internal" href="
 <p>If we have data to send, then first the amount of data to send is
 calculated. This is based on the amount of data we have left
 (<tt class="docutils literal"><span class="pre">hs-&gt;dlen</span></tt>) and the maximum we can send (<tt class="docutils literal"><span class="pre">conn-&gt;mss</span></tt>). Having
-calculated this length, the data is sent using the <a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a>
+calculated this length, the data is sent using the <a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a>
 function.</p>
 <p>Once the data is sent, all that is left to do is update the <tt class="docutils literal"><span class="pre">dptr</span></tt>,
 <tt class="docutils literal"><span class="pre">dlen</span></tt> and <tt class="docutils literal"><span class="pre">prev_dptr</span></tt> variables in the connection state.</p>
@@ -452,6 +453,7 @@ function.</p>
 <h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="programming.html">Programming Guide</a><ul class="current">
@@ -474,7 +476,7 @@ function.</p>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none;margin-bottom: 10px;">
   <h3>Search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" size="18" />

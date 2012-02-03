@@ -22,6 +22,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <script type="text/javascript" src="_static/xcomment.js"></script>
     <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="#" />
     <link rel="next" title="Overview" href="overview.html" /> 
 
@@ -60,7 +61,7 @@ document.getElementById('d1').style.height=h2 + "px";
 <p>This documentation covers the xtcp component for XMOS Devices
 found at:</p>
 <blockquote>
-<div><a class="reference external" href="http://www.github.com/xcore/sc_xtcp">http://www.github.com/xcore/sc_xtcp</a></div></blockquote>
+<div><a class="reference external" href="http://www.github.com/xcore/sc_xtcp"><span>http://www.github.com/xcore/sc_xtcp</span></a></div></blockquote>
 <div class="section" id="table-of-contents">
 <h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -70,6 +71,7 @@ found at:</p>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#component-summary">Component Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="system.html#software-architecture">Software Architecture</a></li>
@@ -81,6 +83,7 @@ found at:</p>
 <li class="toctree-l2"><a class="reference internal" href="system.html#sending-data">Sending Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="system.html#link-status-events">Link Status Events</a></li>
 <li class="toctree-l2"><a class="reference internal" href="system.html#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html#buffered-api">Buffered API</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a><ul>
@@ -114,6 +117,8 @@ found at:</p>
 <li class="toctree-l3"><a class="reference internal" href="api.html#sending-data">Sending Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#other-connection-management">Other Connection Management</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#other-general-client-functions">Other General Client Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#high-level-blocking-client-api">High-level blocking client API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#high-level-buffered-client-api">High-level buffered client API</a></li>
 </ul>
 </li>
 </ul>
@@ -133,6 +138,7 @@ found at:</p>
 <h3><a href="#">XTCP TCP/IP Stack (2v0)</a></h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
@@ -140,7 +146,7 @@ found at:</p>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none;margin-bottom: 10px;">
   <h3>Search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" size="18" />

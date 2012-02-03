@@ -1,4 +1,4 @@
-An XMOS AVB application (tutorial)
+An XTCP application (tutorial)
 ----------------------------------
 
 This tutorial walks through the a simple webserver application that

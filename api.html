@@ -22,6 +22,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <script type="text/javascript" src="_static/xcomment.js"></script>
     <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
     <link rel="next" title="References" href="references.html" />
     <link rel="prev" title="An XTCP application (tutorial)" href="app_tutorial.html" /> 
@@ -94,46 +95,153 @@ handle simultaneously.</td>
 simultaneously.</td>
 <td>20</td>
 </tr>
+<tr><td><tt class="docutils literal"><span class="pre">UIP_USE_SINGLE_THREADED_ETHERNET</span></tt></td>
+<td>Defining this, and using the uipSingleServer function in the
+multithreaded main, will use the two thread TCP plus Ethernet.</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_LISTEN</span></tt></td>
+<td>Exclude support for the listen command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_UNLISTEN</span></tt></td>
+<td>Exclude support for the unlisten command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_CONNECT</span></tt></td>
+<td>Exclude support for the connect command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_BIND_REMOTE</span></tt></td>
+<td>Exclude support for the bind_remote command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_BIND_LOCAL</span></tt></td>
+<td>Exclude support for the bind_local command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_INIT_SEND</span></tt></td>
+<td>Exclude support for the init_send command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_SET_APPSTATE</span></tt></td>
+<td>Exclude support for the set_appstate command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ABORT</span></tt></td>
+<td>Exclude support for the abort command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_CLOSE</span></tt></td>
+<td>Exclude support for the close command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_SET_POLL_INTERVAL</span></tt></td>
+<td>Exclude support for the set_poll_interval command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_JOIN_GROUP</span></tt></td>
+<td>Exclude support for the join_group command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_LEAVE_GROUP</span></tt></td>
+<td>Exclude support for the leave_group command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_GET_MAC_ADDRESS</span></tt></td>
+<td>Exclude support for the get_mac_address command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_GET_IPCONFIG</span></tt></td>
+<td>Exclude support for the get_ipconfig command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ACK_RECV</span></tt></td>
+<td>Exclude support for the ack_recv command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ACK_RECV_MODE</span></tt></td>
+<td>Exclude support for the ack_recv_mode command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_PAUSE</span></tt></td>
+<td>Exclude support for the pause command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_UNPAUSE</span></tt></td>
+<td>Exclude support for the unpause command from the server,
+reducing memory footprint</td>
+<td>Not defined</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">UIP_USE_AUTOIP</span></tt></td>
+<td>1</td>
+<td>By defining this as 0, the auto IP application is removed from the code. Do this to save
+approxmiately 1kB.  Auto IP is a stateless protocol that assigns an IP address to a
+device.  Typically, if a unit is trying to use DHCP to obtain an address, and a server
+cannot be found, then auto IP is used to assign an address of the form 169.254.x.y.</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">UIP_USE_DHCP</span></tt></td>
+<td>1</td>
+<td>By defining this as 0, the DHCP client is removed from the code. This will save approximately
+2kB.  DHCP is a protocol for dynamically acquiring an IP address from a centralised DHCP server.</td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="data-structures-types">
 <h2>Data Structures/Types<a class="headerlink" href="#data-structures-types" title="Permalink to this headline">¶</a></h2>
-<dt><dl class="type">
+<dl class="type">
 <dt id="xtcp_ipaddr_t">
 <tt class="descname">xtcp_ipaddr_t</tt><a class="headerlink" href="#xtcp_ipaddr_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>XTCP IP address.</p>
 <p>This data type represents a single ipv4 address in the XTCP stack.</p>
 </dd></dl>
 
-<dt><dl class="type">
+<dl class="type">
 <dt id="xtcp_ipconfig_t">
 <tt class="descname">xtcp_ipconfig_t</tt><a class="headerlink" href="#xtcp_ipconfig_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>IP configuration information structure.</p>
 <p>This structure describes IP configuration for an ip node.</p>
-<p><strong>Structure Members</strong>:</p>
+<p><strong>Structure Members:</strong></p>
 <dl class="member">
 <dt id="xtcp_ipconfig_t.ipaddr">
-<a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t">xtcp_ipaddr_t</a> <tt class="descname">ipaddr</tt><a class="headerlink" href="#xtcp_ipconfig_t.ipaddr" title="Permalink to this definition">¶</a></dt>
+<a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t"><span>xtcp_ipaddr_t</span></a> <tt class="descname">ipaddr</tt><a class="headerlink" href="#xtcp_ipconfig_t.ipaddr" title="Permalink to this definition">¶</a></dt>
 <dd><p>The IP Address of the node.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_ipconfig_t.netmask">
-<a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t">xtcp_ipaddr_t</a> <tt class="descname">netmask</tt><a class="headerlink" href="#xtcp_ipconfig_t.netmask" title="Permalink to this definition">¶</a></dt>
+<a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t"><span>xtcp_ipaddr_t</span></a> <tt class="descname">netmask</tt><a class="headerlink" href="#xtcp_ipconfig_t.netmask" title="Permalink to this definition">¶</a></dt>
 <dd><p>The netmask of the node.</p>
 <p>The mask used to determine which address are routed locally.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_ipconfig_t.gateway">
-<a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t">xtcp_ipaddr_t</a> <tt class="descname">gateway</tt><a class="headerlink" href="#xtcp_ipconfig_t.gateway" title="Permalink to this definition">¶</a></dt>
+<a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t"><span>xtcp_ipaddr_t</span></a> <tt class="descname">gateway</tt><a class="headerlink" href="#xtcp_ipconfig_t.gateway" title="Permalink to this definition">¶</a></dt>
 <dd><p>The gateway of the node.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dt><dl class="type">
+<dl class="type">
 <dt id="xtcp_protocol_t">
 <tt class="descname">xtcp_protocol_t</tt><a class="headerlink" href="#xtcp_protocol_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>XTCP protocol type.</p>
@@ -155,11 +263,11 @@ simultaneously.</td>
 </div></blockquote>
 </dd></dl>
 
-<dt><dl class="type">
+<dl class="type">
 <dt id="xtcp_event_type_t">
 <tt class="descname">xtcp_event_type_t</tt><a class="headerlink" href="#xtcp_event_type_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>XTCP event type.</p>
-<p>The event type represents what event is occuring on a particualr connection. It is instantiated when an event is received by the client using the <a class="reference internal" href="#xtcp_event" title="xtcp_event"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_event()</span></tt></a> function.</p>
+<p>The event type represents what event is occuring on a particualr connection. It is instantiated when an event is received by the client using the <a class="reference internal" href="#xtcp_event" title="xtcp_event"><span>xtcp_event()</span></a> function.</p>
 <p><strong>Enum Values:</strong></p>
 <blockquote>
 <div><dl class="member">
@@ -173,28 +281,28 @@ simultaneously.</td>
 <dt id="xtcp_event_type_t.XTCP_RECV_DATA">
 <tt class="descname">XTCP_RECV_DATA</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_RECV_DATA" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event occurs when the connection has received some data.</p>
-<p>The client <em>must</em> follow receipt of this event with a call to <a class="reference internal" href="#xtcp_recv" title="xtcp_recv"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_recv()</span></tt></a> before any other interaction with the server.</p>
+<p>The client <em>must</em> follow receipt of this event with a call to <a class="reference internal" href="#xtcp_recv" title="xtcp_recv"><span>xtcp_recv()</span></a> before any other interaction with the server.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_event_type_t.XTCP_REQUEST_DATA">
 <tt class="descname">XTCP_REQUEST_DATA</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_REQUEST_DATA" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event occurs when the server is ready to send data and is requesting that the client send data.</p>
-<p>This event happens after a call to <a class="reference internal" href="#xtcp_init_send" title="xtcp_init_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_init_send()</span></tt></a> from the client. The client <em>must</em> follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a> before any other interaction with the server.</p>
+<p>This event happens after a call to <a class="reference internal" href="#xtcp_init_send" title="xtcp_init_send"><span>xtcp_init_send()</span></a> from the client. The client <em>must</em> follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_event_type_t.XTCP_SENT_DATA">
 <tt class="descname">XTCP_SENT_DATA</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_SENT_DATA" title="Permalink to this definition">¶</a></dt>
-<dd><p>This event occurs when the server has successfully sent the previous piece of data that was given to it via a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a>.</p>
-<p>The server is now requesting more data so the client must* follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a> before any other interaction with the server.</p>
+<dd><p>This event occurs when the server has successfully sent the previous piece of data that was given to it via a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a>.</p>
+<p>The server is now requesting more data so the client must* follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_event_type_t.XTCP_RESEND_DATA">
 <tt class="descname">XTCP_RESEND_DATA</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_RESEND_DATA" title="Permalink to this definition">¶</a></dt>
-<dd><p>This event occurs when the server has failed to send the previous piece of data that was given to it via a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a>.</p>
-<p>The server is now requesting for the same data to be sent again. The client must* follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a> before any other interaction with the server.</p>
+<dd><p>This event occurs when the server has failed to send the previous piece of data that was given to it via a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a>.</p>
+<p>The server is now requesting for the same data to be sent again. The client must* follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
 </dd></dl>
 
 <dl class="member">
@@ -222,7 +330,7 @@ simultaneously.</td>
 <dt id="xtcp_event_type_t.XTCP_POLL">
 <tt class="descname">XTCP_POLL</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_POLL" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event occurs at regular intervals per connection.</p>
-<p>Polling can be initiated and the interval can be set with <a class="reference internal" href="#xtcp_set_poll_interval" title="xtcp_set_poll_interval"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_set_poll_interval()</span></tt></a></p>
+<p>Polling can be initiated and the interval can be set with <a class="reference internal" href="#xtcp_set_poll_interval" title="xtcp_set_poll_interval"><span>xtcp_set_poll_interval()</span></a></p>
 </dd></dl>
 
 <dl class="member">
@@ -248,7 +356,7 @@ simultaneously.</td>
 </div></blockquote>
 </dd></dl>
 
-<dt><dl class="type">
+<dl class="type">
 <dt id="xtcp_connection_type_t">
 <tt class="descname">xtcp_connection_type_t</tt><a class="headerlink" href="#xtcp_connection_type_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>Type representing a connection type.</p>
@@ -269,12 +377,12 @@ simultaneously.</td>
 </div></blockquote>
 </dd></dl>
 
-<dt><dl class="type">
+<dl class="type">
 <dt id="xtcp_connection_t">
 <tt class="descname">xtcp_connection_t</tt><a class="headerlink" href="#xtcp_connection_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>This type represents a TCP or UDP connection.</p>
-<p>This is the main type containing connection information for the client to handle. Elements of this type are instantiated by the <a class="reference internal" href="#xtcp_event" title="xtcp_event"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_event()</span></tt></a> function which informs the client about an event and the connection the event is on.</p>
-<p><strong>Structure Members</strong>:</p>
+<p>This is the main type containing connection information for the client to handle. Elements of this type are instantiated by the <a class="reference internal" href="#xtcp_event" title="xtcp_event"><span>xtcp_event()</span></a> function which informs the client about an event and the connection the event is on.</p>
+<p><strong>Structure Members:</strong></p>
 <dl class="member">
 <dt id="xtcp_connection_t.id">
 int <tt class="descname">id</tt><a class="headerlink" href="#xtcp_connection_t.id" title="Permalink to this definition">¶</a></dt>
@@ -283,19 +391,19 @@ int <tt class="descname">id</tt><a class="headerlink" href="#xtcp_connection_t.i
 
 <dl class="member">
 <dt id="xtcp_connection_t.protocol">
-<a class="reference internal" href="#xtcp_protocol_t" title="xtcp_protocol_t">xtcp_protocol_t</a> <tt class="descname">protocol</tt><a class="headerlink" href="#xtcp_connection_t.protocol" title="Permalink to this definition">¶</a></dt>
+<a class="reference internal" href="#xtcp_protocol_t" title="xtcp_protocol_t"><span>xtcp_protocol_t</span></a> <tt class="descname">protocol</tt><a class="headerlink" href="#xtcp_connection_t.protocol" title="Permalink to this definition">¶</a></dt>
 <dd><p>The protocol of the connection (TCP/UDP).</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_connection_t.connection_type">
-<a class="reference internal" href="#xtcp_connection_type_t" title="xtcp_connection_type_t">xtcp_connection_type_t</a> <tt class="descname">connection_type</tt><a class="headerlink" href="#xtcp_connection_t.connection_type" title="Permalink to this definition">¶</a></dt>
+<a class="reference internal" href="#xtcp_connection_type_t" title="xtcp_connection_type_t"><span>xtcp_connection_type_t</span></a> <tt class="descname">connection_type</tt><a class="headerlink" href="#xtcp_connection_t.connection_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The type of connection (client/sever).</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_connection_t.event">
-<a class="reference internal" href="#xtcp_event_type_t" title="xtcp_event_type_t">xtcp_event_type_t</a> <tt class="descname">event</tt><a class="headerlink" href="#xtcp_connection_t.event" title="Permalink to this definition">¶</a></dt>
+<a class="reference internal" href="#xtcp_event_type_t" title="xtcp_event_type_t"><span>xtcp_event_type_t</span></a> <tt class="descname">event</tt><a class="headerlink" href="#xtcp_connection_t.event" title="Permalink to this definition">¶</a></dt>
 <dd><p>The last reported event on this connection.</p>
 </dd></dl>
 
@@ -303,12 +411,12 @@ int <tt class="descname">id</tt><a class="headerlink" href="#xtcp_connection_t.i
 <dt id="xtcp_connection_t.appstate">
 xtcp_appstate_t <tt class="descname">appstate</tt><a class="headerlink" href="#xtcp_connection_t.appstate" title="Permalink to this definition">¶</a></dt>
 <dd><p>The application state associated with the connection.</p>
-<p>This is set using the <a class="reference internal" href="#xtcp_set_connection_appstate" title="xtcp_set_connection_appstate"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_set_connection_appstate()</span></tt></a> function.</p>
+<p>This is set using the <a class="reference internal" href="#xtcp_set_connection_appstate" title="xtcp_set_connection_appstate"><span>xtcp_set_connection_appstate()</span></a> function.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_connection_t.remote_addr">
-<a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t">xtcp_ipaddr_t</a> <tt class="descname">remote_addr</tt><a class="headerlink" href="#xtcp_connection_t.remote_addr" title="Permalink to this definition">¶</a></dt>
+<a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t"><span>xtcp_ipaddr_t</span></a> <tt class="descname">remote_addr</tt><a class="headerlink" href="#xtcp_connection_t.remote_addr" title="Permalink to this definition">¶</a></dt>
 <dd><p>The remote ip address of the connection.</p>
 </dd></dl>
 
@@ -327,7 +435,7 @@ unsigned int <tt class="descname">local_port</tt><a class="headerlink" href="#xt
 <dl class="member">
 <dt id="xtcp_connection_t.mss">
 unsigned int <tt class="descname">mss</tt><a class="headerlink" href="#xtcp_connection_t.mss" title="Permalink to this definition">¶</a></dt>
-<dd><p>The maximum size in bytes that can be send using <a class="reference internal" href="#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a> after a send event.</p>
+<dd><p>The maximum size in bytes that can be send using <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> after a send event.</p>
 </dd></dl>
 
 </dd></dl>
@@ -335,10 +443,11 @@ unsigned int <tt class="descname">mss</tt><a class="headerlink" href="#xtcp_conn
 </div>
 <div class="section" id="server-api">
 <h2>Server API<a class="headerlink" href="#server-api" title="Permalink to this headline">¶</a></h2>
-<dt><dl class="function">
+<dl class="function">
 <dt id="uip_server">
-void <tt class="descname">uip_server</tt><big>(</big>chanend<em>&nbsp;mac_rx</em>, chanend<em>&nbsp;mac_tx</em>, chanend<em>&nbsp;xtcp[]</em>, int<em>&nbsp;num_xtcp_clients</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t">xtcp_ipconfig_t</a> &amp;<em>&nbsp;?ipconfig</em>, chanend<em>&nbsp;connect_status</em><big>)</big><a class="headerlink" href="#uip_server" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">uip_server</tt><big>(</big>chanend<em>&nbsp;mac_rx</em>, chanend<em>&nbsp;mac_tx</em>, chanend<em>&nbsp;xtcp[]</em>, int<em>&nbsp;num_xtcp_clients</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t"><span>xtcp_ipconfig_t</span></a> &amp;<em>&nbsp;?ipconfig</em>, chanend<em>&nbsp;connect_status</em><big>)</big><a class="headerlink" href="#uip_server" title="Permalink to this definition">¶</a></dt>
 <dd><p>uIP based xtcp server.</p>
+<p>This function implements an xtcp tcp/ip server in a thread. It uses a port of the uIP stack which is then interfaces over the xtcp channel array.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -355,11 +464,34 @@ void <tt class="descname">uip_server</tt><big>(</big>chanend<em>&nbsp;mac_rx</em
 </tr>
 </tbody>
 </table>
-<p>This function implements an xtcp tcp/ip server in a thread. It uses a port of the uIP stack which is then interfaces over the xtcp channel array.</p>
 <p>The IP setup is based on the ipconfig parameter. If this parameter is NULL then an automatic IP address is found (using dhcp or ipv4 link local addressing if no dhcp server is present). Otherwise it uses the ipconfig structure to allocate a static ip address.</p>
 <p>The clients can communicate with the server using the API found in xtcp_client.h</p>
-<p><strong>See also:</strong></p>
-<p><a class="reference internal" href="#xtcp_event" title="xtcp_event"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_event()</span></tt></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="uipSingleServer">
+void <tt class="descname">uipSingleServer</tt><big>(</big>clock<em>&nbsp;clk_smi</em>, out port<em>&nbsp;?p_mii_resetn</em>, smi_interface_t<em>&nbsp;&amp;smi</em>, mii_interface_t<em>&nbsp;&amp;mii</em>, chanend<em>&nbsp;xtcp[]</em>, int<em>&nbsp;num_xtcp</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t"><span>xtcp_ipconfig_t</span></a><em>&nbsp;&amp;ipconfig</em>, char<em>&nbsp;mac_address[6]</em><big>)</big><a class="headerlink" href="#uipSingleServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The top level thread function for a single threaded XTCP server, interfacing to a single thread ethernet MII.</p>
+<p>The xtcp_client_conf.h file should define the compile time flag UIP_USE_SINGLE_THREADED_ETHERNET in order to use this function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>clk_smi</strong> &#8211; Clock block for controlling the SMI interface</li>
+<li><strong>p_mii_resetn</strong> &#8211; Optional port which resets the PHY</li>
+<li><strong>smi</strong> &#8211; Structure describing the SMI ports</li>
+<li><strong>mii</strong> &#8211; Structure describing the MII ports</li>
+<li><strong>xtcp</strong> &#8211; Array of client comms channels</li>
+<li><strong>num_xtcp</strong> &#8211; The number of TCP client channels</li>
+<li><strong>ipconfig</strong> &#8211; The configuration structure for the IP address</li>
+<li><strong>mac_address</strong> &#8211; The unicast MAC address for this device</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This function should be used in a top level &#8216;par&#8217; in the main function. It will internally create the single MII thread.</p>
 </dd></dl>
 
 </div>
@@ -367,12 +499,12 @@ void <tt class="descname">uip_server</tt><big>(</big>chanend<em>&nbsp;mac_rx</em
 <span id="sec-client-api"></span><h2>Client API<a class="headerlink" href="#client-api" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="event-receipt">
 <h3>Event Receipt<a class="headerlink" href="#event-receipt" title="Permalink to this headline">¶</a></h3>
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_event">
-transaction <tt class="descname">xtcp_event</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t">xtcp_connection_t</a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_event" title="Permalink to this definition">¶</a></dt>
+transaction <tt class="descname">xtcp_event</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_event" title="Permalink to this definition">¶</a></dt>
 <dd><p>Receive the next connect event.</p>
-<p>This can be used in a select statement.</p>
 <p>Upon receiving the event, the xtcp_connection_t structure conn is instatiated with information of the event and the connection it is on.</p>
+<p>This can be used in a select statement.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -390,11 +522,11 @@ transaction <tt class="descname">xtcp_event</tt><big>(</big>chanend<em>&nbsp;c_x
 </div>
 <div class="section" id="setting-up-connections">
 <h3>Setting Up Connections<a class="headerlink" href="#setting-up-connections" title="Permalink to this headline">¶</a></h3>
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_listen">
-void <tt class="descname">xtcp_listen</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, int<em>&nbsp;port_number</em>, <a class="reference internal" href="#xtcp_protocol_t" title="xtcp_protocol_t">xtcp_protocol_t</a><em>&nbsp;proto</em><big>)</big><a class="headerlink" href="#xtcp_listen" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_listen</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, int<em>&nbsp;port_number</em>, <a class="reference internal" href="#xtcp_protocol_t" title="xtcp_protocol_t"><span>xtcp_protocol_t</span></a><em>&nbsp;proto</em><big>)</big><a class="headerlink" href="#xtcp_listen" title="Permalink to this definition">¶</a></dt>
 <dd><p>Listen to a particular incoming port.</p>
-<p>After this call, when a connection is established a XTCP_NEW_CONNECTION event is signalled.</p>
+<p>After this call, when a connection is established an XTCP_NEW_CONNECTION event is signalled.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -410,7 +542,7 @@ void <tt class="descname">xtcp_listen</tt><big>(</big>chanend<em>&nbsp;c_xtcp</e
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_unlisten">
 void <tt class="descname">xtcp_unlisten</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, int<em>&nbsp;port_number</em><big>)</big><a class="headerlink" href="#xtcp_unlisten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stop listening to a particular incoming port.</p>
@@ -429,9 +561,9 @@ void <tt class="descname">xtcp_unlisten</tt><big>(</big>chanend<em>&nbsp;c_xtcp<
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_connect">
-void <tt class="descname">xtcp_connect</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, int<em>&nbsp;port_number</em>, <a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t">xtcp_ipaddr_t</a><em>&nbsp;ipaddr</em>, <a class="reference internal" href="#xtcp_protocol_t" title="xtcp_protocol_t">xtcp_protocol_t</a><em>&nbsp;proto</em><big>)</big><a class="headerlink" href="#xtcp_connect" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_connect</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, int<em>&nbsp;port_number</em>, <a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t"><span>xtcp_ipaddr_t</span></a><em>&nbsp;ipaddr</em>, <a class="reference internal" href="#xtcp_protocol_t" title="xtcp_protocol_t"><span>xtcp_protocol_t</span></a><em>&nbsp;proto</em><big>)</big><a class="headerlink" href="#xtcp_connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Try to connect to a remote port.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -449,9 +581,9 @@ void <tt class="descname">xtcp_connect</tt><big>(</big>chanend<em>&nbsp;c_xtcp</
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_bind_local">
-void <tt class="descname">xtcp_bind_local</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t">xtcp_connection_t</a><em>&nbsp;&amp;conn</em>, int<em>&nbsp;port_number</em><big>)</big><a class="headerlink" href="#xtcp_bind_local" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_bind_local</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em>, int<em>&nbsp;port_number</em><big>)</big><a class="headerlink" href="#xtcp_bind_local" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bind the local end of a connection to a particular port (UDP).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -468,9 +600,9 @@ void <tt class="descname">xtcp_bind_local</tt><big>(</big>chanend<em>&nbsp;c_xtc
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_bind_remote">
-void <tt class="descname">xtcp_bind_remote</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t">xtcp_connection_t</a><em>&nbsp;&amp;conn</em>, <a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t">xtcp_ipaddr_t</a><em>&nbsp;addr</em>, int<em>&nbsp;port_number</em><big>)</big><a class="headerlink" href="#xtcp_bind_remote" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_bind_remote</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em>, <a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t"><span>xtcp_ipaddr_t</span></a><em>&nbsp;addr</em>, int<em>&nbsp;port_number</em><big>)</big><a class="headerlink" href="#xtcp_bind_remote" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bind the remote end of a connection to a particular port and ip address.</p>
 <p>This is only valid for XTCP_PROTOCOL_UDP connections. After this call, packets sent to this connection will go to the specified address and port</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -489,9 +621,9 @@ void <tt class="descname">xtcp_bind_remote</tt><big>(</big>chanend<em>&nbsp;c_xt
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_set_connection_appstate">
-void <tt class="descname">xtcp_set_connection_appstate</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t">xtcp_connection_t</a><em>&nbsp;&amp;conn</em>, xtcp_appstate_t<em>&nbsp;appstate</em><big>)</big><a class="headerlink" href="#xtcp_set_connection_appstate" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_set_connection_appstate</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em>, xtcp_appstate_t<em>&nbsp;appstate</em><big>)</big><a class="headerlink" href="#xtcp_set_connection_appstate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the connections application state data item.</p>
 <p>After this call, subsequent events on this connection will have the appstate field of the connection set</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -512,11 +644,11 @@ void <tt class="descname">xtcp_set_connection_appstate</tt><big>(</big>chanend<e
 </div>
 <div class="section" id="receiving-data">
 <h3>Receiving Data<a class="headerlink" href="#receiving-data" title="Permalink to this headline">¶</a></h3>
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_recv">
 int <tt class="descname">xtcp_recv</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char<em>&nbsp;data[]</em><big>)</big><a class="headerlink" href="#xtcp_recv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Receive data from the server.</p>
-<p>This should be called after a XTCP_RECV_DATA event.</p>
+<p>This can be called after an XTCP_RECV_DATA event.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -534,11 +666,12 @@ int <tt class="descname">xtcp_recv</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>,
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_recvi">
 int <tt class="descname">xtcp_recvi</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char<em>&nbsp;data[]</em>, int<em>&nbsp;i</em><big>)</big><a class="headerlink" href="#xtcp_recvi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Receive data from the server.</p>
-<p>This should be called after a XTCP_RECV_DATA event. The data is put into the array data starting at index i i.e. the first byte of data is written to data[i].</p>
+<dd><p>Receive data from the xtcp server.</p>
+<p>This can be called after an XTCP_RECV_DATA event.</p>
+<p>The data is put into the array data starting at index i i.e. the first byte of data is written to data[i].</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -557,12 +690,42 @@ int <tt class="descname">xtcp_recvi</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="xtcp_recv_count">
+int <tt class="descname">xtcp_recv_count</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char<em>&nbsp;data[]</em>, int<em>&nbsp;count</em><big>)</big><a class="headerlink" href="#xtcp_recv_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive a number of bytes of data from the xtcp server.</p>
+<p>This can be called after an XTCP_RECV_DATA event.</p>
+<p>Data is pulled from the xtcp server and put into the array, until either there is no more data to pull, or until count bytes have been received. If there are more bytes to be received from the server then the remainder are discarded. The return value reflects the number of bytes pulled from the server, not the number stored in the buffer. From this the user can determine if they have lost some data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>c_xtcp</strong> &#8211; chanend connected to the xtcp server</li>
+<li><strong>data</strong> &#8211; A array to place the received data into</li>
+<li><strong>count</strong> &#8211; The number of bytes to receive</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>see the buffer client protocol for a mechanism for receiving bytes without discarding the extra ones.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">The length of the received data in bytes, whether this was more or less than the requested amount.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="sending-data">
 <h3>Sending Data<a class="headerlink" href="#sending-data" title="Permalink to this headline">¶</a></h3>
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_init_send">
-void <tt class="descname">xtcp_init_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t">xtcp_connection_t</a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_init_send" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_init_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_init_send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initiate sending data on a connection.</p>
 <p>After making this call, the server will respond with a XTCP_REQUEST_DATA event when it is ready to accept data.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -579,11 +742,11 @@ void <tt class="descname">xtcp_init_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_send">
 void <tt class="descname">xtcp_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char NULLABLE<em>&nbsp;data[]</em>, int<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#xtcp_send" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send data to the server.</p>
-<p>This should be called after a XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event (alternatively xtcp_write_buf can be called). To finish sending this must be called with a length of zero or call the <a class="reference internal" href="#xtcp_complete_send" title="xtcp_complete_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_complete_send()</span></tt></a> function.</p>
+<dd><p>Send data to the xtcp server.</p>
+<p>Send data to the server. This should be called after a XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event (alternatively xtcp_write_buf can be called). To finish sending this must be called with a length of zero or call the <a class="reference internal" href="#xtcp_complete_send" title="xtcp_complete_send"><span>xtcp_complete_send()</span></a> function.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -599,11 +762,11 @@ void <tt class="descname">xtcp_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_sendi">
 void <tt class="descname">xtcp_sendi</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char NULLABLE<em>&nbsp;data[]</em>, int<em>&nbsp;i</em>, int<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#xtcp_sendi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send data to the server.</p>
-<p>This should be called after a XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event (alternatively xtcp_write_buf can be called). The data is sent starting from index i i.e. data[i] is the first byte to be sent. To finish sending this must be called with a length of zero.</p>
+<dd><p>Send data to the xtcp server.</p>
+<p>Send data to the server. This should be called after a XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event (alternatively xtcp_write_buf can be called). The data is sent starting from index i i.e. data[i] is the first byte to be sent. To finish sending this must be called with a length of zero.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -620,7 +783,7 @@ void <tt class="descname">xtcp_sendi</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_complete_send">
 void <tt class="descname">xtcp_complete_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em><big>)</big><a class="headerlink" href="#xtcp_complete_send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Complete a send transaction with the server.</p>
@@ -641,11 +804,11 @@ void <tt class="descname">xtcp_complete_send</tt><big>(</big>chanend<em>&nbsp;c_
 </div>
 <div class="section" id="other-connection-management">
 <h3>Other Connection Management<a class="headerlink" href="#other-connection-management" title="Permalink to this headline">¶</a></h3>
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_set_poll_interval">
-void <tt class="descname">xtcp_set_poll_interval</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t">xtcp_connection_t</a><em>&nbsp;&amp;conn</em>, int<em>&nbsp;poll_interval</em><big>)</big><a class="headerlink" href="#xtcp_set_poll_interval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the poll interval for a udp connection in seconds.</p>
-<p>If this is called then the udp connection will cause a poll event every poll_interval milliseconds.</p>
+void <tt class="descname">xtcp_set_poll_interval</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em>, int<em>&nbsp;poll_interval</em><big>)</big><a class="headerlink" href="#xtcp_set_poll_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set UDP poll interval.</p>
+<p>When this is called then the udp connection will cause a poll event every poll_interval milliseconds.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -661,9 +824,9 @@ void <tt class="descname">xtcp_set_poll_interval</tt><big>(</big>chanend<em>&nbs
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_close">
-void <tt class="descname">xtcp_close</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t">xtcp_connection_t</a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_close" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_close</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Close a connection.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -679,9 +842,9 @@ void <tt class="descname">xtcp_close</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_abort">
-void <tt class="descname">xtcp_abort</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t">xtcp_connection_t</a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_abort" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_abort</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_abort" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abort a connection.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -697,12 +860,50 @@ void <tt class="descname">xtcp_abort</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="xtcp_pause">
+void <tt class="descname">xtcp_pause</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_pause" title="Permalink to this definition">¶</a></dt>
+<dd><p>pause a connection.</p>
+<p>No further reads and writes will occur on the network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>c_xtcp</strong> &#8211; chanend connected to the xtcp server</li>
+<li><strong>conn</strong> &#8211; tcp connection structure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_unpause">
+void <tt class="descname">xtcp_unpause</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em><big>)</big><a class="headerlink" href="#xtcp_unpause" title="Permalink to this definition">¶</a></dt>
+<dd><p>unpause a connection</p>
+<p>Activity is resumed on a connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>c_xtcp</strong> &#8211; chanend connected to the xtcp server</li>
+<li><strong>conn</strong> &#8211; tcp connection structure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="other-general-client-functions">
 <h3>Other General Client Functions<a class="headerlink" href="#other-general-client-functions" title="Permalink to this headline">¶</a></h3>
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_join_multicast_group">
-void <tt class="descname">xtcp_join_multicast_group</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t">xtcp_ipaddr_t</a><em>&nbsp;addr</em><big>)</big><a class="headerlink" href="#xtcp_join_multicast_group" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_join_multicast_group</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t"><span>xtcp_ipaddr_t</span></a><em>&nbsp;addr</em><big>)</big><a class="headerlink" href="#xtcp_join_multicast_group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subscribe to a particular ip multicast group address.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -718,9 +919,9 @@ void <tt class="descname">xtcp_join_multicast_group</tt><big>(</big>chanend<em>&
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_leave_multicast_group">
-void <tt class="descname">xtcp_leave_multicast_group</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t">xtcp_ipaddr_t</a><em>&nbsp;addr</em><big>)</big><a class="headerlink" href="#xtcp_leave_multicast_group" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_leave_multicast_group</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_ipaddr_t" title="xtcp_ipaddr_t"><span>xtcp_ipaddr_t</span></a><em>&nbsp;addr</em><big>)</big><a class="headerlink" href="#xtcp_leave_multicast_group" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unsubscribe to a particular ip multicast group address.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -736,7 +937,7 @@ void <tt class="descname">xtcp_leave_multicast_group</tt><big>(</big>chanend<em>
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_get_mac_address">
 void <tt class="descname">xtcp_get_mac_address</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, unsigned char<em>&nbsp;mac_addr[]</em><big>)</big><a class="headerlink" href="#xtcp_get_mac_address" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the current host MAC address of the server.</p>
@@ -754,10 +955,11 @@ void <tt class="descname">xtcp_get_mac_address</tt><big>(</big>chanend<em>&nbsp;
 </table>
 </dd></dl>
 
-<dt><dl class="function">
+<dl class="function">
 <dt id="xtcp_get_ipconfig">
-void <tt class="descname">xtcp_get_ipconfig</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t">xtcp_ipconfig_t</a><em>&nbsp;&amp;ipconfig</em><big>)</big><a class="headerlink" href="#xtcp_get_ipconfig" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the current host IP configuration of the server.</p>
+void <tt class="descname">xtcp_get_ipconfig</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t"><span>xtcp_ipconfig_t</span></a><em>&nbsp;&amp;ipconfig</em><big>)</big><a class="headerlink" href="#xtcp_get_ipconfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the IP config information into a local structure.</p>
+<p>Get the current host IP configuration of the server.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -766,6 +968,241 @@ void <tt class="descname">xtcp_get_ipconfig</tt><big>(</big>chanend<em>&nbsp;c_x
 <li><strong>c_xtcp</strong> &#8211; chanend connected to the xtcp server</li>
 <li><strong>ipconfig</strong> &#8211; the structure to be filled with the IP configuration information</li>
 </ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="high-level-blocking-client-api">
+<h3>High-level blocking client API<a class="headerlink" href="#high-level-blocking-client-api" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="xtcp_wait_for_ifup">
+void <tt class="descname">xtcp_wait_for_ifup</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em><big>)</big><a class="headerlink" href="#xtcp_wait_for_ifup" title="Permalink to this definition">¶</a></dt>
+<dd><p>block until the xtcp interface has come up</p>
+<p>This means, amongst other things, that it has acquired an IP address using whatever scheme was necessary</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_wait_for_connection">
+<a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a> <tt class="descname">xtcp_wait_for_connection</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em><big>)</big><a class="headerlink" href="#xtcp_wait_for_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Block until a connection attempt to is made.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_write">
+int <tt class="descname">xtcp_write</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em>, unsigned char<em>&nbsp;buf[]</em>, int<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#xtcp_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a buffer of data to a TCP connection.</p>
+<p>This is a blocking write of data to the given xtcp connection</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tcp_svr</strong> &#8211; The xtcp control channel</li>
+<li><strong>conn</strong> &#8211; The xtcp server connection structure</li>
+<li><strong>buf</strong> &#8211; The buffer to write</li>
+<li><strong>len</strong> &#8211; The length of data to send</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">1 for success, 0 for failure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_read">
+int <tt class="descname">xtcp_read</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;&amp;conn</em>, unsigned char<em>&nbsp;buf[]</em>, int<em>&nbsp;minlen</em><big>)</big><a class="headerlink" href="#xtcp_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive data from xtcp connection.</p>
+<p>This is a blocking read from the xtcp stack</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tcp_svr</strong> &#8211; The xtcp control channel</li>
+<li><strong>conn</strong> &#8211; The xtcp server connection structure</li>
+<li><strong>buf</strong> &#8211; The buffer to read into</li>
+<li><strong>minlen</strong> &#8211; The minimim length of data to receive</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The number of bytes received</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="high-level-buffered-client-api">
+<h3>High-level buffered client API<a class="headerlink" href="#high-level-buffered-client-api" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="xtcp_buffered_set_rx_buffer">
+void <tt class="descname">xtcp_buffered_set_rx_buffer</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;*conn</em>, xtcp_bufinfo_t<em>&nbsp;*bufinfo</em>, char<em>&nbsp;*buf</em>, int<em>&nbsp;buflen</em><big>)</big><a class="headerlink" href="#xtcp_buffered_set_rx_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the location and size of the receiver buffer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tcp_svr</strong> &#8211; the xtcp server control channel</li>
+<li><strong>conn</strong> &#8211; a pointer to the xtcp connection info structure</li>
+<li><strong>bufinfo</strong> &#8211; a pointer to the buffered API control structure</li>
+<li><strong>buf</strong> &#8211; a pointer to the buffer to use for received data</li>
+<li><strong>buflen</strong> &#8211; the length of the receive buffer in bytes</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_buffered_set_tx_buffer">
+void <tt class="descname">xtcp_buffered_set_tx_buffer</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;*conn</em>, xtcp_bufinfo_t<em>&nbsp;*bufinfo</em>, char<em>&nbsp;*buf</em>, int<em>&nbsp;buflen</em>, int<em>&nbsp;lowmark</em><big>)</big><a class="headerlink" href="#xtcp_buffered_set_tx_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the location and size of the transmission buffer</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tcp_svr</strong> &#8211; the xtcp server control channel</li>
+<li><strong>conn</strong> &#8211; a pointer to the xtcp connection info structure</li>
+<li><strong>bufinfo</strong> &#8211; a pointer to the buffered API control structure</li>
+<li><strong>buf</strong> &#8211; a pointer to the buffer to use for received data</li>
+<li><strong>buflen</strong> &#8211; the length of the receive buffer in bytes</li>
+<li><strong>lowmark</strong> &#8211; if the number of spare bytes in the buffer falls below this, TCP pauses the stream</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>the size of the buffer should probably be no smaller than XTCP_CLIENT_BUF_SIZE plus the maximum buffered message length. if it is, then buffer overflow can be detected and data will be lost.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_buffered_recv">
+int <tt class="descname">xtcp_buffered_recv</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;*conn</em>, xtcp_bufinfo_t<em>&nbsp;*bufinfo</em>, char<em>&nbsp;**buf</em>, int<em>&nbsp;len</em>, int<em>&nbsp;*overflow</em><big>)</big><a class="headerlink" href="#xtcp_buffered_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pull a buffer of data out of the received data buffer.</p>
+<p>This pulls a specified length of data from the data buffer. It is most useful for protocols where the packet format is known, or at least where variable sized data blocks are preceeded by a length field. A good example is DHCP.</p>
+<p>When calling this in response to a XTCP_RECV_DATA event, and you must keep calling it until it returns zero.</p>
+<p>The return value is either:</p>
+<p>when the user wants to pull N bytes from the buffer, but less than N have been received into it, then the function returns zero. In this case, a calling function would typically not process further until another receive event was detected, indicating that there is some more data available in to read, and therefore that the number of bytes requested can now be fullfilled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tcp_svr</strong> &#8211; the xtcp server control channel</li>
+<li><strong>conn</strong> &#8211; a pointer to the xtcp connection info structure</li>
+<li><strong>bufinfo</strong> &#8211; a pointer to the buffered API control structure</li>
+<li><strong>buf</strong> &#8211; on return this points to the received data.</li>
+<li><strong>len</strong> &#8211; length of the buffer to receive into</li>
+<li><strong>overflow</strong> &#8211; pointer to an int which is set to non-zero if the buffer overflowed</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the number of characters received in the buffer, or zero if we have used up all of the data, or the space available when receiving more data from xtcp would overflow the buffer</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>consider the data pointed to by the buf parameter to be read only. It points into the allocated buffer</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_buffered_recv_upto">
+int <tt class="descname">xtcp_buffered_recv_upto</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;*conn</em>, xtcp_bufinfo_t<em>&nbsp;*bufinfo</em>, char<em>&nbsp;**buf</em>, char<em>&nbsp;delim</em>, int<em>&nbsp;*overflow</em><big>)</big><a class="headerlink" href="#xtcp_buffered_recv_upto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive data from the receive buffer, up to a given delimiter character.</p>
+<p>Many protocols, eg SMTP, FTP, HTTP, have variable length records with delimiters at the end of the record. This function can be used to fetch data from that type of data stream.</p>
+<p>When calling this in response to a XTCP_RECV_DATA event, and you must keep calling it until it returns zero.</p>
+<p>The returned length contains the delimiter</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tcp_svr</strong> &#8211; the xtcp server control channel</li>
+<li><strong>conn</strong> &#8211; a pointer to the xtcp connection info structure</li>
+<li><strong>bufinfo</strong> &#8211; a pointer to the buffered API control structure</li>
+<li><strong>buf</strong> &#8211; on return this points to the received data.</li>
+<li><strong>delim</strong> &#8211; a character to receive data until</li>
+<li><strong>overflow</strong> &#8211; pointer to an int which is set to non-zero if the buffer overflowed</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the number of characters in the returned data (including delimiter), or zero when there is nothing to receive, or the space available when receiving more data from xtcp would overflow the buffer</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_buffered_send">
+int <tt class="descname">xtcp_buffered_send</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;*conn</em>, xtcp_bufinfo_t<em>&nbsp;*bufinfo</em>, char<em>&nbsp;*buf</em>, int<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#xtcp_buffered_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add more data to the send buffer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tcp_svr</strong> &#8211; the xtcp server control channel</li>
+<li><strong>conn</strong> &#8211; a pointer to the xtcp connection info structure</li>
+<li><strong>bufinfo</strong> &#8211; a pointer to the buffered API control structure</li>
+<li><strong>buf</strong> &#8211; a buffer of data to queue for sending</li>
+<li><strong>len</strong> &#8211; the length of the data in the buffer</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">1 if the data was able to be buffered for send, 0 otherwise</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_buffered_send_handler">
+void <tt class="descname">xtcp_buffered_send_handler</tt><big>(</big>chanend<em>&nbsp;tcp_svr</em>, <a class="reference internal" href="#xtcp_connection_t" title="xtcp_connection_t"><span>xtcp_connection_t</span></a><em>&nbsp;*conn</em>, xtcp_bufinfo_t<em>&nbsp;*bufinfo</em><big>)</big><a class="headerlink" href="#xtcp_buffered_send_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>The handler function for transmission requests from the xtcp stack.</p>
+<p>When one of the following event types is received from the xtcp server channel then this method should be called.</p>
+<p>XTCP_SENT_DATA XTCP_REQUEST_DATA XTCP_RESEND_DATA</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tcp_svr</strong> &#8211; the xtcp server control channel</li>
+<li><strong>conn</strong> &#8211; a pointer to the xtcp connection info structure</li>
+<li><strong>bufinfo</strong> &#8211; a pointer to the buffered API control structure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="xtcp_buffered_send_buffer_remaining">
+int <tt class="descname">xtcp_buffered_send_buffer_remaining</tt><big>(</big>xtcp_bufinfo_t<em>&nbsp;*bufinfo</em><big>)</big><a class="headerlink" href="#xtcp_buffered_send_buffer_remaining" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the remaining amount of space in the send buffer.</p>
+<p>A client can use this to determine whether the outgoing buffer has enough space to accept more data before the call to send that data is made.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>bufinfo</strong> &#8211; a pointer to the buffered API control structure</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the number of bytes remaining in the send buffer</p>
 </td>
 </tr>
 </tbody>
@@ -786,6 +1223,7 @@ void <tt class="descname">xtcp_get_ipconfig</tt><big>(</big>chanend<em>&nbsp;c_x
 <h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
@@ -800,6 +1238,8 @@ void <tt class="descname">xtcp_get_ipconfig</tt><big>(</big>chanend<em>&nbsp;c_x
 <li class="toctree-l3"><a class="reference internal" href="#sending-data">Sending Data</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#other-connection-management">Other Connection Management</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#other-general-client-functions">Other General Client Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#high-level-blocking-client-api">High-level blocking client API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#high-level-buffered-client-api">High-level buffered client API</a></li>
 </ul>
 </li>
 </ul>
@@ -807,7 +1247,7 @@ void <tt class="descname">xtcp_get_ipconfig</tt><big>(</big>chanend<em>&nbsp;c_x
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none;margin-bottom: 10px;">
   <h3>Search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" size="18" />

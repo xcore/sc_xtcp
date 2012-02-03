@@ -13,6 +13,11 @@ The stack is based on the open-source stack uIP with modifications to
 work efficiently on XMOS architecture and communicate between threads
 using XC channels.
 
+The TCP stack interfaces to the 5-thread XMOS ethernet stack via a pair
+of channels.  Alternatively, an integrated 2-thread Ethernet plus TCP/IP
+is available for use in resource limited applications.
+
+
 Component Summary
 +++++++++++++++++
 
@@ -42,4 +47,39 @@ Component Summary
  | Component code provided without charge from XMOS.                 |
  | Component code is maintained by XMOS.                             |
  +-------------------------------------------------------------------+
+
+Resource requirements
+=====================
+
+The resource requirements for the XTCP stack alone are:
+
++--------------------------------------------------+
+| Resource     | Usage                             |
++==============+===================================+
+| Channels     | 1 per client                      |
++--------------------------------------------------+
+| Memory       | Between 20 and 45 KBytes          |
++--------------------------------------------------+
+| Timers       | 2                                 |
++--------------------------------------------------+
+| Clocks       | 0                                 |
++--------------------------------------------------+
+
+When used with the single thread ethernet MII module,
+the combined usage is:
+
++--------------------------------------------------+
+| Resource     | Usage                             |
++==============+===================================+
+| Channels     | 3 plus 1 per client               |
++--------------------------------------------------+
+| Memory       | Between 26 and 50 KBytes          |
++--------------------------------------------------+
+| Timers       | 4                                 |
++--------------------------------------------------+
+| Clocks       | 1                                 |
++--------------------------------------------------+
+
+The memory usage depends on the selection of different options
+at compile time, and on the amount of buffering chosen.
 

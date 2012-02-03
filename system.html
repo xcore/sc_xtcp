@@ -22,6 +22,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
+    <script type="text/javascript" src="_static/xcomment.js"></script>
     <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
     <link rel="next" title="Programming Guide" href="programming.html" />
     <link rel="prev" title="H/W Development Platforms" href="hw.html" /> 
@@ -62,20 +63,30 @@ document.getElementById('d1').style.height=h2 + "px";
 <h1>TCP/IP Stack System Description<a class="headerlink" href="#tcp-ip-stack-system-description" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="software-architecture">
 <h2>Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this headline">¶</a></h2>
-<p>The following Figure shows the architecture of the TCP/IP stack:</p>
+<p>The following Figure shows the architecture of the TCP/IP stack when
+attaching to an independent Ethernet stack through XC channel:</p>
 <div class="figure align-center">
 <img alt="_images/xtcp_arch-crop.png" src="_images/xtcp_arch-crop.png" />
 <p class="caption">XTCP software architecture</p>
 </div>
-<p>The server runs in a single thread and connects to the XMOS eThernet
-MAC component (see <a class="reference internal" href="references.html#xeth10">[XEth10]</a>). It can then connect to several client
+<p>The server runs in a single thread and connects to the XMOS Ethernet
+MAC component (see <a class="reference internal" href="references.html#xeth10"><span>[XEth10]</span></a>). It can then connect to several client
 threads over XC channels.</p>
+<p>Alternatively, the TCP/IP server and Ethernet server can be run as
+an integrated system of two threads.  To enable this, the header
+file <tt class="docutils literal"><span class="pre">uip_single_server.h</span></tt> should be included, and the function
+<a class="reference internal" href="api.html#uipSingleServer" title="uipSingleServer"><span>uipSingleServer()</span></a> used in place of the <a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a> and
+<tt class="docutils literal"><span class="pre">ethernet_server</span></tt> function from the ethernet repository.  In addition,
+the <tt class="docutils literal"><span class="pre">module_mii_singlethread</span></tt> should be used instead of <tt class="docutils literal"><span class="pre">module_ethernet</span></tt>
+and <tt class="docutils literal"><span class="pre">module_locks</span></tt> in the Makefile. Finally, define the constant
+<tt class="docutils literal"><span class="pre">UIP_USE_SINGLE_THREADED_ETHERNET</span></tt> in your application&#8217;s <tt class="docutils literal"><span class="pre">xtcp_client_config.h</span></tt>
+file.</p>
 </div>
 <div class="section" id="ip-configuration">
 <h2>IP Configuration<a class="headerlink" href="#ip-configuration" title="Permalink to this headline">¶</a></h2>
 <p>The server will determine its IP configuration based on the arguments
-passed into the <a class="reference internal" href="api.html#uip_server" title="uip_server"><tt class="xref c c-func docutils literal"><span class="pre">uip_server()</span></tt></a> function. If an address is
-supplied then that address will be used (a static IP address
+passed into the <a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a> or <a class="reference internal" href="api.html#uipSingleServer" title="uipSingleServer"><span>uipSingleServer()</span></a> function.
+If an address is supplied then that address will be used (a static IP address
 configuration). If no address is supplied then the server will first
 try to find a DHCP server on the network to obtain an address
 automatically. If this fails it will determine a link local address
@@ -105,19 +116,19 @@ interleave events for each connection so the client has to hold a
 persistent state for each connection.</p>
 <p>The connection and event model is the same from both TCP connections
 and UDP connections. Full details of both the possible events and
-possible commands can be found in Section <a class="reference internal" href="api.html#sec-api"><em>API</em></a>.</p>
+possible commands can be found in Section <a class="reference internal" href="api.html#sec-api"><span>API</span></a>.</p>
 </div>
 <div class="section" id="tcp-and-udp">
 <h2>TCP and UDP<a class="headerlink" href="#tcp-and-udp" title="Permalink to this headline">¶</a></h2>
 <p>The XTCP API treats UDP and TCP connections in the same way. The only
 difference is when the protocol is specified on initializing
-connections with <a class="reference internal" href="api.html#xtcp_connect" title="xtcp_connect"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_connect()</span></tt></a> or <a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_listen()</span></tt></a>.</p>
+connections with <a class="reference internal" href="api.html#xtcp_connect" title="xtcp_connect"><span>xtcp_connect()</span></a> or <a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><span>xtcp_listen()</span></a>.</p>
 </div>
 <div class="section" id="new-connections">
 <h2>New Connections<a class="headerlink" href="#new-connections" title="Permalink to this headline">¶</a></h2>
 <p>New connections are made in two different ways. Either the
-<a class="reference internal" href="api.html#xtcp_connect" title="xtcp_connect"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_connect()</span></tt></a> function is used to initiate a connection with
-a remote host as a client or the <a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_listen()</span></tt></a> function is
+<a class="reference internal" href="api.html#xtcp_connect" title="xtcp_connect"><span>xtcp_connect()</span></a> function is used to initiate a connection with
+a remote host as a client or the <a class="reference internal" href="api.html#xtcp_listen" title="xtcp_listen"><span>xtcp_listen()</span></a> function is
 used to listen on a port for other hosts to connect to the application
 . In either
 case once a connection is established then the
@@ -127,11 +138,13 @@ case once a connection is established then the
 <h2>Receiving Data<a class="headerlink" href="#receiving-data" title="Permalink to this headline">¶</a></h2>
 <p>When data is received by a connection, the <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RECV_DATA</span></tt>
 event is triggered and communicated to the client. At this point the
-client <strong>must</strong> call the <a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_recv()</span></tt></a> function to receive the
+client <strong>must</strong> call the <a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><span>xtcp_recv()</span></a> function to receive the
 data.</p>
 <p>Data is sent from host to client as the UDP or TCP packets come
 in. There is no buffering in the server so it will wait for the client
 to handle the event before processing new incoming packets.</p>
+<p>As an alternative to the low level interface, a higher level buffered
+interface is available.  See the section below.</p>
 </div>
 <div class="section" id="sending-data">
 <h2>Sending Data<a class="headerlink" href="#sending-data" title="Permalink to this headline">¶</a></h2>
@@ -147,14 +160,14 @@ a connection between the destination IP address and layer 2
 MAC address.</p>
 </div>
 <p>The client can initiate a send transaction with the
-<a class="reference internal" href="api.html#xtcp_init_send" title="xtcp_init_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_init_send()</span></tt></a> function. At this point no sending has been
+<a class="reference internal" href="api.html#xtcp_init_send" title="xtcp_init_send"><span>xtcp_init_send()</span></a> function. At this point no sending has been
 done but the server is notified of a wish to send. The client must
 then wait for a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_REQUEST_DATA</span></tt> event at which point it
-must respond with a call to <a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a>.</p>
+must respond with a call to <a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The maximum buffer size that can be sent in one call to
-<a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_send()</span></tt></a> is contained in the <tt class="xref c c-member docutils literal"><span class="pre">mss</span></tt>
+<a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> is contained in the <tt class="xref c c-member docutils literal"><span class="pre">mss</span></tt>
 field of the connection structure relating to the event.</p>
 </div>
 <p>After this data is sent to the server, two things can happen: Either
@@ -163,7 +176,7 @@ which case the next chunk of data can be sent or with an
 <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RESEND_DATA</span></tt> event in which case the client must
 re-transmit the previous chunk of data.</p>
 <p>The command/event exchange continues until the client calls the
-<a class="reference internal" href="api.html#xtcp_complete_send" title="xtcp_complete_send"><tt class="xref c c-func docutils literal"><span class="pre">xtcp_complete_send()</span></tt></a> function to finish the send
+<a class="reference internal" href="api.html#xtcp_complete_send" title="xtcp_complete_send"><span>xtcp_complete_send()</span></a> function to finish the send
 transaction. After this the server will not trigger any more
 <tt class="xref c c-member docutils literal"><span class="pre">XTCP_SENT_DATA</span></tt> events.</p>
 </div>
@@ -176,10 +189,30 @@ link status events to the client. The events <tt class="xref c c-member docutils
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>The server is configured via arguments passed to the
-<a class="reference internal" href="api.html#uip_server" title="uip_server"><tt class="xref c c-func docutils literal"><span class="pre">uip_server()</span></tt></a> function and the defines described in Section
-<a class="reference internal" href="api.html#sec-config-defines"><em>Configuration Defines</em></a>.</p>
+<a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a> function and the defines described in Section
+<a class="reference internal" href="api.html#sec-config-defines"><span>Configuration Defines</span></a>.</p>
 <p>Client connections are configured via the client API described in
-Section <a class="reference internal" href="api.html#sec-config-defines"><em>Configuration Defines</em></a>.</p>
+Section <a class="reference internal" href="api.html#sec-config-defines"><span>Configuration Defines</span></a>.</p>
+</div>
+<div class="section" id="buffered-api">
+<h2>Buffered API<a class="headerlink" href="#buffered-api" title="Permalink to this headline">¶</a></h2>
+<p>As an alternative to the low level interface, a buffered interface is
+available as a utility layer.</p>
+<p>To set up the buffered interface, the application must receive or make
+a new connection.  As part of the new connection processing a buffer
+must be associated with it, by calling <a class="reference internal" href="api.html#xtcp_buffered_set_rx_buffer" title="xtcp_buffered_set_rx_buffer"><span>xtcp_buffered_set_rx_buffer()</span></a>
+and <a class="reference internal" href="api.html#xtcp_buffered_set_tx_buffer" title="xtcp_buffered_set_tx_buffer"><span>xtcp_buffered_set_tx_buffer()</span></a>.</p>
+<p>When sending using the buffered interface, a call to <a class="reference internal" href="api.html#xtcp_buffered_send" title="xtcp_buffered_send"><span>xtcp_buffered_send()</span></a>
+is all that is required.  When processing the <tt class="xref c c-member docutils literal"><span class="pre">XTCP_SENT_DATA</span></tt>,
+<tt class="xref c c-member docutils literal"><span class="pre">XTCP_REQUEST_DATA</span></tt> and <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RESEND_DATA</span></tt>, the function
+<a class="reference internal" href="api.html#xtcp_buffered_send_handler" title="xtcp_buffered_send_handler"><span>xtcp_buffered_send_handler()</span></a> should be called.</p>
+<p>When processing a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RECV_DATA</span></tt> event, either the function
+<a class="reference internal" href="api.html#xtcp_buffered_recv" title="xtcp_buffered_recv"><span>xtcp_buffered_recv()</span></a> or <a class="reference internal" href="api.html#xtcp_buffered_recv_upto" title="xtcp_buffered_recv_upto"><span>xtcp_buffered_recv_upto()</span></a> can be
+called.  These either return the data requested, or zero.  If some data
+is returned, indicated by a non-zero return value, then the application
+should process the data, and call the receive function again.  Only when
+the function returns zero can the application stop trying to receive and
+process the data.</p>
 </div>
 </div>
 
@@ -193,6 +226,7 @@ Section <a class="reference internal" href="api.html#sec-config-defines"><em>Con
 <h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">TCP/IP Stack System Description</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#software-architecture">Software Architecture</a></li>
@@ -204,6 +238,7 @@ Section <a class="reference internal" href="api.html#sec-config-defines"><em>Con
 <li class="toctree-l2"><a class="reference internal" href="#sending-data">Sending Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#link-status-events">Link Status Events</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#buffered-api">Buffered API</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
@@ -211,7 +246,7 @@ Section <a class="reference internal" href="api.html#sec-config-defines"><em>Con
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none;margin-bottom: 10px;">
   <h3>Search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" size="18" />
