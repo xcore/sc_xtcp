@@ -1,4 +1,6 @@
-TARGET = XP-DSC-BLDC
+#TARGET = XP-DSC-BLDC
+TARGET = XP-MC-CTRL-L2
+
 APP_NAME =
 XCC_FLAGS = -Os -g -report -lxscope -save-temps \
             -DPIP_ICMP -DPIP_DHCP -DPIP_UDP -DPIP_ARP -DPIP_TCP -DPIP_TFTP
