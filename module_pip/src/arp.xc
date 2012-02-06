@@ -68,6 +68,11 @@ void pipIncomingARP(unsigned short packet[], unsigned offset) {
     unsigned tpa = getIntUnaligned(packet, 2*offset + 24);
     unsigned spa = getIntUnaligned(packet, 2*offset + 14);
 
+#ifdef PIP_LINK_LOCAL
+    if (pipIncomingLinkLocalARP(oper, tpa, (packet, unsigned char[]), 2*offset + 8)) {
+        return;
+    }
+#endif
     if (oper == 256) {             // REQUEST
         if (tpa == myIP) {         // for us.
             pipARPStoreEntry(spa, (packet, unsigned char[]), 2*offset + 8);

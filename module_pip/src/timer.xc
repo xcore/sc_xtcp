@@ -11,6 +11,7 @@
 #include "arp.h"
 #include "tftp.h"
 #include "tcp.h"
+#include "linklocal.h"
 
 /* 
  * Times are represented by a pair of numbers, an epoch and a time value.
@@ -61,6 +62,11 @@ static void numberZeroTimedOut() {
 #ifdef PIP_TCP
     case PIP_TCP_TIMER_TIMEWAIT:
         pipTimeoutTCPTimewait();
+        break;
+#endif
+#ifdef PIP_LINK_LOCAL
+    case PIP_LINK_LOCAL_TIMER:
+        pipTimeoutLinkLocal();
         break;
 #endif
     }
