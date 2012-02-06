@@ -28,13 +28,6 @@ xsi:schemaLocation="http://www.xmos.com http://www.xmos.com">
     </Node>
   </Nodes>
 
-  <Links>
-    <Link Encoding="2wire" Delays="4,5" Flags="SOD">
-      <LinkEndpoint NodeId="0" Link="X0LA"/>
-      <LinkEndpoint RoutingId="0x8000" Chanend="1"/>
-    </Link>
-  </Links>
-
   <Packages>	
     <Package id="L1" Type="XS1-L1A-TQ128">
       <Component NodeId="0" InPackage="0"/>

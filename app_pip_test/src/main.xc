@@ -12,11 +12,13 @@
 #include "pipServer.h"
 #include "tcpApplication.h"
 
-#define PORT_ETH_FAKE    XS1_PORT_8C
+#define ETHCORE 0
 
-#define PORT_ETH_RST_N  XS1_PORT_4C
+#define PORT_ETH_FAKE    XS1_PORT_8A
 
-on stdcore[1]: mii_interface_t mii =
+#define PORT_ETH_RST_N  PORT_SHARED_RS
+
+on stdcore[ETHCORE]: mii_interface_t mii =
   {
     XS1_CLKBLK_1,
     XS1_CLKBLK_2,
@@ -33,16 +35,12 @@ on stdcore[1]: mii_interface_t mii =
     PORT_ETH_FAKE,
   };
 
-#ifdef PORT_ETH_RST_N
-on stdcore[1]: out port p_mii_resetn = PORT_ETH_RST_N;
-on stdcore[1]: smi_interface_t smi = { PORT_ETH_MDIO, PORT_ETH_MDC, 0 };
-#else
-on stdcore[1]: smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
-#endif
+on stdcore[ETHCORE]: out port p_mii_resetn = PORT_ETH_RST_N;
+on stdcore[ETHCORE]: smi_interface_t smi = { 0, PORT_ETH_MDIO, PORT_ETH_MDC };
 
-on stdcore[1]: clock clk_smi = XS1_CLKBLK_5;
+on stdcore[ETHCORE]: clock clk_smi = XS1_CLKBLK_5;
 
-on stdcore[1]: struct otp_ports p = {XS1_PORT_32B, XS1_PORT_16C, XS1_PORT_16D };
+on stdcore[ETHCORE]: struct otp_ports p = {XS1_PORT_32B, XS1_PORT_16C, XS1_PORT_16D };
 
 static void httpServer(streaming chanend tcpStack) {
     unsigned char buf[12];
@@ -89,12 +87,13 @@ int main(void) {
 
 	par
 	{
-	 	on stdcore[1]: {
+	 	on stdcore[ETHCORE]: {
 	 		ethernet_getmac_otp(p, myMacAddress);
+            p_mii_resetn <: 2;            
 	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
 	 	}
 
-	 	on stdcore[1]: httpServer(tcpApps);
+	 	on stdcore[ETHCORE]: httpServer(tcpApps);
     }
     return 0;
 }
