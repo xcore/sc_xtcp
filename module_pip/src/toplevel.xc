@@ -30,10 +30,6 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
     int thetime;
     struct miiData miiData;
 
-    // xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
-    // xscope_config_io(XSCOPE_IO_BASIC);
-    printstr("HELLO\n");
-
     miiBufferInit(miiData, cIn, cNotifications, b, 3200);
     miiOutInit(cOut);
 

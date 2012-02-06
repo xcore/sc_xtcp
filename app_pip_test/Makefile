@@ -1,8 +1,8 @@
-#TARGET = XP-DSC-BLDC
-TARGET = XP-MC-CTRL-L2
+TARGET = XP-DSC-BLDC
+# TARGET = XP-MC-CTRL-L2
 
 APP_NAME =
-XCC_FLAGS = -Os -g -report -lxscope -save-temps \
+XCC_FLAGS = -Os -g -report  -save-temps \
             -DPIP_ICMP -DPIP_DHCP -DPIP_UDP -DPIP_ARP -DPIP_TCP -DPIP_TFTP
 USED_MODULES = module_pip module_mii_singlethread
 

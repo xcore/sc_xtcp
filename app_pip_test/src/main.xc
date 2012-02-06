@@ -12,11 +12,11 @@
 #include "pipServer.h"
 #include "tcpApplication.h"
 
-#define ETHCORE 0
+#define ETHCORE 1
 
-#define PORT_ETH_FAKE    XS1_PORT_8A
+#define PORT_ETH_FAKE    XS1_PORT_8C
 
-#define PORT_ETH_RST_N  PORT_SHARED_RS
+#define PORT_ETH_RST_N  PORT_CORE1_SHARED
 
 on stdcore[ETHCORE]: mii_interface_t mii =
   {
@@ -88,6 +88,8 @@ int main(void) {
 	par
 	{
 	 	on stdcore[ETHCORE]: {
+  //          xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
+  //          xscope_config_io(XSCOPE_IO_BASIC);
 	 		ethernet_getmac_otp(p, myMacAddress);
             p_mii_resetn <: 2;            
 	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
