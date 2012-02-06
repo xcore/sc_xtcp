@@ -45,10 +45,17 @@ IP Configuration
 The server will determine its IP configuration based on the arguments
 passed into the :c:func:`uip_server` or :c:func:`uipSingleServer` function.
 If an address is supplied then that address will be used (a static IP address
-configuration). If no address is supplied then the server will first
+configuration).
+
+If no address is supplied then the server will first
 try to find a DHCP server on the network to obtain an address
-automatically. If this fails it will determine a link local address
-(in the range 169.254/16) automatically using the Zeroconf IPV4LL protocol.
+automatically. If it cannot obtain an address from DHCP, it will determine
+a link local address (in the range 169.254/16) automatically using the
+Zeroconf IPV4LL protocol.
+
+To use dynamic address, the :c:func:`uip_server` can be passed a *null* to
+the ip configuration parameter. The :c:func:`uipSingleServer` must be
+passed a structure with 0 for all fields of the addresses.
 
 Events and Connections
 ----------------------
@@ -111,6 +118,12 @@ used to listen on a port for other hosts to connect to the application
 case once a connection is established then the
 :c:member:`XTCP_NEW_CONNECTION` event is triggered.
 
+In the Berkley sockets API, a listening UDP connection merely reports
+data received on the socket, indepedent of the source IP address.  In
+XTCP, a :c:member:`XTCP_NEW_CONNECTION` event is sent each time data
+arrives from a new source.  The API function :c:func:`xtcp_close`
+should be called after the connection is no longer needed.
+
 Receiving Data
 --------------
 
@@ -124,7 +137,7 @@ in. There is no buffering in the server so it will wait for the client
 to handle the event before processing new incoming packets.
 
 As an alternative to the low level interface, a higher level buffered
-interface is available.  See the section below.
+interface is available.  See section :ref:`sec_buffered_api`.
 
 Sending Data
 ------------
@@ -177,6 +190,8 @@ The server is configured via arguments passed to the
 Client connections are configured via the client API described in
 Section :ref:`sec_config_defines`.
 
+.. _sec_buffered_api:
+
 Buffered API
 ------------
 
@@ -201,4 +216,9 @@ should process the data, and call the receive function again.  Only when
 the function returns zero can the application stop trying to receive and
 process the data.
 
-  
+Two example applications are provided. *app_buffered_protocol_demo* shows
+the use of the buffered API used with fixed length packets, and
+*app_buffered_protocol_demo_2* shows the use of the delimited token
+mechanism. 
+
+

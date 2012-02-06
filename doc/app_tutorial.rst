@@ -105,7 +105,7 @@ If we don't find a free state we cannot handle the connection so
    :end-before: // Otherwise,
 
 If we can allocate the state structure then the elements of the
-structure are initalizes. The function
+structure are initialized. The function
 :c:func:`xtcp_set_connection_appstate` is then called to associate the 
 state with the connection. This means when a subsequent event is
 signalled on this connection the state can be recovered.
@@ -233,5 +233,39 @@ Once the data is sent, all that is left to do is update the ``dptr``,
 .. literalinclude:: app_simple_webserver/src/httpd.c
    :start-after: // We need to send some
    :end-before: ////
+
+
+Converting to use the two thread version of the stack
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to convert the application to use the two threaded version, the following changes
+would be made.
+
+First, add the *UIP_USE_SINGLE_THREADED_ETHERNET* constant to the *xtcp_client_config.h* file
+found in the application's source code.
+
+::
+  #define UIP_USE_SINGLE_THREADED_ETHERNET
+
+Next, replace the 5-thread ethernet server, and the TCP/IP server, with a single call to the
+2 thread stack.
+
+::
+  on stdcore[0]:
+  {
+    char mac_address[6];
+
+    ethernet_getmac_otp(otp_ports, mac_address);
+
+    // Bring PHY out of reset
+    p_reset <: 0x2;
+
+    // Start server
+    uipSingleServer(clk_smi, null, smi, mii, xtcp, 1, ipconfig, mac_address);
+    }
+
+
+All other parts of the system will remain the same, as the client-server interface between
+the XTCP server and the application remains the same.
 
 

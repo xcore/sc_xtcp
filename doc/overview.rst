@@ -17,6 +17,23 @@ The TCP stack interfaces to the 5-thread XMOS ethernet stack via a pair
 of channels.  Alternatively, an integrated 2-thread Ethernet plus TCP/IP
 is available for use in resource limited applications.
 
+5 thread Ethernet plus separate TCP/IP stack properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  * Layer 2 packets can be sent and received independently of layer 3
+  * Integrated support for high priority Qtagged packets
+  * Integrated support for 802.1 Qav rate control
+  * Packet filtering in an independent threads
+  * Works on a 400 MHz part
+
+Two thread ethernet plus integrated TCP/IP stack properties
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  * Uses only 2 threads
+  * High throughput
+  * Uses lower memory footprint
+  * Only TCP/IP sourced packets can be transmitted
+  * 500 MHz parts only (MII thread requires 62.5 MIPS)
 
 Component Summary
 +++++++++++++++++
@@ -57,11 +74,11 @@ The resource requirements for the XTCP stack alone are:
 | Resource     | Usage                             |
 +==============+===================================+
 | Channels     | 1 per client                      |
-+--------------------------------------------------+
++--------------+-----------------------------------+
 | Memory       | Between 20 and 45 KBytes          |
-+--------------------------------------------------+
++--------------+-----------------------------------+
 | Timers       | 2                                 |
-+--------------------------------------------------+
++--------------+-----------------------------------+
 | Clocks       | 0                                 |
 +--------------------------------------------------+
 
@@ -72,11 +89,11 @@ the combined usage is:
 | Resource     | Usage                             |
 +==============+===================================+
 | Channels     | 3 plus 1 per client               |
-+--------------------------------------------------+
++--------------+-----------------------------------+
 | Memory       | Between 26 and 50 KBytes          |
-+--------------------------------------------------+
++--------------+-----------------------------------+
 | Timers       | 4                                 |
-+--------------------------------------------------+
++--------------+-----------------------------------+
 | Clocks       | 1                                 |
 +--------------------------------------------------+
 
