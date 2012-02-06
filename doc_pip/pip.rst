@@ -41,14 +41,12 @@ PIP has the following restrictions:
 
 * No support for IP, TCP or UDP options
 
+* Single gateway only for traffic that is not destined for our subnet (to
+  be tested) 
+
 Known limitations that are yet to be implemented:
 
-* IPv4 routing to the gateway for traffic that is not destined for the
-  current subnet
-
 * Timeouts and resends on TCP-SYN and -FIN packets
-
-* DHCP gateway option
 
 * tcp ``open()`` function, and accompanying SYNSENT state (at present only
   servers can be implemented using ``accept()``)

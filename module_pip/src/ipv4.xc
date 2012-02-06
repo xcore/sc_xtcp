@@ -86,6 +86,11 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
     txInt(13, byterev(myIP));             // Set source IP address.
     txInt(15, byterev(ipDst));            // Set destination IP address.
     txShort(12, onesChecksum(0, (txbuf, unsigned short[]), 7, 20)); // Compute checksum
+#ifdef PIP_GATEWAY
+    if ((ipDst | ~mySubnetIP) != (myIP | ~mySubnetIP)) {
+        ipDst = myRouterIP;
+    }
+#endif
     for(int i = 0; i < ARPENTRIES; i++) {
         if (pipArpTable[i].ipAddress == ipDst) {
             pipOutgoingEthernet(pipArpTable[i].macAddr, 0, PIP_ETHTYPE_IPV4_REV);

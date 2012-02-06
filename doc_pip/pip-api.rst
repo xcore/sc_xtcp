@@ -17,6 +17,11 @@ Level 2:
 *-DPIP_ARP*
   Define this to include ARP.
 
+*-DPIP_GATEWAY*
+  Define this to support gateway functionality. A single gateway is
+  accepted from DHCP and used to route IP traffic to that is not on our
+  subnet.
+
 Level 3:
 ''''''''
 

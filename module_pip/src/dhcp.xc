@@ -20,7 +20,7 @@
 static int xid;
 static int interval = 4;
 
-unsigned myIP, serverIP, mySubnetIP;
+unsigned myIP, serverIP, mySubnetIP, myRouterIP;
 
 void pipCreateDHCP(int firstMessage,
                   unsigned proposedIP,
@@ -59,7 +59,7 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
     unsigned renewalTime;
     unsigned rebindTime;
     unsigned proposedIP;
-    unsigned subnet, messageType;
+    unsigned subnet, messageType, router;
 
     if (packet[offset+118] != 0x8263 || packet[offset+119] != 0x6353) {
         return;                                  // incorrect magic cookie
@@ -69,6 +69,7 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
     }
     proposedIP = getIntUnaligned(packet, offset*2 + 16);
     subnet = 0;
+    router = 0;
     leaseTime = 0;
     renewalTime = 0;
     rebindTime = 0;
@@ -87,6 +88,9 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         case 0x01: subnet      = getIntUnaligned(packet, i+2); break;
 #ifdef PIP_TFTP
         case 0x96: pipIpTFTP   = getIntUnaligned(packet, i+2); break;
+#endif
+#ifdef PIP_GATEWAY
+        case 0x03: router      = getIntUnaligned(packet, i+2); break;
 #endif
             // TODO: store router(s)
             // TODO: store DNS server(s)
@@ -108,6 +112,7 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, PIP_FUZZ_1S);
         myIP = proposedIP;
         mySubnetIP = subnet;
+        myRouterIP = router;
         printstr("Got an IP address\n");
 #ifdef PIP_TFTP
         pipInitTFTP();
@@ -122,8 +127,8 @@ void pipInitDHCP() {
     myIP = 0;
     mySubnetIP = 0;
     pipCreateDHCP(1, 0, 0);
-    pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, PIP_FUZZ_1S);
-    interval *= 2;
+    pipSetTimeOut(PIP_DHCP_TIMER_T2, 1, 0, PIP_FUZZ_10S);
+    interval = 1;
     if (interval > 60) {
         interval = 60;
     }
