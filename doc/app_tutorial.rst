@@ -147,7 +147,7 @@ set up and the ``hs`` variable is non-null.
    :start-after: // If we 
    :end-before: // Otherwise
 
-Now we are in a position where we have known connection state and the
+Now the connection state is known and the
 incoming data buffer filled. To keep things simple, this server makes
 the assumption that a single tcp packet gives us enough information to
 parse the http request. However, many applications will need to

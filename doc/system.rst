@@ -81,12 +81,12 @@ application.
      Example event sequence
 
 
-Each clients will receive *events* from the server. These events
+Each client will receive *events* from the server. These events
 usually have an associated *connection*. In addition to receiving
 these events the client can send *commands* to the server to initiate
 new connections and so on.
 
-The preceding figure shows an example event/command sequence of a
+Figure 2 shows an example event/command sequence of a
 client making a connection, sending some data, receiving some data and
 then closing the connection. Note that sending and receiving may be
 split into several events/commands since the server itself performs no

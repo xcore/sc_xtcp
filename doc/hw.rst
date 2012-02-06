@@ -13,3 +13,8 @@ development platforms can be used:
 For developing an application specific board with ethernet please
 refer to the hardware guides for the above boards with example
 schematics, BOMs, design guidelines etc.
+
+Note that the 2 thread version of the stack relies on the single thread MII ethernet
+component, which requires 62.5MIPS to run correctly.  Consequently, the 2-thread
+version of the stack will not run on a 400MHz device.
+
