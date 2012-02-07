@@ -46,7 +46,18 @@ Level 4:
 
 *-DPIP_DHCP*
   Define this to include the DHCP client. This will request an IP address
-  over DHCP. Without this option, no IP address is assigned.
+  over DHCP. See also *PIP_LINK_LOCAL* below.
+
+*-DPIP_LINK_LOCAL*
+  Define this to include link local address assignment. This will try and obtain
+  an IP address in the 169.254.x.x range. See also *PIP_DHCP* above.
+
+
+If both *PIP_DHCP* and *PIP_LINK_LOCAL* are defined then LINK_LOCAL will be
+switched on shortly after DHCP is switched on to give DHCP a chance to
+obtain an address. If neither *PIP_DHCP* nor *PIP_LINK_LOCAL* are defined
+then no IP address is assigned, and pipAssignIPv4 shall be called to set an
+IP address.
 
 
 API

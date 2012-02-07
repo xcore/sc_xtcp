@@ -10,6 +10,8 @@
 #include "rx.h"
 #include "tx.h"
 #include "udp.h"
+#include "linklocal.h"
+#include "ipv4.h"
 #include "ethernet.h"
 #include "timer.h"
 
@@ -17,8 +19,10 @@
 #define DHCP_SERVER_PORT     67
 // DHCP: RFC 2131
 
+#define INTERVAL_START  4
+
 static int xid;
-static int interval = 4;
+static int interval = INTERVAL_START;
 
 unsigned myIP, serverIP, mySubnetIP, myRouterIP;
 
@@ -108,27 +112,35 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         if (rebindTime == 0) {
             rebindTime = leaseTime - (leaseTime >> 3);
         }
+#ifdef PIP_LINK_LOCAL
+        pipDisableLinkLocal();
+#endif        
         pipSetTimeOut(PIP_DHCP_TIMER_T1, renewalTime, 0, PIP_FUZZ_1S);
         pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, PIP_FUZZ_1S);
-        myIP = proposedIP;
-        mySubnetIP = subnet;
-        myRouterIP = router;
-        printstr("Got an IP address\n");
+        pipAssignIPv4(proposedIP, subnet, router);
 #ifdef PIP_TFTP
         pipInitTFTP();
 #endif
     }
 }
 
-
 void pipInitDHCP() {
+    pipSetTimeOut(PIP_DHCP_TIMER_T2, 1, 0, PIP_FUZZ_10S);
+}
+
+void pipTimeOutDHCPT2() {
     timer t;
     t :> xid;
     myIP = 0;
     mySubnetIP = 0;
     pipCreateDHCP(1, 0, 0);
-    pipSetTimeOut(PIP_DHCP_TIMER_T2, 1, 0, PIP_FUZZ_10S);
-    interval = 1;
+    pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, PIP_FUZZ_1S);
+#ifdef PIP_LINK_LOCAL
+    if (interval != INTERVAL_START) {
+        pipInitLinkLocal();
+    }
+#endif
+    interval = interval * 2;
     if (interval > 60) {
         interval = 60;
     }
@@ -136,9 +148,5 @@ void pipInitDHCP() {
 
 void pipTimeOutDHCPT1() {
     pipCreateDHCP(0, myIP, serverIP);
-}
-
-void pipTimeOutDHCPT2() {
-    pipInitDHCP();
 }
 

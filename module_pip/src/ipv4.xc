@@ -87,10 +87,12 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
     txInt(15, byterev(ipDst));            // Set destination IP address.
     txShort(12, onesChecksum(0, (txbuf, unsigned short[]), 7, 20)); // Compute checksum
 #ifdef PIP_GATEWAY
-    if ((ipDst | ~mySubnetIP) != (myIP | ~mySubnetIP)) {
+    if ((ipDst & mySubnetIP) != (myIP & mySubnetIP) && myRouterIP != 0) {
         ipDst = myRouterIP;
     }
 #endif
+// TODO: mask subnet off in ARP table.
+// This makes broadcast work as expected.
     for(int i = 0; i < ARPENTRIES; i++) {
         if (pipArpTable[i].ipAddress == ipDst) {
             pipOutgoingEthernet(pipArpTable[i].macAddr, 0, PIP_ETHTYPE_IPV4_REV);
@@ -100,4 +102,11 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length) {
     // Missing ARP - destroy packet and ARP instead.
     txClear();
     pipCreateARP(0, ipDst, pipArpTable[0].macAddr, 0);
+}
+
+void pipAssignIPv4(unsigned proposedIP, unsigned subnet, unsigned router) {
+    myIP = proposedIP;
+    mySubnetIP = subnet;
+    myRouterIP = router;
+    printstr("Got an IP address\n");
 }

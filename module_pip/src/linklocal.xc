@@ -7,7 +7,6 @@
 #include <xclib.h>
 #include <print.h>
 #include "linklocal.h"
-//#include "tftp.h"
 #include "rx.h"
 #include "tx.h"
 #include "ethernet.h"
@@ -51,6 +50,11 @@ void pipInitLinkLocal() {
     pipSetTimeOut(PIP_LINK_LOCAL_TIMER, 0, 100000, PIP_FUZZ_1S);
 }
 
+void pipDisableLinkLocal() {
+    state = STATE_WAITING;
+    pipReSetTimeOut(PIP_LINK_LOCAL_TIMER);
+}
+
 int pipIncomingLinkLocalARP(int oper, int ipAddress, unsigned char macAddress, int offset) {
     if (ipAddress != randomIPAddress) {
         return 0;
@@ -69,7 +73,7 @@ int pipIncomingLinkLocalARP(int oper, int ipAddress, unsigned char macAddress, i
     return 1;
 }
 
-static void stateProgress(int newState, int wait, int fuzz) {
+static void progressState(int newState, int wait, int fuzz) {
     int zeros[2] = {0,0};
     state = newState;
     pipCreateARP(0, randomIPAddress, (zeros, unsigned char[]), 0);
@@ -79,24 +83,24 @@ static void stateProgress(int newState, int wait, int fuzz) {
 void pipTimeOutLinkLocal() {
     switch(state) {
     case STATE_WAITING:
-        stateProgress(STATE_PROBED_ONCE,   1, PIP_FUZZ_1S);
+        progressState(STATE_PROBED_ONCE,   1, PIP_FUZZ_1S);
         break;
     case STATE_PROBED_ONCE:
-        stateProgress(STATE_PROBED_TWICE,  1, PIP_FUZZ_1S);
+        progressState(STATE_PROBED_TWICE,  1, PIP_FUZZ_1S);
         break;
     case STATE_PROBED_TWICE:
-        stateProgress(STATE_PROBED_THRICE, 2, 0);
+        progressState(STATE_PROBED_THRICE, 2, 0);
         break;
     case STATE_PROBED_THRICE:
         myIP = randomIPAddress;
-        stateProgress(STATE_ANNOUNCED_ONCE, 2, 0);
+        progressState(STATE_ANNOUNCED_ONCE, 2, 0);
         break;
     case STATE_ANNOUNCED_ONCE:
-        stateProgress(STATE_ANNOUNCED_TWICE, 2, 0);
+        progressState(STATE_ANNOUNCED_TWICE, 2, 0);
         break;
     case STATE_ANNOUNCED_TWICE:
         state = STATE_GOT_IT;
-        // set IP address
+        pipAssignIPv4(randomIPAddress, 0xFFFFFFFF, 0);
         break;
     }
 }

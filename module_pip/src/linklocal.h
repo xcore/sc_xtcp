@@ -3,8 +3,9 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
-/** Function that initialises the Link Local client. To be called prior to any
- * other function. Usually called from toplevel.
+/** Function that initialises the Link Local client. To be called prior to
+ * any other function. Usually called from dhcp or toplevel (depending on
+ * whether DHCP is enabled)
  */
 void pipInitLinkLocal();
 
@@ -28,3 +29,8 @@ void pipTimeOutLinkLocal();
  * \returns a boolean stating that this ARP packet was for the link local layer.
  */
 int pipIncomingLinkLocalARP(int oper, int ipAddress, unsigned char macAddress, int offset);
+
+/** Function that disables the Link Local client.
+ */
+void pipDisableLinkLocal();
+

@@ -46,6 +46,10 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
 #ifdef PIP_DHCP
     pipInitDHCP();
     doTx(cOut);
+#else
+#ifdef PIP_LINK_LOCAL
+    pipInitLinkLocal();
+#endif
 #endif
 
     while (1) {
