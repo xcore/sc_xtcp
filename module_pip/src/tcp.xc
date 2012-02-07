@@ -265,7 +265,7 @@ static void loadOutgoingData(struct tcpConnection &conn) {
 
 // TODO: rename to remove Timewait - as it does all.
 
-void pipTimeoutTCPTimewait() {
+void pipTimeOutTCPTimewait() {
     for(int i = 0; i < TCPCONNECTIONS; i++) {
         switch(tcpConnections[i].state) {
         case TIMEWAIT:  tcpConnections[i].state = TIMEWAIT0; break;

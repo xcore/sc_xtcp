@@ -61,12 +61,12 @@ static void numberZeroTimedOut() {
 #endif
 #ifdef PIP_TCP
     case PIP_TCP_TIMER_TIMEWAIT:
-        pipTimeoutTCPTimewait();
+        pipTimeOutTCPTimewait();
         break;
 #endif
 #ifdef PIP_LINK_LOCAL
     case PIP_LINK_LOCAL_TIMER:
-        pipTimeoutLinkLocal();
+        pipTimeOutLinkLocal();
         break;
 #endif
     }

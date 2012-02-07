@@ -28,7 +28,7 @@ void pipTimeOutLinkLocal();
  *
  * \returns a boolean stating that this ARP packet was for the link local layer.
  */
-int pipIncomingLinkLocalARP(int oper, int ipAddress, unsigned char macAddress, int offset);
+int pipIncomingLinkLocalARP(int oper, int ipAddress, unsigned char macAddress[], int offset);
 
 /** Function that disables the Link Local client.
  */

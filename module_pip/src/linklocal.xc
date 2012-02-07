@@ -29,7 +29,7 @@
 #define randomPolynomial      0xEDB88320  // Ethernet polynomial - saves space
 
 static unsigned int random = 0;
-static unsigned int randomIPAddress = 0;
+static unsigned int randomIPAddress;
 static int state;
 static int conflicts;
 
@@ -40,22 +40,27 @@ static void initiateAddress() {
 static void advanceAddress() {
     crc32(random, myMacAddress[4], randomPolynomial);
     crc32(random, myMacAddress[5], randomPolynomial);
-    randomIPAddress = 0xA9FE0000 | random & 0xFF;
+    randomIPAddress = 0xA9FE0000 | (random & 0xFF);
     randomIPAddress |= (1+((random >> 8) % 254)) << 8;
 }
 
 void pipInitLinkLocal() {
+    if (state != STATE_WAITING) {
+        return;
+    }
     state = STATE_WAITING;
     initiateAddress();
+    advanceAddress();
     pipSetTimeOut(PIP_LINK_LOCAL_TIMER, 0, 100000, PIP_FUZZ_1S);
 }
 
 void pipDisableLinkLocal() {
     state = STATE_WAITING;
-    pipReSetTimeOut(PIP_LINK_LOCAL_TIMER);
+    pipResetTimeOut(PIP_LINK_LOCAL_TIMER);
 }
 
-int pipIncomingLinkLocalARP(int oper, int ipAddress, unsigned char macAddress, int offset) {
+int pipIncomingLinkLocalARP(int oper, int ipAddress, unsigned char macAddress[], int offset) {
+
     if (ipAddress != randomIPAddress) {
         return 0;
     }
@@ -74,9 +79,9 @@ int pipIncomingLinkLocalARP(int oper, int ipAddress, unsigned char macAddress, i
 }
 
 static void progressState(int newState, int wait, int fuzz) {
-    int zeros[2] = {0,0};
+    char zeros[1] = {0};
     state = newState;
-    pipCreateARP(0, randomIPAddress, (zeros, unsigned char[]), 0);
+    pipCreateARP(0, randomIPAddress, zeros, -1);
     pipSetTimeOut(PIP_LINK_LOCAL_TIMER, wait, 0, fuzz);
 }
 
@@ -96,11 +101,12 @@ void pipTimeOutLinkLocal() {
         progressState(STATE_ANNOUNCED_ONCE, 2, 0);
         break;
     case STATE_ANNOUNCED_ONCE:
+        myIP = randomIPAddress;
         progressState(STATE_ANNOUNCED_TWICE, 2, 0);
         break;
     case STATE_ANNOUNCED_TWICE:
         state = STATE_GOT_IT;
-        pipAssignIPv4(randomIPAddress, 0xFFFFFFFF, 0);
+        pipAssignIPv4(randomIPAddress, 0, 0);
         break;
     }
 }

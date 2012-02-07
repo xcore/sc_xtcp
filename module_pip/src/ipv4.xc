@@ -108,5 +108,6 @@ void pipAssignIPv4(unsigned proposedIP, unsigned subnet, unsigned router) {
     myIP = proposedIP;
     mySubnetIP = subnet;
     myRouterIP = router;
-    printstr("Got an IP address\n");
+    printstr("Got IP address ");
+    printhexln(myIP);
 }

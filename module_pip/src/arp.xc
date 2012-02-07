@@ -13,6 +13,11 @@
 #include "tx.h"
 #include "ethernet.h"
 #include "timer.h"
+#include "linklocal.h"
+
+// TODO: merge with pipArpTable - leads to conflict.
+
+unsigned char broadcast[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
 struct arp pipArpTable[ARPENTRIES] = {
     {0xFFFFFFFF, {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 1, 0xff}},
@@ -58,9 +63,14 @@ void pipCreateARP(unsigned reply, unsigned tpa, unsigned char tha[], unsigned of
     txInt(zero+2, 0x01000406 + reply * 0x01000000);  // Fill in hw size, proto size
     txData(zero+4, myMacAddress, 0, 6);          // Set ETH mac src
     txInt(zero+7, byterev(myIP));                // Set IP src
-    txData(zero+9, tha, offset, 6);              // Set ETH mac dst
     txInt(zero+12, byterev(tpa));                // Set IP dst
-    pipOutgoingEthernet(tha, offset, PIP_ETHTYPE_ARP_REV);
+    if (offset == -1) {
+        txShortZeroes(zero+9, 3);
+        pipOutgoingEthernet(broadcast, 0, PIP_ETHTYPE_ARP_REV);
+    } else {
+        txData(zero+9, tha, offset, 6);              // Set ETH mac dst
+        pipOutgoingEthernet(tha, offset, PIP_ETHTYPE_ARP_REV);
+    }
 }
 
 void pipIncomingARP(unsigned short packet[], unsigned offset) {
@@ -68,17 +78,22 @@ void pipIncomingARP(unsigned short packet[], unsigned offset) {
     unsigned tpa = getIntUnaligned(packet, 2*offset + 24);
     unsigned spa = getIntUnaligned(packet, 2*offset + 14);
 
-#ifdef PIP_LINK_LOCAL
-    if (pipIncomingLinkLocalARP(oper, tpa, (packet, unsigned char[]), 2*offset + 8)) {
-        return;
-    }
-#endif
     if (oper == 256) {             // REQUEST
+#ifdef PIP_LINK_LOCAL
+        if (pipIncomingLinkLocalARP(oper, tpa, (packet, unsigned char[]), 2*offset + 8)) {
+            return;
+        }
+#endif
         if (tpa == myIP) {         // for us.
             pipARPStoreEntry(spa, (packet, unsigned char[]), 2*offset + 8);
             pipCreateARP(1, spa, (packet, unsigned char[]), 2*offset + 8);
         }
     } else if (oper == 512) {      // REPLY
+#ifdef PIP_LINK_LOCAL
+        if (pipIncomingLinkLocalARP(oper, spa, (packet, unsigned char[]), 2*offset + 8)) {
+            return;
+        }
+#endif
         pipARPStoreEntry(spa, (packet, unsigned char[]), 2*offset + 8);
     }
 }
