@@ -31,7 +31,7 @@ PIP implements the following:
 
 * TCP
 
-* DHCP
+* DHCP and link-local (169.254.x.x)
 
 * TFTP
 
@@ -51,18 +51,21 @@ Known limitations that are yet to be implemented:
 * tcp ``open()`` function, and accompanying SYNSENT state (at present only
   servers can be implemented using ``accept()``)
 
-* No fallback to a private network (using a 169.254.x.x address)
-
 * No DNS or MDNS
 
 * TFTP has yet to implement the actual jump to 0x10000; to be taken from
   the USB bootloader.
 
+Known issues:
+
+* DHCP packets may appear to originate frmo 169.254.x.x addresses rather
+  than 0.0.0.0
+
 PIP design philosophy
 ---------------------
 
 Since PIP is designed to not use dynamic memory, and to be small and
-readable, its interface is different.
+readable. Its interface is therefore different from uip + xtcp.
 
 TCP interface
 '''''''''''''

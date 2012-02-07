@@ -26,3 +26,16 @@ void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int 
         pipOutgoingIPv4(PIP_IPTYPE_ICMP, srcIP, length);
     }
 }
+
+void pipOutgoingICMPPing(unsigned dstIP, int sequence) {
+    int offset = 17;
+    int length = 32 - offset;
+    txShort(offset, 8);   // Type 8: echo request; code 0.
+    txShort(offset+1, 0); // Initial checksum
+    txInt(offset + 2, byterev(sequence));
+    for(int i = offset+4; i < offset + length; i++) {
+        txShort(i, i);
+    }
+    txShort(offset + 1, onesChecksum(0, (txbuf, unsigned short[]), 17, length<<1));
+    pipOutgoingIPv4(PIP_IPTYPE_ICMP, dstIP, length<<1);
+}

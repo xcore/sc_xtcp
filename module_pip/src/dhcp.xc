@@ -19,10 +19,13 @@
 #define DHCP_SERVER_PORT     67
 // DHCP: RFC 2131
 
-#define INTERVAL_START  4
+#define STATE_BLANK 0
+#define STATE_INITED 1
+#define STATE_ALLOCATED 2
 
 static int xid;
-static int interval = INTERVAL_START;
+static int interval = 4;
+static int state = STATE_BLANK;
 
 unsigned myIP, serverIP, mySubnetIP, myRouterIP;
 
@@ -117,6 +120,7 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
 #endif        
         pipSetTimeOut(PIP_DHCP_TIMER_T1, renewalTime, 0, PIP_FUZZ_1S);
         pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, PIP_FUZZ_1S);
+        state = STATE_ALLOCATED;
         pipAssignIPv4(proposedIP, subnet, router);
 #ifdef PIP_TFTP
         pipInitTFTP();
@@ -131,15 +135,18 @@ void pipInitDHCP() {
 void pipTimeOutDHCPT2() {
     timer t;
     t :> xid;
-    myIP = 0;
-    mySubnetIP = 0;
+    if (state == STATE_ALLOCATED) {
+        state = STATE_INITED;
+        pipUnassignIPv4();
+    }
     pipCreateDHCP(1, 0, 0);
     pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, PIP_FUZZ_1S);
 #ifdef PIP_LINK_LOCAL
-    if (interval != INTERVAL_START) {
+    if (state != STATE_BLANK) {
         pipInitLinkLocal();
     }
 #endif
+    state = STATE_INITED;
     interval = interval * 2;
     if (interval > 60) {
         interval = 60;

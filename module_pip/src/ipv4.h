@@ -45,6 +45,11 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length);
  */
 void pipAssignIPv4(unsigned proposedIP, unsigned subnet, unsigned router);
 
+/** Function that unsets our IP address - called by dhcp.xc when the lease
+ * expires and the lease could not be renewed.
+ */
+void pipUnassignIPv4();
+
 /** Variable that holds the current IP address; 0 if this node does not
  * have an IP address at present.
  */

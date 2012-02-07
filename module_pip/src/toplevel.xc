@@ -17,16 +17,24 @@
 #include "timer.h"
 #include "tcp.h"
 #include "arp.h"
+#include "icmp.h"
 
 extern char notifySeen;
 
+int thetime;
+
+select  doPing(timer t2) {
+case t2 when timerafter(thetime+100000000) :> thetime:
+//    pipOutgoingICMPPing(0xc0a82101, thetime/100000000);
+    pipOutgoingICMPPing(0x0A006618, thetime/100000000);
+    break;
+}
 
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streaming chanend tcpApps) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
     int b[3200];
     timer t, t2;
-    int thetime;
     struct miiData miiData;
 
     miiBufferInit(miiData, cIn, cNotifications, b, 3200);
@@ -54,9 +62,8 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
     while (1) {
         int cmd;
         select {
-#if 1
+//        case doPing(t2);
         case pipTimeOut(t);
-#endif
         case inuchar_byref(cNotifications, miiData.notifySeen):
             break;
 #ifdef PIP_TCP
