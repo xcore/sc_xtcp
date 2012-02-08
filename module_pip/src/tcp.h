@@ -69,6 +69,12 @@ void pipApplicationTCP(streaming chanend app, int cmd);
  * word) and then output a stream of bytes as a series of data tokens.
  */
 #define PIP_TCP_WRITE 4
+/** Value to send over the application channel to indicate an open command.
+ * to be followed by the number of the connection, the port on the local
+ * host, the IP address of the remote host, and the port on the remote
+ * host.
+ */
+#define PIP_TCP_CONNECT_V 5
 
 
 /** Token to send over application channel to indicate acknowledgment of

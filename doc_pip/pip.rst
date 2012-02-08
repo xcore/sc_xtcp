@@ -61,6 +61,9 @@ Known issues:
 * DHCP packets may appear to originate frmo 169.254.x.x addresses rather
   than 0.0.0.0
 
+* No ``conf.h`` file that includes ``pip_conf.h`` and that implements all
+  rules such as "DHCP requires UDP" etc.
+
 PIP design philosophy
 ---------------------
 

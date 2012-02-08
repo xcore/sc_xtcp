@@ -6,6 +6,7 @@
 #include <xs1.h>
 #include <xclib.h>
 #include <print.h>
+#include "config.h"
 #include "linklocal.h"
 #include "rx.h"
 #include "tx.h"

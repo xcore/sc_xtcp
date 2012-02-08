@@ -5,6 +5,7 @@
 
 #include <xclib.h>
 #include <print.h>
+#include "config.h"
 #include "dhcp.h"
 #include "tftp.h"
 #include "rx.h"

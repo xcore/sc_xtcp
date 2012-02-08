@@ -7,6 +7,7 @@
 
 #include <print.h>
 #include <xclib.h>
+#include "config.h"
 #include "arp.h"
 #include "ipv4.h"
 #include "rx.h"

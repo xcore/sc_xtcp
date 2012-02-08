@@ -6,6 +6,7 @@
 #include <xs1.h>
 #include <print.h>
 #include <stdio.h>
+#include "config.h"
 #include "timer.h"
 #include "dhcp.h"
 #include "arp.h"

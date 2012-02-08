@@ -5,6 +5,7 @@
 
 #include <xclib.h>
 #include <print.h>
+#include "config.h"
 #include "udp.h"
 #include "checksum.h"
 #include "ipv4.h"

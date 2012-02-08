@@ -7,6 +7,7 @@
 #include <xs1.h>
 #include <xclib.h>
 #include <print.h>
+#include "config.h"
 #include "miiDriver.h"
 #include "mii.h"
 #include "miiClient.h"

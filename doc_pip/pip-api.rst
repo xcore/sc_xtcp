@@ -5,13 +5,13 @@ Compile time defines
 --------------------
 
 Compile time defines are used to include support for all optional parts of
-the networking stack. Note that there is no automatic inclusion, eg, if
-DHCP support is required one has to include DHCP, UDP, IPv4 and ARP.
+the networking stack. The compile time defines can be placed in a file
+called ``pip_conf.h``, or they can be set with -DXXXX on the xcc command line.
 
 Level 2:
 ''''''''
 
-*-DPIP_IPv4*
+*-DPIP_IPV4*
   Define this to include IPv4.
 
 *-DPIP_ARP*
@@ -26,7 +26,13 @@ Level 3:
 ''''''''
 
 *-DPIP_TCP*
-  Define this to include the TCP stack.
+  Define this to include the TCP stack with just an ACCEPT system call.
+  This is suitable for most server applications.
+
+*-DPIP_TCP_CONNECT*
+  Define this to include the TCP stack with both an
+  ACCEPT and a CONNECT system call. Only required for applications that
+  need to connect to a server.
 
 *-DPIP_UDP*
   Define this to include the UDP stack.
@@ -67,6 +73,8 @@ TCP
 '''
 
 .. doxygenfunction:: pipApplicationAccept
+
+.. doxygenfunction:: pipApplicationConnect
 
 .. doxygenfunction:: pipApplicationClose
 

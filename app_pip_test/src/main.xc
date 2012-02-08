@@ -51,7 +51,7 @@ static void httpServer(streaming chanend tcpStack) {
         total = 0;
         pipApplicationAccept(tcpStack, 0);
         t :> t0;
-        while(l = pipApplicationRead(tcpStack, 0, buf, 10)) {
+        while((l = pipApplicationRead(tcpStack, 0, buf, 10)) > 0) {
             total += l;
             buf[l] = '.';
             buf[l+1] = 0;
@@ -82,6 +82,29 @@ static void httpServer(streaming chanend tcpStack) {
     }
 }
 
+static void httpClient(streaming chanend tcpStack) {
+    unsigned char buf[102];
+    int l, total;
+    timer t;
+    int t0;
+    t :> t0;
+    t when timerafter(t0+500000000) :> void;
+    while(1) {
+        total = 0;
+        pipApplicationConnect(tcpStack, 1, 0xC0A82101, 80, 12377);
+        t :> t0;
+        pipApplicationWrite(tcpStack, 1, "GET /\r\n\r\n", 9);
+        while((l = pipApplicationRead(tcpStack, 1, buf, 100)) > 0) {
+            total += l;
+            buf[l] = '.';
+            buf[l+1] = 0;
+            printstr(buf);
+        }
+        printintln(l);
+        pipApplicationClose(tcpStack, 1);
+    }
+}
+
 int main(void) {
 	streaming chan tcpApps;
 
@@ -95,7 +118,7 @@ int main(void) {
 	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
 	 	}
 
-	 	on stdcore[ETHCORE]: httpServer(tcpApps);
+	 	on stdcore[ETHCORE]: httpClient(tcpApps);
     }
     return 0;
 }
