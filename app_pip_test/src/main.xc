@@ -82,26 +82,32 @@ static void httpServer(streaming chanend tcpStack) {
     }
 }
 
+#define CLIENT_SOCKET 1
+
 static void httpClient(streaming chanend tcpStack) {
     unsigned char buf[102];
     int l, total;
     timer t;
     int t0;
+    int portnr = 12345;
     t :> t0;
-    t when timerafter(t0+500000000) :> void;
-    while(1) {
+    t when timerafter(t0+500000000) :> t0;
+    printstr("Starting HTTP nuke\n");
+    for(int i = 0; i < 10000; i++) {
+        portnr = (portnr + 1) & 0xF7FF;
         total = 0;
-        pipApplicationConnect(tcpStack, 1, 0xC0A82101, 80, 12377);
+        t when timerafter(t0+1000000000) :> t0;
+        pipApplicationConnect(tcpStack, CLIENT_SOCKET, 0xC0A82101, 80, portnr);
         t :> t0;
-        pipApplicationWrite(tcpStack, 1, "GET /\r\n\r\n", 9);
-        while((l = pipApplicationRead(tcpStack, 1, buf, 100)) > 0) {
+        pipApplicationWrite(tcpStack, CLIENT_SOCKET, "GET /\r\n\r\n", 9);
+        while((l = pipApplicationRead(tcpStack, CLIENT_SOCKET, buf, 100)) > 0) {
             total += l;
             buf[l] = '.';
             buf[l+1] = 0;
-            printstr(buf);
+//            printstr(buf);
         }
-        printintln(l);
-        pipApplicationClose(tcpStack, 1);
+        pipApplicationClose(tcpStack, CLIENT_SOCKET);
+        printint(i%10);
     }
 }
 

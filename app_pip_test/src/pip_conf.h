@@ -1,4 +1,4 @@
-#define PIP_DHCP
+#define PIP_DHCP_DONT_WAIT
 #define PIP_ICMP
 #define PIP_GATEWAY
 #define PIP_LINK_LOCAL

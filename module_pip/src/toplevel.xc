@@ -19,6 +19,7 @@
 #include "tcp.h"
 #include "arp.h"
 #include "icmp.h"
+#include "linklocal.h"
 
 extern char notifySeen;
 
@@ -53,6 +54,7 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
 
 #ifdef PIP_DHCP
     pipInitDHCP();
+    printstr("Dhcp...\n");
     doTx(cOut);
 #else
 #ifdef PIP_LINK_LOCAL

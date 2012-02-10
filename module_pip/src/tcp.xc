@@ -25,9 +25,9 @@
 #define APP_ACCEPTING    4
 #define APP_CONNECTING      5
 
-#define TCPCONNECTIONS 10
+#define TCPCONNECTIONS 4
 
-#define BUFFERSIZERX   256               // Must be a power of 2.
+#define BUFFERSIZERX   512               // Must be a power of 2.
 #define BUFFERSIZETX   512               // Must be a power of 2.
 
 struct tcpConnection {
@@ -91,6 +91,9 @@ void pipOutgoingTCP(struct tcpConnection &conn, int length, int flags) {
     int totalLength = length + 20;
     int chkSum;
     int zero = 17;
+    if (flags & SYN) {
+        totalLength += 4;
+    }
     if (conn.ackRequired) {
         flags |= ACK;
     }
@@ -102,10 +105,13 @@ void pipOutgoingTCP(struct tcpConnection &conn, int length, int flags) {
     } else {
         txInt(zero+4, 0); // Ack number, reversed
     }
-    txShort(zero+6, flags<<8 | 0x50);             // Flags and header size
-    conn.rcvWND = (conn.rx.free > BUFFERSIZERX/2-1) ? BUFFERSIZERX/2 : conn.rx.free;
+    txShort(zero+6, flags<<8 | (0x50 + ((flags & SYN)<<3)));             // Flags and header size
+    conn.rcvWND = conn.rx.free;
     txShort(zero+7, byterev(conn.rcvWND)>>16);    // Number of bytes free in window.
     txInt(zero+8, 0);                             // checksum, urgent pointer
+    if (flags & SYN) {
+        txInt(zero+10, 0x00000402 | ((BUFFERSIZERX/2)&0xff)<<24 | ((BUFFERSIZERX/2)&0xff00)<<8 );
+    }
     chkSum = onesChecksum(0x0006 + totalLength + onesAdd(myIP, conn.remoteIP), (txbuf, unsigned short[]), 17, totalLength);
     txShort(zero+8, chkSum);                      // checksum.
     conn.ackRequired = 0;
@@ -143,7 +149,7 @@ void pipInitTCP() {
     pipSetTimeOut(PIP_TCP_TIMER_TIMEWAIT, 0, 10*1000*100, 0); // 10 ms clock
 }
 
-static void bounceRST(int localPortRev, int remotePortRev, int remoteIP, int segACKRev, int sequenceNumberRev, int incorporateACK) {
+static void bounceRST(int localPortRev, int remotePortRev, int remoteIP, int segACKRev, int sequenceNumberRev, int incorporateACK, int reason) {
     struct tcpConnection pseudoConnection;
     int flags;
     pseudoConnection.localPortRev = localPortRev;
@@ -159,6 +165,7 @@ static void bounceRST(int localPortRev, int remotePortRev, int remoteIP, int seg
         flags = ACK | RST;
     }
     pipOutgoingTCP(pseudoConnection, 0, flags);
+    printf("RST %d\n", reason);
 }
 
 static void copyDataForRead(struct tcpConnection &conn, streaming chanend app) {
@@ -194,7 +201,7 @@ static void copyDataForRead2(struct tcpConnection &conn, int app) {
     }
 }
 
-static void storeIncomingData(struct tcpConnection &conn, unsigned short packet[],
+static int storeIncomingData(struct tcpConnection &conn, unsigned short packet[],
                              int offset, int length) {
     int i;
     for(i = 0; i < length; i++) {
@@ -210,6 +217,7 @@ static void storeIncomingData(struct tcpConnection &conn, unsigned short packet[
         conn.appStatus = APP_NOT_WAITING;
     }
     conn.rcvNXT += i;
+    return i == length;
 }
 
 static void copyDataFromWrite(struct tcpConnection &conn, streaming chanend app) {
@@ -276,8 +284,8 @@ void pipTimeOutTCPTimewait() {
         case TIMEWAIT1: tcpConnections[i].state = TIMEWAIT2; break;
         case TIMEWAIT2:
             tcpConnections[i].state = CLOSED;
-            if (tcpConnections[i].appWaiting) {
-                appSendAcknowledge(tcpConnections[i]);
+            if (tcpConnections[i].appStatus != APP_NOT_WAITING) {
+                appSendClose(tcpConnections[i]);
             }
             break;
         case ESTAB:          // TODO: add others.
@@ -345,7 +353,7 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
     }
     if (opened == -1) {
         if (!(flags & RST)) {
-            bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, !(flags & ACK));
+            bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, !(flags & ACK), 1);
         }
         return;
     }
@@ -358,7 +366,7 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
             return;
         }
         if (flags & ACK) {
-            bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, !(flags & ACK));
+            bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, !(flags & ACK), 2);
             return;
         }
         if (flags & SYN) {
@@ -382,9 +390,10 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
         if (flags & ACK) { // first check ACK
             if(tcpConnections[opened].sndUNA - segACK > 0 ||
                segACK - tcpConnections[opened].sndNXT > 0) {
-                bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, 0);
+                bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, 0, 3);
                 return;
             }
+            tcpConnections[opened].sndUNA = segACK;
         }
         if (flags & RST) { // second check RST
             if (flags & ACK) {
@@ -419,10 +428,9 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
     case CLOSEWAIT:
     case CLOSING:
     case LASTACK:
-        printf("segSEQ: %08x, rcvNXT: %08x, state %d\n", segSEQ, tcpConnections[opened].rcvNXT,
-               tcpConnections[opened].state);
+//        printf("segSEQ: %08x, rcvNXT: %08x, state %d\n", segSEQ, tcpConnections[opened].rcvNXT, tcpConnections[opened].state);
         if (segSEQ != tcpConnections[opened].rcvNXT) {
-            printstr("Ignore, out of order packet\n");
+//            printstr("Ignore, out of order packet\n");
             pipOutgoingTCP(tcpConnections[opened], 0, ACK);           // Out of order - reject.
             return;
         }
@@ -474,7 +482,7 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
         if (tcpConnections[opened].state == SYNRCVD) {
             if(tcpConnections[opened].sndUNA - segACK > 0 ||
                segACK - tcpConnections[opened].sndNXT > 0) {
-                bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, 1);
+                bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, 1, 4);
                 // TODO: set to CLOSED?
                 return;
             }
@@ -487,16 +495,21 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
         }
 
         if (tcpConnections[opened].state == LASTACK) {
-            if (tcpConnections[opened].tx.free == BUFFERSIZETX + 1) {
+//            printintln(tcpConnections[opened].tx.free);
+//            if (tcpConnections[opened].tx.free == BUFFERSIZETX + 1) {
+            
+            if (tcpConnections[opened].sndNXT == segACK) {
                 tcpConnections[opened].state  = CLOSED;
                 if (tcpConnections[opened].appStatus == APP_CLOSING) {
                     appSendAcknowledge(tcpConnections[opened]);
                 }
+            } else {
+//                printf("DUP ACK ON LASTACK sndNXT: %08x, segACK: %08x\n", tcpConnections[opened].sndNXT, segACK);
             }
             return;
         }
 
-        printf("sndUNA: %08x, segACK: %08x\n", tcpConnections[opened].sndUNA, segACK);
+//        printf("sndUNA: %08x, segACK: %08x\n", tcpConnections[opened].sndUNA, segACK);
         if(tcpConnections[opened].sndUNA - segACK > 0) {
             printstr("Ignoring duplicate ACK\n");
             return; // Duplicate ACK can be ignored.
@@ -525,7 +538,9 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
             }
         } else if (tcpConnections[opened].state == CLOSING) {
             tcpConnections[opened].state = TIMEWAIT;
-            appSendAcknowledge(tcpConnections[opened]);     // Acknowledge the close.
+            if (tcpConnections[opened].appStatus != APP_NOT_WAITING) {
+                appSendClose(tcpConnections[opened]);     // Acknowledge the close.
+            }
             return;
         }
 
@@ -533,7 +548,10 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
         // 7 Process the data.
 
         if (length != 0) {
-            storeIncomingData(tcpConnections[opened], packet, tcpOffset, length);
+            if (!storeIncomingData(tcpConnections[opened], packet, tcpOffset, length)) {
+                flags &= ~FIN;   // make sure we do not acknowledge FIN if not all consumed.
+            }
+//            flags &= ~FIN;   // make sure we do not acknowledge FIN if not all consumed.
             if (tcpConnections[opened].ackRequired) {
                 pipOutgoingTCP(tcpConnections[opened], 0, ACK);
             } else {
@@ -548,6 +566,7 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
             case SYNRCVD:
             case ESTAB:
                 tcpConnections[opened].rcvNXT ++;
+//                printhexln(tcpConnections[opened].rcvNXT);
                 pipOutgoingTCP(tcpConnections[opened], 0, ACK);
                 tcpConnections[opened].state = CLOSEWAIT;
                 break;
@@ -624,7 +643,6 @@ static void doConnect(struct tcpConnection &conn, streaming chanend app) {
     conn.remotePortRev = inputShortRev(app);
     conn.localPortRev = inputShortRev(app);
     t :> t0;
-    conn.tx.free--;
     conn.sndNXT = t0;
     conn.sndUNA = t0 - 1;
     pipOutgoingTCP(conn, 0, SYN);
@@ -661,7 +679,7 @@ static void doClose(struct tcpConnection &conn, streaming chanend app) {
         return;
     case CLOSEWAIT:
         conn.state = LASTACK;
-        pipOutgoingTCP(conn, 0, FIN|ACK);
+        pipOutgoingTCP(conn, 0, FIN|ACK); //Diagram only shows FIN but also req ACK
         conn.sndNXT++;
         setAppWaiting(conn, app, APP_CLOSING);
         return;

@@ -18,6 +18,10 @@
 #define PIP_UDP 1
 #endif
 
+#ifdef PIP_DHCP_DONT_WAIT
+#define PIP_DHCP 1
+#endif
+
 #ifdef PIP_DHCP
 #define PIP_UDP 1
 #endif
@@ -28,7 +32,7 @@
 
 
 
-// TCP Level
+// TCP/UDP Level
 
 #ifdef PIP_TCP_CONNECT
 #define PIP_TCP 1

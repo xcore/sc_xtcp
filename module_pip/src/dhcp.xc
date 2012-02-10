@@ -130,7 +130,11 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
 }
 
 void pipInitDHCP() {
+#ifdef PIP_DHCP_DONT_WAIT
+    pipSetTimeOut(PIP_DHCP_TIMER_T2, 3, 0, 0);
+#else
     pipSetTimeOut(PIP_DHCP_TIMER_T2, 1, 0, PIP_FUZZ_10S);
+#endif
 }
 
 void pipTimeOutDHCPT2() {
