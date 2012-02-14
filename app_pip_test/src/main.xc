@@ -89,14 +89,15 @@ static void httpClient(streaming chanend tcpStack) {
     int l, total;
     timer t;
     int t0;
-    int portnr = 12345;
+    int portnr = 12449;
     t :> t0;
-    t when timerafter(t0+500000000) :> t0;
+    t when timerafter(t0+1000000000) :> t0;
     printstr("Starting HTTP nuke\n");
     for(int i = 0; i < 10000; i++) {
         portnr = (portnr + 1) & 0xF7FF;
         total = 0;
-        t when timerafter(t0+1000000000) :> t0;
+        t :> t0;
+        t when timerafter(t0+100000000) :> t0;
         pipApplicationConnect(tcpStack, CLIENT_SOCKET, 0xC0A82101, 80, portnr);
         t :> t0;
         pipApplicationWrite(tcpStack, CLIENT_SOCKET, "GET /\r\n\r\n", 9);

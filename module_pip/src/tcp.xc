@@ -25,10 +25,14 @@
 #define APP_ACCEPTING    4
 #define APP_CONNECTING      5
 
-#define TCPCONNECTIONS 4
+#define TCPCONNECTIONS 2
 
-#define BUFFERSIZERX   512               // Must be a power of 2.
+#define BUFFERSIZERX   2048               // Must be a power of 2.
 #define BUFFERSIZETX   512               // Must be a power of 2.
+
+struct packetHistory {
+    int ack, seq, length, flags, time;
+};
 
 struct tcpConnection {
     unsigned short remotePortRev, localPortRev;
@@ -52,6 +56,11 @@ struct tcpConnection {
         int rd, wr, free, length;
         char buffer[BUFFERSIZETX];
     } tx;
+#ifdef PIP_DEBUG_TCP
+    int wtx, wrx;
+    struct packetHistory ltx[PIP_DEBUG_TCP];
+    struct packetHistory lrx[PIP_DEBUG_TCP];
+#endif
 };
 
 struct tcpConnection tcpConnections[TCPCONNECTIONS] = {
@@ -80,6 +89,20 @@ struct tcpConnection tcpConnections[TCPCONNECTIONS] = {
 #define TIMEWAIT1 13
 #define TIMEWAIT2 14
 
+
+void pipDebugTCPStore(int ack, int seq, int flags, int length, struct packetHistory ph[], int &w) {
+    timer t;
+    ph[w].ack = ack;
+    ph[w].seq = seq;
+    ph[w].length = length;
+    ph[w].flags = flags;
+    t :> ph[w].time;
+    w++;
+    if (w == PIP_DEBUG_TCP) {
+        w = 0;
+    }
+}
+
 void error(char msg[], int flags) {
     printstr(msg);
     printstr(" received flags ");
@@ -91,6 +114,7 @@ void pipOutgoingTCP(struct tcpConnection &conn, int length, int flags) {
     int totalLength = length + 20;
     int chkSum;
     int zero = 17;
+    int seq, ack;
     if (flags & SYN) {
         totalLength += 4;
     }
@@ -99,12 +123,14 @@ void pipOutgoingTCP(struct tcpConnection &conn, int length, int flags) {
     }
     txShort(zero+0, conn.localPortRev);             // Store source port, already reversed
     txShort(zero+1, conn.remotePortRev);             // Store dst port, already reversed
-    txInt(zero+2, byterev(conn.sndNXT)); // Sequence number, reversed
+    seq = conn.sndNXT;
+    txInt(zero+2, byterev(seq)); // Sequence number, reversed
     if (flags & ACK) {
-        txInt(zero+4, byterev(conn.rcvNXT)); // Ack number, reversed
+        ack = conn.rcvNXT;
     } else {
-        txInt(zero+4, 0); // Ack number, reversed
+        ack = 0;
     }
+    txInt(zero+4, byterev(ack)); // Ack number, reversed
     txShort(zero+6, flags<<8 | (0x50 + ((flags & SYN)<<3)));             // Flags and header size
     conn.rcvWND = conn.rx.free;
     txShort(zero+7, byterev(conn.rcvWND)>>16);    // Number of bytes free in window.
@@ -116,9 +142,9 @@ void pipOutgoingTCP(struct tcpConnection &conn, int length, int flags) {
     txShort(zero+8, chkSum);                      // checksum.
     conn.ackRequired = 0;
     pipOutgoingIPv4(PIP_IPTYPE_TCP, conn.remoteIP, totalLength);
-//    printstr("Send ");
-//    printhexln(conn.remoteIP);
-//    printhexln(totalLength);
+#ifdef PIP_DEBUG_TCP
+    pipDebugTCPStore(ack, seq, flags, length, conn.ltx, conn.wtx);
+#endif
 }
 
 static void appSendAcknowledge(struct tcpConnection & conn) {
@@ -296,9 +322,7 @@ void pipTimeOutTCPTimewait() {
         case LASTACK:
             if (tcpConnections[i].timeouts) {
                 int notAcknowledged = BUFFERSIZETX - (tcpConnections[i].tx.length + tcpConnections[i].tx.free);
-                if (notAcknowledged == 0) {
-                    tcpConnections[i].timeouts = 0;
-                } else {
+                if (notAcknowledged != 0) {
                     int t = ++tcpConnections[i].timeouts;
                     if ((t&(t-1)) == 0) {        // 4, 8, 16, ...
                         if (t > 255) {
@@ -309,6 +333,8 @@ void pipTimeOutTCPTimewait() {
                         tcpConnections[i].tx.rd = (tcpConnections[i].tx.rd - notAcknowledged) & (BUFFERSIZETX - 1);
                         loadOutgoingData(tcpConnections[i]);
                     }
+                } else {
+                    tcpConnections[i].timeouts = 0;
                 }
             }
             break;
@@ -358,6 +384,9 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
         return;
     }
 
+#ifdef PIP_DEBUG_TCP
+    pipDebugTCPStore(byterev(segACKRev), byterev(segSEQRev), flags, length, tcpConnections[opened].lrx, tcpConnections[opened].wrx);
+#endif
     switch(tcpConnections[opened].state) {
     case CLOSED:
         break;
@@ -552,7 +581,7 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
                 flags &= ~FIN;   // make sure we do not acknowledge FIN if not all consumed.
             }
 //            flags &= ~FIN;   // make sure we do not acknowledge FIN if not all consumed.
-            if (tcpConnections[opened].ackRequired) {
+            if (1||tcpConnections[opened].ackRequired) {
                 pipOutgoingTCP(tcpConnections[opened], 0, ACK);
             } else {
                 tcpConnections[opened].ackRequired = 1;
@@ -620,6 +649,14 @@ static void initConnection(struct tcpConnection &conn, int state) {
     conn.tx.length = 0;
     conn.rcvWND = BUFFERSIZERX/2;
     conn.sndWND = 0;
+#ifdef PIP_DEBUG_TCP
+    conn.wtx = 0;
+    conn.wrx = 0;
+    for(int i = 0; i <PIP_DEBUG_TCP; i++) {
+        conn.ltx[i].time = 0;
+        conn.lrx[i].time = 0;
+    }
+#endif
 }
 
 static void doAccept(struct tcpConnection &conn, streaming chanend app) {
@@ -854,3 +891,54 @@ int pipApplicationWrite(streaming chanend stack, unsigned connection,
     }
     return bytesWritten;
 }
+
+
+static int byterevShort(int i) {
+    return ((unsigned)byterev(i)) >> 16;
+}
+
+static void printIP(char str[], unsigned int i) {
+    printf("%s %d.%d.%d.%d", str, (i>>24)&0xff, (i>>16)&0xff, (i>>8)&0xff, i&0xff);
+}
+
+#ifdef PIP_DEBUG_TCP
+static void printHistory(char str[], struct packetHistory ph[], int k) {
+    int otime = ph[0].time;
+    printf("%s\n", str);
+    for(int j = 0; j < PIP_DEBUG_TCP; j++) {
+        int ctime = ph[k].time;
+        printf("%d: ", k);
+        printf(" Seq: %10u 0x%08x", ph[k].seq, ph[k].seq);
+        printf(" Ack: %10u 0x%08x", ph[k].ack, ph[k].ack);
+        printf(" Flags: %02x", ph[k].flags);
+        printf(" Length: %4d", ph[k].length);
+        printf(" Time: %10u (%d)\n", ctime, ctime - otime);
+        otime = ctime;
+        k++;
+        if (k == PIP_DEBUG_TCP) {
+            k = 0;
+        }
+    }
+}
+
+void pipDebugTCPPrint() {
+    for(int i = 0; i < TCPCONNECTIONS; i++) {
+        printf("Connection %d; === State %d ===\n", i, tcpConnections[i].state);
+        printf("Ports: local %d remote %d\n", byterevShort(tcpConnections[i].localPortRev),  byterevShort(tcpConnections[i].remotePortRev));
+        printIP("IP: local ", tcpConnections[i].localIP);
+        printIP(" remote ", tcpConnections[i].remoteIP);
+        printf("\nmaaxSS :%d\nsnd.NXT %d (0x%08x)\n", tcpConnections[i].maxSegmentSize,tcpConnections[i].sndNXT, tcpConnections[i].sndNXT);
+        printf("snd.UNA %10u (0x%08x)\n", tcpConnections[i].sndUNA, tcpConnections[i].sndUNA);
+        printf("rcv.NXT %10u (0x%08x)\n", tcpConnections[i].rcvNXT, tcpConnections[i].rcvNXT);
+        printf("rcv.WND %10u (0x%08x)\n", tcpConnections[i].rcvWND, tcpConnections[i].rcvWND);
+        printf("snd.WND %10u (0x%08x)\n", tcpConnections[i].sndWND, tcpConnections[i].sndWND);
+        printf("appWaiting: 0x%08x\n",  tcpConnections[i].appWaiting);
+        printf("appStatus: %d\n",  tcpConnections[i].appStatus);
+        printf("ackRequired: %d\n",  tcpConnections[i].ackRequired);
+        printf("timeouts: %d\n",  tcpConnections[i].timeouts);
+        printHistory("Tx history", tcpConnections[i].ltx, tcpConnections[i].wtx);
+        printHistory("Rx history", tcpConnections[i].lrx, tcpConnections[i].wrx);
+                
+   }
+}
+#endif

@@ -45,6 +45,8 @@ void pipTimeOutTCPTimewait();
  */
 void pipApplicationTCP(streaming chanend app, int cmd);
 
+void pipDebugTCPPrint();
+
 /** Value to send over the application channel to indicate an accept command.
  * to be followed by the number of the connection. The return value is a
  * status control token.

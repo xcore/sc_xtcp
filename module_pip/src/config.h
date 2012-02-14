@@ -12,6 +12,13 @@
 #include "pip_conf.h"
 #endif
 
+#ifdef PIP_DEBUG_TCP
+#ifndef PIP_ICMP
+#define PIP_ICMP 1
+#endif
+#endif
+
+
 // Application level
 
 #ifdef PIP_TFTP
@@ -43,6 +50,10 @@
 #endif
 
 #ifdef PIP_UDP
+#define PIP_IPV4 1
+#endif
+
+#ifdef PIP_ICMP
 #define PIP_IPV4 1
 #endif
 

@@ -9,6 +9,7 @@
 #include "icmp.h"
 #include "ethernet.h"
 #include "tx.h"
+#include "tcp.h"
 #include "ipv4.h"
 #include "checksum.h"
 
@@ -25,6 +26,9 @@ void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int 
         txShort(18, 0);                                          // This could be simplified by patching old checksum rather than computing a new one.
         txShort(18, onesChecksum(0, (txbuf, unsigned short[]), 17, length));
         pipOutgoingIPv4(PIP_IPTYPE_ICMP, srcIP, length);
+#ifdef PIP_DEBUG_TCP
+        pipDebugTCPPrint();
+#endif
     }
 }
 

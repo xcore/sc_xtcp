@@ -64,6 +64,14 @@ Level 4:
   Define this to include link local address assignment. This will try and obtain
   an IP address in the 169.254.x.x range. See also *PIP_DHCP* above.
 
+Level 4:
+''''''''
+
+*PIP_DEBUG_TCP*
+  Define this to an integral number include a debugging
+  facility that keeps a history of the header information of the last
+  *PIP_DEBUG_TCP* packets. The information is printed off on a PING.
+
 
 If both *PIP_DHCP* and *PIP_LINK_LOCAL* are defined then LINK_LOCAL will be
 switched on shortly after DHCP is switched on to give DHCP a chance to
