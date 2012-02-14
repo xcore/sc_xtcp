@@ -12,6 +12,7 @@
 #include "tcp.h"
 #include "ipv4.h"
 #include "checksum.h"
+#include "timer.h"
 
 
 // RFC 0792
@@ -28,6 +29,9 @@ void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int 
         pipOutgoingIPv4(PIP_IPTYPE_ICMP, srcIP, length);
 #ifdef PIP_DEBUG_TCP
         pipDebugTCPPrint();
+#endif
+#ifdef PIP_DEBUG_TIMER
+        pipPrintTimeOuts();
 #endif
     }
 }

@@ -26,12 +26,14 @@
 #define APP_CONNECTING      5
 
 #define TCPCONNECTIONS 2
+#define TCP_MAX_TIMEOUT  2048            // TODO: 128. Must be a power of 2.
+#define TCP_MIN_TIMEOUT  256             // TODO: 4. Must be a power of 2.
 
 #define BUFFERSIZERX   2048               // Must be a power of 2.
 #define BUFFERSIZETX   512               // Must be a power of 2.
 
 struct packetHistory {
-    int ack, seq, length, flags, time;
+    int ack, seq, length, flags, state, time;
 };
 
 struct tcpConnection {
@@ -90,12 +92,13 @@ struct tcpConnection tcpConnections[TCPCONNECTIONS] = {
 #define TIMEWAIT2 14
 
 
-void pipDebugTCPStore(int ack, int seq, int flags, int length, struct packetHistory ph[], int &w) {
+void pipDebugTCPStore(int ack, int seq, int flags, int length, int state, struct packetHistory ph[], int &w) {
     timer t;
     ph[w].ack = ack;
     ph[w].seq = seq;
     ph[w].length = length;
     ph[w].flags = flags;
+    ph[w].state = state;
     t :> ph[w].time;
     w++;
     if (w == PIP_DEBUG_TCP) {
@@ -143,8 +146,10 @@ void pipOutgoingTCP(struct tcpConnection &conn, int length, int flags) {
     conn.ackRequired = 0;
     pipOutgoingIPv4(PIP_IPTYPE_TCP, conn.remoteIP, totalLength);
 #ifdef PIP_DEBUG_TCP
-    pipDebugTCPStore(ack, seq, flags, length, conn.ltx, conn.wtx);
+    pipDebugTCPStore(ack, seq, flags, length, conn.state, conn.ltx, conn.wtx);
 #endif
+    conn.timeouts = TCP_MIN_TIMEOUT;
+
 }
 
 static void appSendAcknowledge(struct tcpConnection & conn) {
@@ -181,6 +186,8 @@ static void bounceRST(int localPortRev, int remotePortRev, int remoteIP, int seg
     pseudoConnection.localPortRev = localPortRev;
     pseudoConnection.remotePortRev = remotePortRev;
     pseudoConnection.remoteIP = remoteIP;
+    pseudoConnection.wtx = 0;
+    pseudoConnection.wrx = 0;
     if (incorporateACK) {
         pseudoConnection.rcvNXT = 0;
         pseudoConnection.sndNXT = byterev(segACKRev);
@@ -297,13 +304,34 @@ static void loadOutgoingData(struct tcpConnection &conn) {
     }
     pipOutgoingTCP(conn, i, PSH|ACK);
     conn.sndNXT += i;
-    conn.timeouts = 4;
 }
 
 // TODO: rename to remove Timewait - as it does all.
 
 void pipTimeOutTCPTimewait() {
+    int t, t2, notAcknowledged;
     for(int i = 0; i < TCPCONNECTIONS; i++) {
+        if (tcpConnections[i].timeouts == 0) {
+            continue;
+        }
+        t = tcpConnections[i].timeouts;
+        t2 = t + 1;
+        tcpConnections[i].timeouts = t2;
+        if ((t & t2) != 0) {        // 8, 16, ...
+            continue;
+        }
+        if (t2 >= TCP_MAX_TIMEOUT) {
+            tcpConnections[i].timeouts = TCP_MAX_TIMEOUT;
+        }
+        notAcknowledged = BUFFERSIZETX - (tcpConnections[i].tx.length + tcpConnections[i].tx.free);
+        if (notAcknowledged > 0) {
+            tcpConnections[i].sndNXT -= notAcknowledged;
+            tcpConnections[i].tx.length += notAcknowledged;
+            tcpConnections[i].tx.rd = (tcpConnections[i].tx.rd - notAcknowledged) & (BUFFERSIZETX - 1);
+            loadOutgoingData(tcpConnections[i]);
+            printstr("+");
+            continue;
+        }
         switch(tcpConnections[i].state) {
         case TIMEWAIT:  tcpConnections[i].state = TIMEWAIT0; break;
         case TIMEWAIT0: tcpConnections[i].state = TIMEWAIT1; break;
@@ -314,31 +342,24 @@ void pipTimeOutTCPTimewait() {
                 appSendClose(tcpConnections[i]);
             }
             break;
-        case ESTAB:          // TODO: add others.
+        case SYNSENT:
+        case SYNRCVD:
+            break;
         case FINWAIT1:
         case FINWAIT2:
         case CLOSEWAIT:
         case CLOSING:
         case LASTACK:
-            if (tcpConnections[i].timeouts) {
-                int notAcknowledged = BUFFERSIZETX - (tcpConnections[i].tx.length + tcpConnections[i].tx.free);
-                if (notAcknowledged != 0) {
-                    int t = ++tcpConnections[i].timeouts;
-                    if ((t&(t-1)) == 0) {        // 4, 8, 16, ...
-                        if (t > 255) {
-                            t = 128;
-                        }
-                        tcpConnections[i].sndNXT -= notAcknowledged;
-                        tcpConnections[i].tx.length += notAcknowledged;
-                        tcpConnections[i].tx.rd = (tcpConnections[i].tx.rd - notAcknowledged) & (BUFFERSIZETX - 1);
-                        loadOutgoingData(tcpConnections[i]);
-                    }
-                } else {
-                    tcpConnections[i].timeouts = 0;
-                }
+            if (tcpConnections[i].sndNXT + 1 - tcpConnections[i].sndUNA > 0) {
+                pipOutgoingTCP(tcpConnections[i], 0, FIN|ACK);
+                printstr("*");
+                continue;
             }
             break;
+        case ESTAB:
+            break;
         }
+        tcpConnections[i].timeouts = 0;
     }
     pipSetTimeOut(PIP_TCP_TIMER_TIMEWAIT, 0, 10*1000*100, 0); // 10 ms clock
 }
@@ -380,12 +401,13 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
     if (opened == -1) {
         if (!(flags & RST)) {
             bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, !(flags & ACK), 1);
+            pipDebugTCPPrint();
         }
         return;
     }
 
 #ifdef PIP_DEBUG_TCP
-    pipDebugTCPStore(byterev(segACKRev), byterev(segSEQRev), flags, length, tcpConnections[opened].lrx, tcpConnections[opened].wrx);
+    pipDebugTCPStore(byterev(segACKRev), byterev(segSEQRev), flags, length, tcpConnections[opened].state, tcpConnections[opened].lrx, tcpConnections[opened].wrx);
 #endif
     switch(tcpConnections[opened].state) {
     case CLOSED:
@@ -420,6 +442,10 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
             if(tcpConnections[opened].sndUNA - segACK > 0 ||
                segACK - tcpConnections[opened].sndNXT > 0) {
                 bounceRST(dstPortRev, srcPortRev, srcIP, segACKRev, segSEQRev, 0, 3);
+                if (tcpConnections[opened].appStatus != APP_NOT_WAITING) {
+                    appSendError(tcpConnections[opened]);     // report problem.
+                }
+                tcpConnections[opened].state = CLOSED;
                 return;
             }
             tcpConnections[opened].sndUNA = segACK;
@@ -527,7 +553,7 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
 //            printintln(tcpConnections[opened].tx.free);
 //            if (tcpConnections[opened].tx.free == BUFFERSIZETX + 1) {
             
-            if (tcpConnections[opened].sndNXT == segACK) {
+            if (tcpConnections[opened].sndNXT+1 == segACK) {
                 tcpConnections[opened].state  = CLOSED;
                 if (tcpConnections[opened].appStatus == APP_CLOSING) {
                     appSendAcknowledge(tcpConnections[opened]);
@@ -653,8 +679,8 @@ static void initConnection(struct tcpConnection &conn, int state) {
     conn.wtx = 0;
     conn.wrx = 0;
     for(int i = 0; i <PIP_DEBUG_TCP; i++) {
-        conn.ltx[i].time = 0;
-        conn.lrx[i].time = 0;
+        conn.ltx[i].flags = -1;
+        conn.lrx[i].flags = -1;
     }
 #endif
 }
@@ -717,7 +743,7 @@ static void doClose(struct tcpConnection &conn, streaming chanend app) {
     case CLOSEWAIT:
         conn.state = LASTACK;
         pipOutgoingTCP(conn, 0, FIN|ACK); //Diagram only shows FIN but also req ACK
-        conn.sndNXT++;
+//        conn.sndNXT++;
         setAppWaiting(conn, app, APP_CLOSING);
         return;
     }
@@ -902,26 +928,42 @@ static void printIP(char str[], unsigned int i) {
 }
 
 #ifdef PIP_DEBUG_TCP
-static void printHistory(char str[], struct packetHistory ph[], int k) {
-    int otime = ph[0].time;
-    printf("%s\n", str);
-    for(int j = 0; j < PIP_DEBUG_TCP; j++) {
-        int ctime = ph[k].time;
-        printf("%d: ", k);
-        printf(" Seq: %10u 0x%08x", ph[k].seq, ph[k].seq);
-        printf(" Ack: %10u 0x%08x", ph[k].ack, ph[k].ack);
-        printf(" Flags: %02x", ph[k].flags);
-        printf(" Length: %4d", ph[k].length);
-        printf(" Time: %10u (%d)\n", ctime, ctime - otime);
-        otime = ctime;
-        k++;
-        if (k == PIP_DEBUG_TCP) {
-            k = 0;
+static void skipEmptyHistory(struct packetHistory ph[], int &w, int &l) {
+    l = PIP_DEBUG_TCP;
+    while(l > 0 && ph[w].flags == -1) {
+        l--;
+        w++;
+        if (w == PIP_DEBUG_TCP) {
+            w = 0;
         }
     }
 }
 
+static void printOne(int isTx, struct packetHistory ph[], int &w, int &l) {
+    static unsigned int otime = 0;
+    unsigned int ctime = ph[w].time;
+    printf("%cx %d: ", isTx ? 't' : 'r', w);
+    if (isTx) {
+        printf(" Seq: %10u 0x%08x", ph[w].seq, ph[w].seq);
+        printf(" Ack: %10u 0x%08x", ph[w].ack, ph[w].ack);
+    } else {
+        printf(" Ack: %10u 0x%08x", ph[w].ack, ph[w].ack);
+        printf(" Seq: %10u 0x%08x", ph[w].seq, ph[w].seq);
+    }
+    printf(" Flags: %02x", ph[w].flags);
+    printf(" Length: %4d", ph[w].length);
+    printf(" State: %2d", ph[w].state);
+    printf(" Time: %10u (%d us)\n", ctime, (ctime - otime)/100);
+    otime = ctime;
+    l--;
+    w++;
+    if (w == PIP_DEBUG_TCP) {
+        w = 0;
+    }
+}
+
 void pipDebugTCPPrint() {
+    int wtx, wrx, lentx, lenrx;
     for(int i = 0; i < TCPCONNECTIONS; i++) {
         printf("Connection %d; === State %d ===\n", i, tcpConnections[i].state);
         printf("Ports: local %d remote %d\n", byterevShort(tcpConnections[i].localPortRev),  byterevShort(tcpConnections[i].remotePortRev));
@@ -935,10 +977,22 @@ void pipDebugTCPPrint() {
         printf("appWaiting: 0x%08x\n",  tcpConnections[i].appWaiting);
         printf("appStatus: %d\n",  tcpConnections[i].appStatus);
         printf("ackRequired: %d\n",  tcpConnections[i].ackRequired);
-        printf("timeouts: %d\n",  tcpConnections[i].timeouts);
-        printHistory("Tx history", tcpConnections[i].ltx, tcpConnections[i].wtx);
-        printHistory("Rx history", tcpConnections[i].lrx, tcpConnections[i].wrx);
-                
+        printf("timeouts: %d\nPacket history of last %d RX and TX transactions:\n",  tcpConnections[i].timeouts, PIP_DEBUG_TCP);
+        wtx = tcpConnections[i].wtx;
+        wrx = tcpConnections[i].wrx;
+        skipEmptyHistory(tcpConnections[i].ltx, wtx, lentx);
+        skipEmptyHistory(tcpConnections[i].lrx, wrx, lenrx);
+        while(lentx != 0 || lenrx != 0) {
+            if (lenrx == 0) {
+                printOne(1, tcpConnections[i].ltx, wtx, lentx);
+            } else if (lentx == 0) {
+                printOne(0, tcpConnections[i].lrx, wrx, lenrx);
+            } else if (((int)(tcpConnections[i].ltx[wtx].time - tcpConnections[i].lrx[wrx].time)) > 0) {
+                printOne(0, tcpConnections[i].lrx, wrx, lenrx);
+            } else {
+                printOne(1, tcpConnections[i].ltx, wtx, lentx);
+            }
+        }
    }
 }
 #endif
