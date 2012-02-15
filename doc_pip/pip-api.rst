@@ -26,12 +26,14 @@ Level 3:
 ''''''''
 
 *PIP_TCP*
-  Define this to include the TCP stack with just an ACCEPT system call.
-  This is suitable for most server applications.
+  Define this to a value N to include the TCP stack with N simultaneous
+  connections that do not support a CONNECT system call.
+  This is suitable for server applications.
 
 *PIP_TCP_CONNECT*
-  Define this to include the TCP stack with both an
-  ACCEPT and a CONNECT system call. Only required for applications that
+  Define this to a value N to include the TCP stack with both an
+  ACCEPT and a CONNECT system call with at most N simultaneous TCP
+  connections. Only required for applications that
   need to connect to a server.
 
 *PIP_UDP*
@@ -63,6 +65,18 @@ Level 4:
 *PIP_LINK_LOCAL*
   Define this to include link local address assignment. This will try and obtain
   an IP address in the 169.254.x.x range. See also *PIP_DHCP* above.
+
+Fine tuning
+'''''''''''
+
+*PIP_TCP_BUFFER_RX*
+  Define this to the size of the receive buffer in the TCP stack - must be
+  a power of 2. Must be at least 512; smaller receive buffers may confuse
+  the remote TCP/IP stack. If not set, a default value of 512 will be used.
+
+*PIP_TCP_BUFFER_TX*
+  Define this to the size of the transmit buffer in the TCP stack - must be
+  a power of 2. If not set, a default value of 512 will be used.
 
 Debugging
 '''''''''

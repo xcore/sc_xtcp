@@ -32,6 +32,13 @@ case t2 when timerafter(thetime+100000000) :> thetime:
     break;
 }
 
+// TODO: THESE SHOULD NOT BE HERE
+extern int epoch, timeOutValue, waitingForEpoch;
+#define EPOCH_BIT    30
+extern void numberZeroTimedOut();
+extern void setTimeOutValue();
+
+
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streaming chanend tcpApps) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
@@ -66,12 +73,29 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
         int cmd;
         select {
 //        case doPing(t2);
+#if COMPILER_REPAIRED
         case pipTimeOut(t);
+#else
+        case t when timerafter(timeOutValue) :> unsigned now:
+            if (!waitingForEpoch) {
+                numberZeroTimedOut();
+            }
+            if ((epoch & ((1<<(32-EPOCH_BIT))-1)) != (now >> EPOCH_BIT)) {
+                epoch++;
+            }
+            setTimeOutValue();
+            break;
+#endif
+
         case inuchar_byref(cNotifications, miiData.notifySeen):
             break;
 #ifdef PIP_TCP
         case tcpApps :> cmd:
             pipApplicationTCP(tcpApps,cmd);
+            break;
+        pipOutgoingTCPReady => default:
+            pipOutgoingPrepareTCP();
+            doTx(cOut);
             break;
 #endif
         }

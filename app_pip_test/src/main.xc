@@ -8,7 +8,7 @@
 #include "miiDriver.h"
 #include "mii.h"
 #include "getmac.h"
-//#include "xscope.h"
+#include "xscope.h"
 #include "pipServer.h"
 #include "tcpApplication.h"
 
@@ -89,18 +89,28 @@ static void httpClient(streaming chanend tcpStack) {
     int l, total;
     timer t;
     int t0;
-    int portnr = 12449;
+    int portnr = 22449;
     t :> t0;
     t when timerafter(t0+1000000000) :> t0;
     printstr("Starting HTTP nuke\n");
-    for(int i = 0; i < 10000; i++) {
+    for(int i = 0; i < 100000; i++) {
         portnr = (portnr + 1) & 0xF7FF;
         total = 0;
         t :> t0;
-        t when timerafter(t0+100000000) :> t0;
-        pipApplicationConnect(tcpStack, CLIENT_SOCKET, 0xC0A82101, 80, portnr);
+        t when timerafter(t0+500000) :> t0;
+        l = pipApplicationConnect(tcpStack, CLIENT_SOCKET, 0xC0A82101, 80, portnr);
+        if (!l) {
+            printstr("Connect returned ");
+            printintln(l);
+            continue;
+        }
         t :> t0;
-        pipApplicationWrite(tcpStack, CLIENT_SOCKET, "GET /\r\n\r\n", 9);
+        if ((l=pipApplicationWrite(tcpStack, CLIENT_SOCKET, "GET /\r\n\r\n", 9)) != 9) {
+            printstr("AppWrite returned ");
+            printintln(l);
+            pipApplicationClose(tcpStack, CLIENT_SOCKET);
+            continue;
+        }
         while((l = pipApplicationRead(tcpStack, CLIENT_SOCKET, buf, 100)) > 0) {
             total += l;
             buf[l] = '.';
@@ -108,8 +118,15 @@ static void httpClient(streaming chanend tcpStack) {
 //            printstr(buf);
         }
         pipApplicationClose(tcpStack, CLIENT_SOCKET);
-        printint(i%10);
+        if ((i & 63) == 0) printstr(".");
     }
+}
+
+void xscope_user_init() {
+    if (get_core_id() == 0) {
+        xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
+    }
+    xscope_config_io(XSCOPE_IO_BASIC);
 }
 
 int main(void) {
@@ -118,8 +135,6 @@ int main(void) {
 	par
 	{
 	 	on stdcore[ETHCORE]: {
-  //          xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
-  //          xscope_config_io(XSCOPE_IO_BASIC);
 	 		ethernet_getmac_otp(p, myMacAddress);
             p_mii_resetn <: 2;            
 	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);

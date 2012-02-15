@@ -46,10 +46,9 @@ PIP has the following restrictions:
 
 Known limitations that are yet to be implemented:
 
-* Timeouts and resends on TCP-SYN and -FIN packets
+* Timeouts and resends on TCP-SYN and -FIN packets (FIN to be tested)
 
-* tcp ``open()`` function, and accompanying SYNSENT state (at present only
-  servers can be implemented using ``accept()``)
+* Needs a 'default' in the select for sending data that is ready to go.
 
 * No DNS or MDNS
 
@@ -58,11 +57,8 @@ Known limitations that are yet to be implemented:
 
 Known issues:
 
-* DHCP packets may appear to originate frmo 169.254.x.x addresses rather
+* DHCP packets may appear to originate from 169.254.x.x addresses rather
   than 0.0.0.0
-
-* No ``conf.h`` file that includes ``pip_conf.h`` and that implements all
-  rules such as "DHCP requires UDP" etc.
 
 PIP design philosophy
 ---------------------
@@ -75,10 +71,11 @@ TCP interface
 
 The TCP interface is designed to be user-friendly. It assumes that
 applications that use TCP run in a separate thread, and use one of the
-``accept()``, ``read()``, ``write()``, and ``close()`` calls. Note that
-there is no ``socket()`` call to dynamically create a socket, and instead
-that all sockets are pre-allocated at compile-time. The number of sockets
-is not limited other than byt he amount of memory taken up by buffers.
+``accept()``, ``connect()``, ``read()``, ``write()``, and ``close()``
+calls. Note that there is no ``socket()`` call to dynamically create a
+socket, and instead all sockets are pre-allocated at compile-time. The
+number of sockets is not limited other than by the amount of memory taken
+up by buffers.
 
 UDP interface
 '''''''''''''
@@ -88,7 +85,12 @@ this thread. It is assumed that no scheduling is required in those apps;
 for example, DHCP or TFTP simply reacts to UDP packets by transmitting
 another UDP packet.
 
+Configuration
+'''''''''''''
 
+Most parameters are built-time parameters, to enable the designer to slice
+out the bit of the stack that they need. The build options are defined in
+the API below.
 
 .. toctree::
 

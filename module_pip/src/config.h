@@ -18,7 +18,6 @@
 #endif
 #endif
 
-
 // Application level
 
 #ifdef PIP_TFTP
@@ -42,7 +41,7 @@
 // TCP/UDP Level
 
 #ifdef PIP_TCP_CONNECT
-#define PIP_TCP 1
+#define PIP_TCP PIP_TCP_CONNECT
 #endif
 
 #ifdef PIP_TCP
@@ -63,4 +62,22 @@
 
 #ifdef PIP_IPV4
 #define PIP_ARP 1
+#endif
+
+
+
+#ifndef PIP_TCP_BUFSIZE_RX
+#define PIP_TCP_BUFSIZE_RX 512
+#endif
+
+#ifndef PIP_TCP_BUFSIZE_TX
+#define PIP_TCP_BUFSIZE_TX 512
+#endif
+
+#if (PIP_TCP_BUFSIZE_RX & (PIP_TCP_BUFSIZE_RX - 1)) != 0
+#error "PIP_TCP_BUFSIZE_RX must be a power of 2"
+#endif
+
+#if (PIP_TCP_BUFSIZE_TX & (PIP_TCP_BUFSIZE_TX - 1)) != 0
+#error "PIP_TCP_BUFSIZE_TX must be a power of 2"
 #endif

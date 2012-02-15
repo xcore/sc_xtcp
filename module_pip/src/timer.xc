@@ -33,9 +33,12 @@ static struct {
 
 static int timeOuts = 0;
 static timer globalTimer;
-static int epoch = 0, timeOutValue = 0, waitingForEpoch = 0;
 
-static void numberZeroTimedOut() {
+// static                      // TODO: REPAIR WHEN COMPILER IS OK.
+int epoch = 0, timeOutValue = 0, waitingForEpoch = 0;
+
+//static                      // TODO: repair when compiler is ok.
+void numberZeroTimedOut() {
     int timerNumber = timeOut[0].timerNumber;
     timeOuts--;
     for(int i = 0; i < timeOuts; i++) {
@@ -73,7 +76,8 @@ static void numberZeroTimedOut() {
     }
 }
 
-static void setTimeOutValue() {
+//static                             TODO: COMPILER BROKEN.
+void setTimeOutValue() {
     waitingForEpoch = timeOut[0].epoch != epoch;
     if (waitingForEpoch) {
         timeOutValue = ((epoch+1) << EPOCH_BIT);

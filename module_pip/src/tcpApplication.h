@@ -11,7 +11,7 @@
  * \param connection Number of the connection to accept on.
  *
  */
-void pipApplicationAccept(streaming chanend stack, unsigned connection);
+int pipApplicationAccept(streaming chanend stack, unsigned connection);
 
 /** Function that an application can call to wait and open a connection
  * on a TCP stream. The streams are pre-allocated and numbered.
@@ -28,7 +28,7 @@ void pipApplicationAccept(streaming chanend stack, unsigned connection);
  * \param localPort  Port number to use locally.
  *
  */
-void pipApplicationConnect(streaming chanend stack, unsigned connection, int remoteIP, int remotePort, int localPort);
+int pipApplicationConnect(streaming chanend stack, unsigned connection, int remoteIP, int remotePort, int localPort);
 
 
 /** Function that an application can call close a TCP stream. The streams

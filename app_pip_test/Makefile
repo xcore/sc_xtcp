@@ -2,7 +2,7 @@ TARGET = XP-DSC-BLDC
 # TARGET = XP-MC-CTRL-L2
 
 APP_NAME =
-XCC_FLAGS = -Os -g -report  -save-temps
+XCC_FLAGS = -Os -g -report -save-temps -lxscope
 USED_MODULES = module_pip module_mii_singlethread
 
 

@@ -33,6 +33,14 @@ void pipInitTCP();
  */
 void pipTimeOutTCPTimewait();
 
+/** Variable that flags whether data is ready to be transmitted */
+extern int pipOutgoingTCPReady;
+
+/** Function to be called when there is a window to transmit data. Called
+ * from toplevel.
+ */
+void pipOutgoingPrepareTCP();
+
 /** Function to be called to process an application request to the TCP
  * stack. The streaming channel end connects to the application. THis
  * function is to be called when a word has been input from the channel.
