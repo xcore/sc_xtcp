@@ -5,18 +5,21 @@
 
 #include <platform.h>
 #include <print.h>
+#include <stdio.h>
 #include "miiDriver.h"
 #include "mii.h"
 #include "getmac.h"
-//#include "xscope.h"
+#include "xscope.h"
 #include "pipServer.h"
 #include "tcpApplication.h"
+#include "udpApplication.h"
+#include "pip_conf.h"
 
-#define ETHCORE 0
+#define ETHCORE 1
 
-#define PORT_ETH_FAKE    XS1_PORT_8A
+#define PORT_ETH_FAKE    XS1_PORT_8C
 
-#define PORT_ETH_RST_N  PORT_SHARED_RS
+#define PORT_ETH_RST_N  PORT_CORE1_SHARED
 
 on stdcore[ETHCORE]: mii_interface_t mii =
   {
@@ -51,7 +54,7 @@ static void httpServer(streaming chanend tcpStack) {
         total = 0;
         pipApplicationAccept(tcpStack, 0);
         t :> t0;
-        while(l = pipApplicationRead(tcpStack, 0, buf, 10)) {
+        while((l = pipApplicationRead(tcpStack, 0, buf, 10)) > 0) {
             total += l;
             buf[l] = '.';
             buf[l+1] = 0;
@@ -82,18 +85,79 @@ static void httpServer(streaming chanend tcpStack) {
     }
 }
 
+#define CLIENT_SOCKET 1
+
+static void httpClient(streaming chanend tcpStack) {
+    unsigned char buf[102];
+    int l, total;
+    timer t;
+    int t0;
+    int portnr = 22449;
+    t :> t0;
+    t when timerafter(t0+1000000000) :> t0;
+    printstr("Starting HTTP nuke\n");
+    for(int i = 0; i < 100000; i++) {
+        portnr = (portnr + 1) & 0xF7FF;
+        total = 0;
+        t :> t0;
+        t when timerafter(t0+500000) :> t0;
+        l = pipApplicationConnect(tcpStack, CLIENT_SOCKET, 0xC0A82101, 80, portnr);
+        if (!l) {
+            printstr("Connect returned ");
+            printintln(l);
+            continue;
+        }
+        t :> t0;
+        if ((l=pipApplicationWrite(tcpStack, CLIENT_SOCKET, "GET /\r\n\r\n", 9)) != 9) {
+            printstr("AppWrite returned ");
+            printintln(l);
+            pipApplicationClose(tcpStack, CLIENT_SOCKET);
+            continue;
+        }
+        while((l = pipApplicationRead(tcpStack, CLIENT_SOCKET, buf, 100)) > 0) {
+            total += l;
+            buf[l] = '.';
+            buf[l+1] = 0;
+//            printstr(buf);
+        }
+        pipApplicationClose(tcpStack, CLIENT_SOCKET);
+        if ((i & 63) == 0) printstr(".");
+    }
+}
+
+static void cupsServer(streaming chanend c) {
+    while(1) {
+        char buffer[1024];
+        unsigned rIP, rPort;
+        int l = pipApplicationReadUDP(c, buffer, 0, 1023, rIP, rPort, 631);
+        buffer[l] = 0;
+        printf("Got CUPS packet len %d: <%s>\n", l, buffer);
+        pipApplicationWriteUDP(c, buffer, 0, 100, rIP, 56789, 631);
+    }
+}
+
+void xscope_user_init() {
+    if (get_core_id() == 0) {
+        xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
+    }
+    xscope_config_io(XSCOPE_IO_BASIC);
+}
+
 int main(void) {
-	streaming chan tcpApps;
+	streaming chan tcpApps[PIP_TCP_CHANNELS];
+	streaming chan udpApps[1];
 
 	par
 	{
 	 	on stdcore[ETHCORE]: {
 	 		ethernet_getmac_otp(p, myMacAddress);
             p_mii_resetn <: 2;            
-	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
+	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps, udpApps);
 	 	}
 
-	 	on stdcore[ETHCORE]: httpServer(tcpApps);
+	 	on stdcore[ETHCORE]: httpClient(tcpApps[0]);
+
+	 	on stdcore[0]: cupsServer(udpApps[0]);
     }
     return 0;
 }

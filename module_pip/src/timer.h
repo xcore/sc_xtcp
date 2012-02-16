@@ -9,6 +9,7 @@
 #define PIP_ARP_TIMER                2
 #define PIP_TCP_TIMER_TIMEWAIT       3
 #define PIP_TFTP_TIMER               4
+#define PIP_LINK_LOCAL_TIMER         5
 
 #define PIP_FUZZ_NONE                0
 #define PIP_FUZZ_1MS                 0x0001FFFF

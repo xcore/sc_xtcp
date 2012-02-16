@@ -11,7 +11,25 @@
  * \param connection Number of the connection to accept on.
  *
  */
-void pipApplicationAccept(streaming chanend stack, unsigned connection);
+int pipApplicationAccept(streaming chanend stack, unsigned connection);
+
+/** Function that an application can call to wait and open a connection
+ * on a TCP stream. The streams are pre-allocated and numbered.
+ *
+ * \param stack      Channel that connects to the TCP server.
+ *
+ * \param connection Number to place the open connection in.
+ *
+ * \param remoteIP   IP address of host as an integer in host format eg,
+ *                   192.168.1.3 is 0xC0A80103
+ *
+ * \param remotePort Port number to connect to (0..65535)
+ *
+ * \param localPort  Port number to use locally.
+ *
+ */
+int pipApplicationConnect(streaming chanend stack, unsigned connection, int remoteIP, int remotePort, int localPort);
+
 
 /** Function that an application can call close a TCP stream. The streams
  * are pre-allocated and numbered.
@@ -56,3 +74,5 @@ int pipApplicationRead(streaming chanend stack, unsigned connection,
  */
 int pipApplicationWrite(streaming chanend stack, unsigned connection,
                        unsigned char buffer[], unsigned nBytes);
+
+

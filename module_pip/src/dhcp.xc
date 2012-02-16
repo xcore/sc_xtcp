@@ -5,11 +5,14 @@
 
 #include <xclib.h>
 #include <print.h>
+#include "config.h"
 #include "dhcp.h"
 #include "tftp.h"
 #include "rx.h"
 #include "tx.h"
 #include "udp.h"
+#include "linklocal.h"
+#include "ipv4.h"
 #include "ethernet.h"
 #include "timer.h"
 
@@ -17,10 +20,15 @@
 #define DHCP_SERVER_PORT     67
 // DHCP: RFC 2131
 
+#define STATE_BLANK 0
+#define STATE_INITED 1
+#define STATE_ALLOCATED 2
+
 static int xid;
 static int interval = 4;
+static int state = STATE_BLANK;
 
-unsigned myIP, serverIP, mySubnetIP;
+unsigned myIP, serverIP, mySubnetIP, myRouterIP;
 
 void pipCreateDHCP(int firstMessage,
                   unsigned proposedIP,
@@ -59,7 +67,7 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
     unsigned renewalTime;
     unsigned rebindTime;
     unsigned proposedIP;
-    unsigned subnet, messageType;
+    unsigned subnet, messageType, router;
 
     if (packet[offset+118] != 0x8263 || packet[offset+119] != 0x6353) {
         return;                                  // incorrect magic cookie
@@ -69,6 +77,7 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
     }
     proposedIP = getIntUnaligned(packet, offset*2 + 16);
     subnet = 0;
+    router = 0;
     leaseTime = 0;
     renewalTime = 0;
     rebindTime = 0;
@@ -88,6 +97,9 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
 #ifdef PIP_TFTP
         case 0x96: pipIpTFTP   = getIntUnaligned(packet, i+2); break;
 #endif
+#ifdef PIP_GATEWAY
+        case 0x03: router      = getIntUnaligned(packet, i+2); break;
+#endif
             // TODO: store router(s)
             // TODO: store DNS server(s)
         }
@@ -104,26 +116,43 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         if (rebindTime == 0) {
             rebindTime = leaseTime - (leaseTime >> 3);
         }
+#ifdef PIP_LINK_LOCAL
+        pipDisableLinkLocal();
+#endif        
         pipSetTimeOut(PIP_DHCP_TIMER_T1, renewalTime, 0, PIP_FUZZ_1S);
         pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, PIP_FUZZ_1S);
-        myIP = proposedIP;
-        mySubnetIP = subnet;
-        printstr("Got an IP address\n");
+        state = STATE_ALLOCATED;
+        pipAssignIPv4(proposedIP, subnet, router);
 #ifdef PIP_TFTP
         pipInitTFTP();
 #endif
     }
 }
 
-
 void pipInitDHCP() {
+#ifdef PIP_DHCP_DONT_WAIT
+    pipSetTimeOut(PIP_DHCP_TIMER_T2, 3, 0, 0);
+#else
+    pipSetTimeOut(PIP_DHCP_TIMER_T2, 1, 0, PIP_FUZZ_10S);
+#endif
+}
+
+void pipTimeOutDHCPT2() {
     timer t;
     t :> xid;
-    myIP = 0;
-    mySubnetIP = 0;
+    if (state == STATE_ALLOCATED) {
+        state = STATE_INITED;
+        pipUnassignIPv4();
+    }
     pipCreateDHCP(1, 0, 0);
     pipSetTimeOut(PIP_DHCP_TIMER_T2, interval, 0, PIP_FUZZ_1S);
-    interval *= 2;
+#ifdef PIP_LINK_LOCAL
+    if (state != STATE_BLANK) {
+        pipInitLinkLocal();
+    }
+#endif
+    state = STATE_INITED;
+    interval = interval * 2;
     if (interval > 60) {
         interval = 60;
     }
@@ -131,9 +160,5 @@ void pipInitDHCP() {
 
 void pipTimeOutDHCPT1() {
     pipCreateDHCP(0, myIP, serverIP);
-}
-
-void pipTimeOutDHCPT2() {
-    pipInitDHCP();
 }
 

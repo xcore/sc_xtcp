@@ -33,12 +33,33 @@ void pipIncomingIPv4(unsigned short packet[], int offset);
  */
 void pipOutgoingIPv4(int ipType, unsigned ipDst, int length);
 
+/** Function that sets our IP address - called by dhcp.xc and linklocal.xc
+ * to set the IP address once one has been established. Set router to 0 if
+ * no router is available.
+ *
+ * \param proposedIP new IP address
+ * 
+ * \param subnet     new subnet mask
+ *
+ * \param router     new gateway IP for traffic outside our subnet.
+ */
+void pipAssignIPv4(unsigned proposedIP, unsigned subnet, unsigned router);
+
+/** Function that unsets our IP address - called by dhcp.xc when the lease
+ * expires and the lease could not be renewed.
+ */
+void pipUnassignIPv4();
+
 /** Variable that holds the current IP address; 0 if this node does not
  * have an IP address at present.
  */
 extern unsigned myIP;
 
-/** Variable that holds the current IP subnet; 0 if this node does not have
- * an IP address at present.
+/** Variable that holds the current IP subnet.
  */
 extern unsigned mySubnetIP;
+
+/** Variable that holds the current gateway for traffic to other subnets; 0
+ * if this node does not have a router.
+ */
+extern unsigned myRouterIP;

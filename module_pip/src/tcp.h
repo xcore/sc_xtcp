@@ -31,7 +31,15 @@ void pipInitTCP();
 /** Function to be called when the Timewait-timer expires. Normally called
  * from the main timer.
  */
-void pipTimeoutTCPTimewait();
+void pipTimeOutTCPTimewait();
+
+/** Variable that flags whether data is ready to be transmitted */
+extern int pipOutgoingTCPReady;
+
+/** Function to be called when there is a window to transmit data. Called
+ * from toplevel.
+ */
+void pipOutgoingPrepareTCP();
 
 /** Function to be called to process an application request to the TCP
  * stack. The streaming channel end connects to the application. THis
@@ -44,6 +52,8 @@ void pipTimeoutTCPTimewait();
  * \param cmd the word input from the channel.
  */
 void pipApplicationTCP(streaming chanend app, int cmd);
+
+void pipDebugTCPPrint();
 
 /** Value to send over the application channel to indicate an accept command.
  * to be followed by the number of the connection. The return value is a
@@ -69,6 +79,12 @@ void pipApplicationTCP(streaming chanend app, int cmd);
  * word) and then output a stream of bytes as a series of data tokens.
  */
 #define PIP_TCP_WRITE 4
+/** Value to send over the application channel to indicate an open command.
+ * to be followed by the number of the connection, the port on the local
+ * host, the IP address of the remote host, and the port on the remote
+ * host.
+ */
+#define PIP_TCP_CONNECT_V 5
 
 
 /** Token to send over application channel to indicate acknowledgment of

@@ -7,7 +7,7 @@
 #include <xs1.h>
 #include <xclib.h>
 #include <print.h>
-//#include <xscope.h>
+#include "config.h"
 #include "miiDriver.h"
 #include "mii.h"
 #include "miiClient.h"
@@ -17,22 +17,37 @@
 #include "dhcp.h"
 #include "timer.h"
 #include "tcp.h"
+#include "udp.h"
 #include "arp.h"
+#include "icmp.h"
+#include "linklocal.h"
 
 extern char notifySeen;
 
+int thetime;
 
-static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streaming chanend tcpApps) {
+select  doPing(timer t2) {
+case t2 when timerafter(thetime+100000000) :> thetime:
+//    pipOutgoingICMPPing(0xc0a82101, thetime/100000000);
+    pipOutgoingICMPPing(0x0A006618, thetime/100000000);
+    break;
+}
+
+// TODO: THESE SHOULD NOT BE HERE
+extern int epoch, timeOutValue, waitingForEpoch;
+#define EPOCH_BIT    30
+extern void numberZeroTimedOut();
+extern void setTimeOutValue();
+
+
+static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
+                      streaming chanend tcpApps[],
+                      streaming chanend udpApps[]) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
     int b[3200];
     timer t, t2;
-    int thetime;
     struct miiData miiData;
-
-    // xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
-    // xscope_config_io(XSCOPE_IO_BASIC);
-    printstr("HELLO\n");
 
     miiBufferInit(miiData, cIn, cNotifications, b, 3200);
     miiOutInit(cOut);
@@ -49,20 +64,48 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
 
 #ifdef PIP_DHCP
     pipInitDHCP();
+    printstr("Dhcp...\n");
     doTx(cOut);
+#else
+#ifdef PIP_LINK_LOCAL
+    pipInitLinkLocal();
+#endif
 #endif
 
     while (1) {
         int cmd;
         select {
-#if 1
+//        case doPing(t2);
+#if COMPILER_REPAIRED
         case pipTimeOut(t);
+#else
+        case t when timerafter(timeOutValue) :> unsigned now:
+            if (!waitingForEpoch) {
+                numberZeroTimedOut();
+            }
+            if ((epoch & ((1<<(32-EPOCH_BIT))-1)) != (now >> EPOCH_BIT)) {
+                epoch++;
+            }
+            setTimeOutValue();
+            break;
 #endif
+
         case inuchar_byref(cNotifications, miiData.notifySeen):
             break;
+#if PIP_UDP_CHANNELS != 0
+        case (int i = 0; i < PIP_UDP_CHANNELS; i++)
+            udpApps[i] :> cmd:
+            pipApplicationUDP(udpApps[i],cmd,cOut);
+            break;
+#endif
 #ifdef PIP_TCP
-        case tcpApps :> cmd:
-            pipApplicationTCP(tcpApps,cmd);
+        case (int i = 0; i < PIP_TCP_CHANNELS; i++)
+            tcpApps[i] :> cmd:
+            pipApplicationTCP(tcpApps[i],cmd);
+            break;
+        pipOutgoingTCPReady => default:
+            pipOutgoingPrepareTCP();
+            doTx(cOut);
             break;
 #endif
         }
@@ -83,7 +126,8 @@ void pipServer(clock clk_smi,
                out port ?p_mii_resetn,
                smi_interface_t &smi,
                mii_interface_t &m,
-               streaming chanend tcpApps) {
+               streaming chanend tcpApps[],
+               streaming chanend udpApps[]) {
     chan cIn, cOut;
     chan notifications;
     par {
@@ -91,6 +135,6 @@ void pipServer(clock clk_smi,
             miiInitialise(clk_smi, p_mii_resetn, smi, m);
             miiDriver(m, cIn, cOut);
         }
-        theServer(cIn, cOut, notifications, tcpApps);
+        theServer(cIn, cOut, notifications, tcpApps, udpApps);
     }
 }

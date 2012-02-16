@@ -31,7 +31,7 @@ PIP implements the following:
 
 * TCP
 
-* DHCP
+* DHCP and link-local (169.254.x.x)
 
 * TFTP
 
@@ -41,40 +41,41 @@ PIP has the following restrictions:
 
 * No support for IP, TCP or UDP options
 
+* Single gateway only for traffic that is not destined for our subnet (to
+  be tested) 
+
 Known limitations that are yet to be implemented:
 
-* IPv4 routing to the gateway for traffic that is not destined for the
-  current subnet
+* Timeouts and resends on TCP-SYN and -FIN packets (FIN to be tested)
 
-* Timeouts and resends on TCP-SYN and -FIN packets
-
-* DHCP gateway option
-
-* tcp ``open()`` function, and accompanying SYNSENT state (at present only
-  servers can be implemented using ``accept()``)
-
-* No fallback to a private network (using a 169.254.x.x address)
+* Needs a 'default' in the select for sending data that is ready to go.
 
 * No DNS or MDNS
 
 * TFTP has yet to implement the actual jump to 0x10000; to be taken from
   the USB bootloader.
 
+Known issues:
+
+* DHCP packets may appear to originate from 169.254.x.x addresses rather
+  than 0.0.0.0
+
 PIP design philosophy
 ---------------------
 
 Since PIP is designed to not use dynamic memory, and to be small and
-readable, its interface is different.
+readable. Its interface is therefore different from uip + xtcp.
 
 TCP interface
 '''''''''''''
 
 The TCP interface is designed to be user-friendly. It assumes that
 applications that use TCP run in a separate thread, and use one of the
-``accept()``, ``read()``, ``write()``, and ``close()`` calls. Note that
-there is no ``socket()`` call to dynamically create a socket, and instead
-that all sockets are pre-allocated at compile-time. The number of sockets
-is not limited other than byt he amount of memory taken up by buffers.
+``accept()``, ``connect()``, ``read()``, ``write()``, and ``close()``
+calls. Note that there is no ``socket()`` call to dynamically create a
+socket, and instead all sockets are pre-allocated at compile-time. The
+number of sockets is not limited other than by the amount of memory taken
+up by buffers.
 
 UDP interface
 '''''''''''''
@@ -84,7 +85,12 @@ this thread. It is assumed that no scheduling is required in those apps;
 for example, DHCP or TFTP simply reacts to UDP packets by transmitting
 another UDP packet.
 
+Configuration
+'''''''''''''
 
+Most parameters are built-time parameters, to enable the designer to slice
+out the bit of the stack that they need. The build options are defined in
+the API below.
 
 .. toctree::
 
