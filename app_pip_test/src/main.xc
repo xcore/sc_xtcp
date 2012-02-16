@@ -5,12 +5,15 @@
 
 #include <platform.h>
 #include <print.h>
+#include <stdio.h>
 #include "miiDriver.h"
 #include "mii.h"
 #include "getmac.h"
 #include "xscope.h"
 #include "pipServer.h"
 #include "tcpApplication.h"
+#include "udpApplication.h"
+#include "pip_conf.h"
 
 #define ETHCORE 1
 
@@ -122,6 +125,17 @@ static void httpClient(streaming chanend tcpStack) {
     }
 }
 
+static void cupsServer(streaming chanend c) {
+    while(1) {
+        char buffer[1024];
+        unsigned rIP, rPort;
+        int l = pipApplicationReadUDP(c, buffer, 0, 1023, rIP, rPort, 631);
+        buffer[l] = 0;
+        printf("Got CUPS packet len %d: <%s>\n", l, buffer);
+        pipApplicationWriteUDP(c, buffer, 0, 100, rIP, 56789, 631);
+    }
+}
+
 void xscope_user_init() {
     if (get_core_id() == 0) {
         xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
@@ -130,17 +144,20 @@ void xscope_user_init() {
 }
 
 int main(void) {
-	streaming chan tcpApps;
+	streaming chan tcpApps[PIP_TCP_CHANNELS];
+	streaming chan udpApps[1];
 
 	par
 	{
 	 	on stdcore[ETHCORE]: {
 	 		ethernet_getmac_otp(p, myMacAddress);
             p_mii_resetn <: 2;            
-	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
+	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps, udpApps);
 	 	}
 
-	 	on stdcore[ETHCORE]: httpClient(tcpApps);
+	 	on stdcore[ETHCORE]: httpClient(tcpApps[0]);
+
+	 	on stdcore[0]: cupsServer(udpApps[0]);
     }
     return 0;
 }

@@ -17,6 +17,7 @@
 #include "dhcp.h"
 #include "timer.h"
 #include "tcp.h"
+#include "udp.h"
 #include "arp.h"
 #include "icmp.h"
 #include "linklocal.h"
@@ -39,7 +40,9 @@ extern void numberZeroTimedOut();
 extern void setTimeOutValue();
 
 
-static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streaming chanend tcpApps) {
+static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
+                      streaming chanend tcpApps[],
+                      streaming chanend udpApps[]) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
     int b[3200];
@@ -89,9 +92,16 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications, streami
 
         case inuchar_byref(cNotifications, miiData.notifySeen):
             break;
+#if PIP_UDP_CHANNELS != 0
+        case (int i = 0; i < PIP_UDP_CHANNELS; i++)
+            udpApps[i] :> cmd:
+            pipApplicationUDP(udpApps[i],cmd,cOut);
+            break;
+#endif
 #ifdef PIP_TCP
-        case tcpApps :> cmd:
-            pipApplicationTCP(tcpApps,cmd);
+        case (int i = 0; i < PIP_TCP_CHANNELS; i++)
+            tcpApps[i] :> cmd:
+            pipApplicationTCP(tcpApps[i],cmd);
             break;
         pipOutgoingTCPReady => default:
             pipOutgoingPrepareTCP();
@@ -116,7 +126,8 @@ void pipServer(clock clk_smi,
                out port ?p_mii_resetn,
                smi_interface_t &smi,
                mii_interface_t &m,
-               streaming chanend tcpApps) {
+               streaming chanend tcpApps[],
+               streaming chanend udpApps[]) {
     chan cIn, cOut;
     chan notifications;
     par {
@@ -124,6 +135,6 @@ void pipServer(clock clk_smi,
             miiInitialise(clk_smi, p_mii_resetn, smi, m);
             miiDriver(m, cIn, cOut);
         }
-        theServer(cIn, cOut, notifications, tcpApps);
+        theServer(cIn, cOut, notifications, tcpApps, udpApps);
     }
 }

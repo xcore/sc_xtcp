@@ -81,3 +81,7 @@
 #if (PIP_TCP_BUFSIZE_TX & (PIP_TCP_BUFSIZE_TX - 1)) != 0
 #error "PIP_TCP_BUFSIZE_TX must be a power of 2"
 #endif
+
+#ifndef PIP_UDP_CHANNELS
+#define PIP_UDP_CHANNELS 0
+#endif

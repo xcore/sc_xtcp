@@ -36,8 +36,18 @@ Level 3:
   connections. Only required for applications that
   need to connect to a server.
 
+*PIP_TCP_CHANNELS*
+  Set this to the number of TCP application channels; at
+  least 1 if TCP is enabled, leave undefined when TCP is not enabled.
+
 *PIP_UDP*
   Define this to include the UDP stack.
+
+*PIP_UDP_CHANNELS*
+  Set this to the number of UDP application channels. UDP can be used
+  without application channels (for example for TFTP and DHCP which are
+  embedded in the stack), so it can be left undefined (or set to zero) even
+  if UDP is enabled.
 
 *PIP_ICMP*
   Define this to include code that repsonds to ICMP-Echo (also
@@ -100,8 +110,22 @@ IP address.
 API
 ---
 
-TCP
-'''
+There are four programming APIs: a call to start the server, a set of calls
+for threads that use TCP, a set of calls for threads that use UDP, and a set of
+calls for UDP operations that are embedded in the stack itself.
+
+Server thread
+'''''''''''''
+
+This function is to be called on the core that is connected to the MII PHY.
+
+.. doxygenfunction:: pipServer
+
+
+TCP threads
+'''''''''''
+
+These functions are to be called from a separate thread.
 
 .. doxygenfunction:: pipApplicationAccept
 
@@ -113,7 +137,27 @@ TCP
 
 .. doxygenfunction:: pipApplicationWrite
 
-UDP
-'''
+UDP threads
+'''''''''''
 
-To be provided.
+These functions are to be called from a separate thread.
+
+.. doxygenfunction:: pipApplicationRead
+
+.. doxygenfunction:: pipApplicationWrite
+
+UDP embedded
+''''''''''''
+
+UDP services can be embedded in the PIP thread. From the stack, a single
+packet can be transmitted at a time using ``pipOutgoingUDP``. Timers can be set
+using ``pipSetTimeOut`` and ``pipResetTimeOut``. You need to add any timers
+to ``timer.h``, timer calls to ``timer.xc`` and calls to intercept the
+packet to ``udp.xc``.
+
+.. doxygenfunction:: pipOutgoingUDP
+
+.. doxygenfunction:: pipSetTimeOut
+
+.. doxygenfunction:: pipResetTimeOut
+
