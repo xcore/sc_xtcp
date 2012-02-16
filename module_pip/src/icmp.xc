@@ -5,11 +5,14 @@
 
 #include <xclib.h>
 #include <print.h>
+#include "config.h"
 #include "icmp.h"
 #include "ethernet.h"
 #include "tx.h"
+#include "tcp.h"
 #include "ipv4.h"
 #include "checksum.h"
+#include "timer.h"
 
 
 // RFC 0792
@@ -24,5 +27,24 @@ void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int 
         txShort(18, 0);                                          // This could be simplified by patching old checksum rather than computing a new one.
         txShort(18, onesChecksum(0, (txbuf, unsigned short[]), 17, length));
         pipOutgoingIPv4(PIP_IPTYPE_ICMP, srcIP, length);
+#ifdef PIP_DEBUG_TCP
+        pipDebugTCPPrint();
+#endif
+#ifdef PIP_DEBUG_TIMER
+        pipPrintTimeOuts();
+#endif
     }
+}
+
+void pipOutgoingICMPPing(unsigned dstIP, int sequence) {
+    int offset = 17;
+    int length = 32 - offset;
+    txShort(offset, 8);   // Type 8: echo request; code 0.
+    txShort(offset+1, 0); // Initial checksum
+    txInt(offset + 2, byterev(sequence));
+    for(int i = offset+4; i < offset + length; i++) {
+        txShort(i, i);
+    }
+    txShort(offset + 1, onesChecksum(0, (txbuf, unsigned short[]), 17, length<<1));
+    pipOutgoingIPv4(PIP_IPTYPE_ICMP, dstIP, length<<1);
 }

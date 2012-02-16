@@ -20,3 +20,11 @@
  * \param length Number of bytes in ICMP part of packet.
  */
 void pipIncomingICMP(unsigned short packet[], int ipOffset, int icmpOffset, int srcIP, int dstIP, int length);
+
+/** Function that generates a ping.
+ *
+ * \param dstIP     Destination IP address to send the PING to.
+ *
+ * \param sequence  Sequence number of the ping, top 16 bits are ID.
+ */
+void pipOutgoingICMPPing(unsigned dstIP, int sequence);

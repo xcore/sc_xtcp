@@ -1,2 +1,7 @@
 app_*/.build*
 app_*/bin
+doc/.doxygen
+doc/.linked_dirs
+doc/.sources
+doc/Doxyfile-e
+doc/_build

@@ -4,6 +4,7 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #include "rx.h"
+#include "config.h"
 
 unsigned getIntUnaligned(unsigned short packet[], int offset) {
     unsigned x = (packet, unsigned char[])[offset] << 24 |

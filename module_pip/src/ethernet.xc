@@ -4,6 +4,7 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #include <print.h>
+#include "config.h"
 #include "ethernet.h"
 #include "ipv4.h"
 #include "arp.h"
@@ -20,7 +21,7 @@ void pipIncomingEthernet(unsigned short packet[]) {
         offset++;
     } while (ethType == 0x0081);
 
-#if defined(PIP_TCP) || defined(PIP_UDP) || defined(PIP_ICMP) || defined(PIP_IGMP)
+#if defined(PIP_IPV4)
     if (ethType == PIP_ETHTYPE_IPV4_REV) {
         pipIncomingIPv4(packet, offset);
         return;

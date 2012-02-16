@@ -35,3 +35,31 @@ void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned srcIP, un
  * \param length  number of bytes in the datagram
  */
 void pipOutgoingUDP(unsigned dstIP, unsigned srcPort, unsigned dstPort, unsigned length);
+
+/** Function to be called to process an application request to the UDP
+ * stack. The streaming channel end connects to the application. This
+ * function is to be called when a word has been input from the channel.
+ *
+ * \param app streaming channel that connects to the application program. A
+ *            two way protocol over this channel implements operations such
+ *            as read and write.
+ *
+ * \param cmd the word input from the channel.
+ *
+ * \param cOut channel to MII for transmitting packet.
+ */
+void pipApplicationUDP(streaming chanend app, int cmd, chanend cOut);
+
+/** Value to send over the application channel to indicate a READ command;
+ * to be followed by the local port number (a word), and the maximum number of
+ * bytes (a word). Then input the actual number of bytes (a word) and then
+ * input a stream of bytes as a series of data tokens.
+ */
+#define PIP_UDP_READ 0
+/** Value to send over the application channel to indicate a WRITE command;
+ * to be followed by the local port number (a word), the number of bytes to
+ * be written (a word) and then a stream of bytes as a series of data
+ * tokens.
+ */
+#define PIP_UDP_WRITE 1
+
