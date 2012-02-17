@@ -91,18 +91,6 @@
 
 #include <xclib.h>
 
-void uip_ipaddr_copy(void *dest, const void *src)
-{
-  ((u16_t *)dest)[0] = ((u16_t *)src)[0];
-  ((u16_t *)dest)[1] = ((u16_t *)src)[1];
-}
-
-int uip_ipaddr_cmp(const void *addr1, const void *addr2)
-{
-    return (((u16_t *)addr1)[0] == ((u16_t *)addr2)[0] &&
-            ((u16_t *)addr1)[1] == ((u16_t *)addr2)[1]);
-}
-
 
 #if UIP_CONF_IPV6
 #include "uip-neighbor.h"
@@ -304,7 +292,7 @@ void xtcp_copy_word(u8_t*d, u8_t* s)
 }
 
 __attribute__ ((noinline))
-static int xtcp_compare_words(u8_t* a, u8_t* b)
+static int xtcp_compare_words(const u8_t* a, const u8_t* b)
 {
 	return (*(short*)(&a[0]) == *(short*)(&b[0])) &&
 		   (*(short*)(&a[2]) == *(short*)(&b[2]));
@@ -317,6 +305,17 @@ void uip_add32(u8_t *op32, u16_t op16) {
 	  x = byterev(x);
 	  *res = byterev(x + op16);
 }
+
+void uip_ipaddr_copy(void *dest, const void *src)
+{
+	xtcp_copy_word((u8_t*)dest, (u8_t*)src);
+}
+
+int uip_ipaddr_cmp(const void *addr1, const void *addr2)
+{
+    return xtcp_compare_words(addr1, addr2);
+}
+
 
 /* Alternative faster checksum computation */
 
