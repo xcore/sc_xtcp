@@ -25,15 +25,15 @@ PIP implements the following:
 
 * ICMP echo/reply
 
-* IPv4
+* IPv4 with single gateway
 
-* UDP
+* UDP (UDP can be used embedded in the stack or from a separate thread)
 
-* TCP
+* TCP (TCP must be used from a separate thread)
 
 * DHCP and link-local (169.254.x.x)
 
-* TFTP
+* Boot over TFTP
 
 PIP has the following restrictions:
 
@@ -41,14 +41,7 @@ PIP has the following restrictions:
 
 * No support for IP, TCP or UDP options
 
-* Single gateway only for traffic that is not destined for our subnet (to
-  be tested) 
-
 Known limitations that are yet to be implemented:
-
-* Timeouts and resends on TCP-SYN and -FIN packets (FIN to be tested)
-
-* Needs a 'default' in the select for sending data that is ready to go.
 
 * No DNS or MDNS
 
@@ -60,10 +53,24 @@ Known issues:
 * DHCP packets may appear to originate from 169.254.x.x addresses rather
   than 0.0.0.0
 
+* At present the stack uses streaming channels which is not good for multi
+  core implementations; to be replaced with ordinary channels and
+  transactions.
+
+Known tests that are to be performed:
+
+* Corner cases in TCP
+
+* Gateway
+
+* TFTP boot
+
+* ARP timeouts
+
 PIP design philosophy
 ---------------------
 
-Since PIP is designed to not use dynamic memory, and to be small and
+PIP is designed to not use dynamic memory, and to be small and
 readable. Its interface is therefore different from uip + xtcp.
 
 TCP interface
@@ -80,10 +87,14 @@ up by buffers.
 UDP interface
 '''''''''''''
 
+There are two interfaces for UDP.
+
 The UDP interface is designed for UDP sockets to be completely embedded in
 this thread. It is assumed that no scheduling is required in those apps;
 for example, DHCP or TFTP simply reacts to UDP packets by transmitting
 another UDP packet.
+
+An alternative interface exposes UDP over a channel.
 
 Configuration
 '''''''''''''

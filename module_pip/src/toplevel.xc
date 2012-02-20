@@ -45,7 +45,7 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
                       streaming chanend udpApps[]) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
-    int b[3200];
+    int b[PIP_ETHRX_WORDS];
     timer t, t2;
     struct miiData miiData;
 

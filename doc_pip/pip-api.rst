@@ -8,6 +8,18 @@ Compile time defines are used to include support for all optional parts of
 the networking stack. The compile time defines can be placed in a file
 called ``pip_conf.h``, or they can be set with -DXXXX on the xcc command line.
 
+Level 1:
+''''''''
+
+*PIP_ETHRX_WORDS*
+  Size of buffer to be used for receiving ethernet traffic. Must be able to
+  hold at least two ethernet packets. Defaults to 3200 (12K).
+
+*PIP_ETHTX_WORDS*
+  Size of buffer to be used for transmitting ethernet traffic. Must be able to
+  hold the largest ethernet packet that the program will transmit. Defaults
+  to 200 (800 bytes).
+
 Level 2:
 ''''''''
 
