@@ -110,3 +110,10 @@
 #warning "Warning, PIP_ETHTX_WORDS increased to 64 to fit DHCP"
 #endif
 #endif
+
+#ifdef PIP_DHCP
+#if PIP_ETHTX_WORDS < ((62+PIP_TCP_BUFSIZE_TX)/4)
+#define PIP_ETHTX_WORDS ((62+PIP_TCP_BUFSIZE_TX)/4)
+#warning "Warning, PIP_ETHTX_WORDS increased to fit TCP"
+#endif
+#endif
