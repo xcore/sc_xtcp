@@ -39,6 +39,7 @@ extern int epoch, timeOutValue, waitingForEpoch;
 extern void numberZeroTimedOut();
 extern void setTimeOutValue();
 
+int reboot = 0;
 
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
                       streaming chanend tcpApps[],
@@ -64,7 +65,6 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
 
 #ifdef PIP_DHCP
     pipInitDHCP();
-    printstr("Dhcp...\n");
     doTx(cOut);
 #else
 #ifdef PIP_LINK_LOCAL
@@ -72,7 +72,7 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
 #endif
 #endif
 
-    while (1) {
+    while (!reboot) {
         int cmd;
         select {
 //        case doPing(t2);
@@ -118,7 +118,8 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
             }
         }
         doTx(cOut);
-    } 
+    }
+    miiClose(cNotifications, cIn, cOut);
 }
 
 
@@ -130,11 +131,9 @@ void pipServer(clock clk_smi,
                streaming chanend udpApps[]) {
     chan cIn, cOut;
     chan notifications;
+    miiInitialise(clk_smi, p_mii_resetn, smi, m);
     par {
-        {
-            miiInitialise(clk_smi, p_mii_resetn, smi, m);
-            miiDriver(m, cIn, cOut);
-        }
+        miiDriver(m, cIn, cOut);
         theServer(cIn, cOut, notifications, tcpApps, udpApps);
     }
 }

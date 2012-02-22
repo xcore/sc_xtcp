@@ -29,6 +29,8 @@ static unsigned clientPort;
 static int address, nextAck;
 static int lastCmd = 0;
 
+extern int reboot;
+
 static void doSend(int cmd, int length) {
     txShortRev(21, cmd);
     pipOutgoingUDP(pipIpTFTP, pipPortTFTP, clientPort, length);
@@ -104,7 +106,7 @@ void pipIncomingTFTP(unsigned short packet[], unsigned srcIP, unsigned dstIP,
         if (length != BLOCKSIZE) {
             pipResetTimeOut(PIP_TFTP_TIMER);
             if (1 || checksum == 0) {
-                // Go.
+                reboot = 1;
             } else {
                 pipInitTFTP();
             }

@@ -57,6 +57,12 @@ Known issues:
   core implementations; to be replaced with ordinary channels and
   transactions.
 
+* Reset is currently part of the toplevel - this should be taken out and
+  moved to outside of PIP.
+
+* No SMI line management at present. Arguably it should support the notion
+  of the interface being up or down.
+
 Known tests that are to be performed:
 
 * Corner cases in TCP

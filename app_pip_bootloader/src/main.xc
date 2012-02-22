@@ -41,8 +41,9 @@ smi_interface_t smi = { 0x1F, PORT_ETH_RST_N_MDIO, PORT_ETH_MDC };
 clock clk_smi = XS1_CLKBLK_5;
 
 int main(void) {
-	streaming chan tcpApps;
+	streaming chan tcpApps[1];
+	streaming chan udpApps[1];
 
-    pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps);
+    pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps, udpApps);
     return 0;
 }
