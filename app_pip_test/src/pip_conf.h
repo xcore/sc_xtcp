@@ -5,6 +5,7 @@
 #define PIP_TCP_CONNECT   2     // Two connections for testing.
 #define PIP_DEBUG_TCP    10
 #define PIP_DEBUG_TIMER
+
 #define PIP_TFTP
 
 #define PIP_TCP_CHANNELS 1     // At most one application
