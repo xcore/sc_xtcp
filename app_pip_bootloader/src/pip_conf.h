@@ -1,0 +1,5 @@
+#define PIP_DHCP_DONT_WAIT
+#define PIP_TFTP
+
+#define PIP_ETHRX_WORDS 800
+#define PIP_ETHTX_WORDS 200

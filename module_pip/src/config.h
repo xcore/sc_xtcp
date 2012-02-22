@@ -4,8 +4,9 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 /*
- * This include file contains the dependencies for all defines; for example
- * DHCP requires UDP requires IPV4 requires ARP.
+ * This include file should contain the dependencies between all defines
+ * (for example DHCP requires UDP requires IPV4 requires ARP), and the
+ * defaults for undefined defines for all defines.
  */
 
 #ifdef __pip_conf_h_exists__
@@ -84,4 +85,35 @@
 
 #ifndef PIP_UDP_CHANNELS
 #define PIP_UDP_CHANNELS 0
+#endif
+
+
+#ifndef PIP_ETHTX_WORDS
+#define PIP_ETHTX_WORDS 200
+#endif
+
+#ifndef PIP_ETHRX_WORDS
+#define PIP_ETHRX_WORDS 3200
+#endif
+
+
+#ifdef PIP_ARP
+#if PIP_ETHTX_WORDS < 22
+#define PIP_ETHTX_WORDS 22
+#warning "Warning, PIP_ETHTX_WORDS increased to 22 to fit ARP"
+#endif
+#endif
+
+#ifdef PIP_DHCP
+#if PIP_ETHTX_WORDS < 64
+#define PIP_ETHTX_WORDS 64
+#warning "Warning, PIP_ETHTX_WORDS increased to 64 to fit DHCP"
+#endif
+#endif
+
+#ifdef PIP_DHCP
+#if PIP_ETHTX_WORDS < ((62+PIP_TCP_BUFSIZE_TX)/4)
+#define PIP_ETHTX_WORDS ((62+PIP_TCP_BUFSIZE_TX)/4)
+#warning "Warning, PIP_ETHTX_WORDS increased to fit TCP"
+#endif
 #endif

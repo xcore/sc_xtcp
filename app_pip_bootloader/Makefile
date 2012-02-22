@@ -1,7 +1,6 @@
 TARGET = XP-ETHERNET-TEST
 APP_NAME =
-XCC_FLAGS = -Os -g -report \
-            -DPIP_DHCP -DPIP_UDP -DPIP_ARP -DPIP_TFTP
+XCC_FLAGS = -Os -g -report 
 USED_MODULES = module_pip module_mii_singlethread
 
 

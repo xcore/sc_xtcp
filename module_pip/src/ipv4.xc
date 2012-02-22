@@ -109,13 +109,13 @@ void pipAssignIPv4(unsigned proposedIP, unsigned subnet, unsigned router) {
     myIP = proposedIP;
     mySubnetIP = subnet;
     myRouterIP = router;
-    printstr("Got IP address ");
-    printhexln(myIP);
+//    printstr("Got IP address ");
+//    printhexln(myIP);
 }
 
 void pipUnassignIPv4() {
     myIP = 0;
     mySubnetIP = 0;
     myRouterIP = 0;
-    printstr("Unset IP address\n");
+//    printstr("Unset IP address\n");
 }
