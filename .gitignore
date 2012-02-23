@@ -1,5 +1,7 @@
 app_*/.build*
 app_*/bin
+test_*/.build*
+test_*/bin
 doc/.doxygen
 doc/.linked_dirs
 doc/.sources

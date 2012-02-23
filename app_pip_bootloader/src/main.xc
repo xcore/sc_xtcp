@@ -5,6 +5,7 @@
 
 #include <platform.h>
 #include <print.h>
+#include "smi.h"
 #include "miiDriver.h"
 #include "mii.h"
 #include "pipServer.h"
