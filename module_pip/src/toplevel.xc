@@ -8,6 +8,7 @@
 #include <xclib.h>
 #include <print.h>
 #include "config.h"
+#include "smi.h"
 #include "miiDriver.h"
 #include "mii.h"
 #include "miiClient.h"
@@ -131,7 +132,11 @@ void pipServer(clock clk_smi,
                streaming chanend udpApps[]) {
     chan cIn, cOut;
     chan notifications;
-    miiInitialise(clk_smi, p_mii_resetn, smi, m);
+    miiInitialise(p_mii_resetn, m);
+#ifndef MII_NO_SMI_CONFIG
+	smi_port_init(clk_smi, smi);
+	eth_phy_config(1, smi);
+#endif
     par {
         miiDriver(m, cIn, cOut);
         theServer(cIn, cOut, notifications, tcpApps, udpApps);
