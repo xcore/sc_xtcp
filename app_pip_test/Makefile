@@ -3,7 +3,7 @@ TARGET = XP-DSC-BLDC
 
 APP_NAME =
 XCC_FLAGS = -Os -g -report -save-temps -lxscope
-USED_MODULES = module_pip module_mii_singlethread
+USED_MODULES = module_pip module_mii_singlethread module_ethernet_smi
 
 
 #=============================================================================
