@@ -8,6 +8,7 @@
 #include <print.h>
 #include <xscope.h>
 
+#include "smi.h"
 #include "getmac.h"
 #include "uip_server.h"
 #include "miiSingleServer.h"

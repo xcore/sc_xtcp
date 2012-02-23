@@ -73,7 +73,8 @@ Level 4:
   150-option ("IP address of TFTP server") is present, load the contents of
   this file at address 0x10000, and jump to it. [Note: this last bit is yet
   to be implemented]. Note that the binary should be compiled to execute on
-  address 0x1C000 for this to work sensibly.
+  address 0x1C000 for this to work sensibly. Note: do not expect a lot of
+  action of your TCP stack if you enable TFTP.
 
 *PIP_DHCP*
   Define this to include the DHCP client. This will request an IP address

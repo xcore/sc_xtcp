@@ -140,5 +140,15 @@ void pipServer(clock clk_smi,
     par {
         miiDriver(m, cIn, cOut);
         theServer(cIn, cOut, notifications, tcpApps, udpApps);
+        {
+            while(1) {
+                timer t;
+                int tu;
+            t :> tu;
+                t when timerafter(tu + 100000000) :> void;
+                printstr("Link stat ");
+                printintln(smiCheckLinkState(smi));
+            }
+        }
     }
 }
