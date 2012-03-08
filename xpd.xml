@@ -19,5 +19,15 @@
     <release parenthash = "e3fd243f2baf9daaf1aa1b517be5426eaa7bc640" version = "2.0.0" githash = "ea3926887c68d4158c616e176500feccc240649c"></release>
     <release parenthash = "65f5cd034ebb1da88834fd06515306b8f13ae15b" version = "2.0.1rc0"></release>
     <vendor>XMOS</vendor>
+    <docdir>doc</docdir>
+    <exclude_dir>test_2_thread_example</exclude_dir>
+    <exclude_dir>test_3_thread_example</exclude_dir>
+    <exclude_dir>test_support</exclude_dir>
+    <exclude_dir>test_2_thread_tx_perf</exclude_dir>
+    <exclude_dir>tests</exclude_dir>
+    <exclude_dir>doc_pip</exclude_dir>
+    <exclude_dir>app_pip_bootloader</exclude_dir>
+    <exclude_dir>app_pip_test</exclude_dir>
+    <exclude_dir>module_pip</exclude_dir>
     <xpd_version>1.0</xpd_version>
 </xpd>
