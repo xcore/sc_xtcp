@@ -1,13 +1,13 @@
 XCORE.com xTcp SOFTWARE COMPONENT
 .................................
 
-:Stable release: 2.0.0
+:Latest release: 3.0.0rc0
+:Maintainer: davidn@xmos.com
+:Description: Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.
 
-:Status: Ongoing development
 
-:Maintainer: https://github.com/DavidNorman
 
-:Description: The micro TCP/IP stack
+
 
 Key Features
 ============
@@ -31,14 +31,14 @@ Known Issues
 
 none
 
-Required Modules
-=================
-
-xcommon
-sc_ethernet
-
 Support
 =======
 
 Issues may be submitted via the Issues tab in this github repo. Response to any issues submitted as at the discretion of the maintainer for this line.
+
+Required software (dependencies)
+================================
+
+  * sc_ethernet (git@github.com:xcore/sc_ethernet.git)
+  * xcommon (if using development tools earlier than 11.11.0)
 
