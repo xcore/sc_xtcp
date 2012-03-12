@@ -1,12 +1,9 @@
 XCORE.com xTcp SOFTWARE COMPONENT
 .................................
 
-:Latest release: 3.0.0rc0
+:Latest release: 3.0.0rc1
 :Maintainer: davidn@xmos.com
 :Description: Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.
-
-
-
 
 
 Key Features
