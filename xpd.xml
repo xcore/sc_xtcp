@@ -12,10 +12,7 @@
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>doc</docdir>
-    <exclude_dir>test_2_thread_example</exclude_dir>
     <exclude_dir>test_3_thread_example</exclude_dir>
-    <exclude_dir>test_support</exclude_dir>
-    <exclude_dir>test_2_thread_tx_perf</exclude_dir>
     <exclude_dir>tests</exclude_dir>
     <exclude_dir>doc_pip</exclude_dir>
     <exclude_dir>app_pip_bootloader</exclude_dir>
