@@ -6,9 +6,9 @@
         <version>2.1.1rc1</version>
     </dependency>
     <dependency repo = "xcommon">
-        <githash>3416f530590333980bbe152a9123b16becdb441f</githash>
+        <githash>b7b5be59795a0a4b3fee4aeaff3c8e398bf76d27</githash>
         <uri>https://github.com/xcore/xcommon.git</uri>
-        <version>1.0.0rc1</version>
+        <version>1.0.0rc2</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>doc</docdir>
@@ -30,7 +30,7 @@
     <release parenthash = "e3fd243f2baf9daaf1aa1b517be5426eaa7bc640" version = "2.0.0rc0" githash = "ea3926887c68d4158c616e176500feccc240649c"></release>
     <release parenthash = "e3fd243f2baf9daaf1aa1b517be5426eaa7bc640" version = "2.0.0" githash = "ea3926887c68d4158c616e176500feccc240649c"></release>
     <release parenthash = "65f5cd034ebb1da88834fd06515306b8f13ae15b" version = "2.0.1rc0" githash = "cf96150b4fad5dd8addbeb6a907b0b613b34cf7e"></release>
-    <release parenthash = "8f2d825bf61a69c59d4f066854ea9a13ec2400d0" version = "3.0.0rc0"></release>
+    <release parenthash = "8f2d825bf61a69c59d4f066854ea9a13ec2400d0" version = "3.0.0rc0" githash = "7fea8b948e17e63288891453e92caf2411ddbe87"></release>
     <subpartnumber>XM-000074-SW</subpartnumber>
     <vendor>XMOS</vendor>
     <xpd_version>1.0</xpd_version>
