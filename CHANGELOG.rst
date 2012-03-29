@@ -1,17 +1,16 @@
-XCORE.com xTcp Changelog
-========================
+TCP/IP Component Changelog
+==========================
 
-:Version: 2.0.0
+3.0.1
+~~~~~
 
-Firmware
-========
+   * Updated to use latest sc_ethernet package
 
-
-
-module_xtcp
------------
-
-Core functionality
+3.0.0
+~~~~~
+   * Fixed bugs in DHCP and multicast UDP
+   * Updated packaging, makefiles and documentation
+   * Updated to use latest sc_ethernet package
 
 2.0.1
 ~~~~~
@@ -25,46 +24,9 @@ Core functionality
 
    * Memory improvements
    * Fix error whereby UDP packets with broadcast destination were not received
+   * An initial implementation of a TFTP server
 
 1.3.1
-~~~~~
-
-   * Initial implementation
-
-
-
-module_zeroconf
----------------
-
-An implementation of MDNS/Zeroconf/Bonjour
-
-1.3.1
-~~~~~
-
-   * Initial implementation
-
-
-
-
-module_telnet_console
----------------------
-
-A telnet server
-
-1.3.1
-~~~~~
-
-   * Initial implementation
-
-
-
-
-module_tftp
------------
-
-An implementation of a TFTP server
-
-2.0.0
 ~~~~~
 
    * Initial implementation
