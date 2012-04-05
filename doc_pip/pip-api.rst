@@ -8,6 +8,18 @@ Compile time defines are used to include support for all optional parts of
 the networking stack. The compile time defines can be placed in a file
 called ``pip_conf.h``, or they can be set with -DXXXX on the xcc command line.
 
+Level 1:
+''''''''
+
+*PIP_ETHRX_WORDS*
+  Size of buffer to be used for receiving ethernet traffic. Must be able to
+  hold at least two ethernet packets. Defaults to 3200 (12K).
+
+*PIP_ETHTX_WORDS*
+  Size of buffer to be used for transmitting ethernet traffic. Must be able to
+  hold the largest ethernet packet that the program will transmit. Defaults
+  to 200 (800 bytes).
+
 Level 2:
 ''''''''
 
@@ -60,7 +72,9 @@ Level 4:
   the network stack to request a file ``/x`` from the server if a
   150-option ("IP address of TFTP server") is present, load the contents of
   this file at address 0x10000, and jump to it. [Note: this last bit is yet
-  to be implemented].
+  to be implemented]. Note that the binary should be compiled to execute on
+  address 0x1C000 for this to work sensibly. Note: do not expect a lot of
+  action of your TCP stack if you enable TFTP.
 
 *PIP_DHCP*
   Define this to include the DHCP client. This will request an IP address

@@ -8,6 +8,7 @@
 #include <xclib.h>
 #include <print.h>
 #include "config.h"
+#include "smi.h"
 #include "miiDriver.h"
 #include "mii.h"
 #include "miiClient.h"
@@ -39,13 +40,14 @@ extern int epoch, timeOutValue, waitingForEpoch;
 extern void numberZeroTimedOut();
 extern void setTimeOutValue();
 
+int reboot = 0;
 
 static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
                       streaming chanend tcpApps[],
                       streaming chanend udpApps[]) {
     int havePacket = 0;
     int nBytes, a, timeStamp;
-    int b[3200];
+    int b[PIP_ETHRX_WORDS];
     timer t, t2;
     struct miiData miiData;
 
@@ -64,7 +66,6 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
 
 #ifdef PIP_DHCP
     pipInitDHCP();
-    printstr("Dhcp...\n");
     doTx(cOut);
 #else
 #ifdef PIP_LINK_LOCAL
@@ -72,7 +73,7 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
 #endif
 #endif
 
-    while (1) {
+    while (!reboot) {
         int cmd;
         select {
 //        case doPing(t2);
@@ -118,7 +119,8 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
             }
         }
         doTx(cOut);
-    } 
+    }
+    miiClose(cNotifications, cIn, cOut);
 }
 
 
@@ -130,11 +132,23 @@ void pipServer(clock clk_smi,
                streaming chanend udpApps[]) {
     chan cIn, cOut;
     chan notifications;
+    miiInitialise(p_mii_resetn, m);
+#ifndef MII_NO_SMI_CONFIG
+	smi_port_init(clk_smi, smi);
+	eth_phy_config(1, smi);
+#endif
     par {
-        {
-            miiInitialise(clk_smi, p_mii_resetn, smi, m);
-            miiDriver(m, cIn, cOut);
-        }
+        miiDriver(m, cIn, cOut);
         theServer(cIn, cOut, notifications, tcpApps, udpApps);
+        {
+            while(1) {
+                timer t;
+                int tu;
+            t :> tu;
+                t when timerafter(tu + 100000000) :> void;
+                printstr("Link stat ");
+                printintln(smiCheckLinkState(smi));
+            }
+        }
     }
 }

@@ -17,6 +17,7 @@
 #include "xtcp_server.h"
 #include "uip_xtcp.h"
 
+#include "smi.h"
 #include "uip_single_server.h"
 #include "miiDriver.h"
 #include "miiClient.h"
@@ -132,7 +133,7 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 			// Check for the link state
 			{
 				static int linkstate=0;
-				int status = miiCheckLinkState(smi);
+				int status = smiCheckLinkState(smi);
 				if (!status && linkstate) {
 				  uip_linkdown();
 				}
@@ -192,7 +193,11 @@ void uipSingleServer(clock clk_smi,
                      char mac_address[6]) {
     chan cIn, cOut;
     chan notifications;
-	miiInitialise(clk_smi, p_mii_resetn, smi, mii);
+	miiInitialise(p_mii_resetn, mii);
+#ifndef MII_NO_SMI_CONFIG
+	smi_port_init(clk_smi, smi);
+	eth_phy_config(1, smi);
+#endif
     par {
     	miiDriver(mii, cIn, cOut);
         theServer(cIn, cOut, notifications, clk_smi, smi, xtcp, num_xtcp, ipconfig, mac_address);

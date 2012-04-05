@@ -1,23 +1,37 @@
 <?xml version="1.0" ?>
 <xpd>
     <dependency repo = "sc_ethernet">
-        <githash>edea7ba21dc18c2ecfee818a64e9a26ea25f53de</githash>
+        <githash>e0d8f57a0f817547484f00be5231b536439397d2</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.0.2</version>
+        <version>2.1.2rc0</version>
     </dependency>
     <dependency repo = "xcommon">
-        <githash>7ee08c2272e28e9b12e756a8e1045ab783fe761a</githash>
+        <githash>3416f530590333980bbe152a9123b16becdb441f</githash>
         <uri>https://github.com/xcore/xcommon.git</uri>
+        <version>1.0.0rc1</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
+    <docdir>doc</docdir>
+    <exclude_dir>test_3_thread_example</exclude_dir>
+    <exclude_dir>tests</exclude_dir>
+    <exclude_dir>doc_pip</exclude_dir>
+    <exclude_dir>app_pip_bootloader</exclude_dir>
+    <exclude_dir>app_pip_test</exclude_dir>
+    <exclude_dir>module_pip</exclude_dir>
     <location>ssh://git@github.com/davelxmos/sc_xtcp</location>
     <name>sc_xtcp</name>
     <maintainer>davidn@xmos.com</maintainer>
+    <partnumber>XM-001640-DH</partnumber>
     <release parenthash = "33e5b987446bbbd97e17cbc4089efce5d903b131" version = "1.3.1beta0" githash = "f814b4d48ab22c2475e17a6b743c912e7e4d1d79"></release>
     <release parenthash = "8362ada5fe9cec24f7afad2fd7847e3c44bdb8ba" version = "1.3.1beta1" githash = "bb2affe1c1319538bd430e8165e459b98a253c2b"></release>
     <release parenthash = "e3fd243f2baf9daaf1aa1b517be5426eaa7bc640" version = "2.0.0rc0" githash = "ea3926887c68d4158c616e176500feccc240649c"></release>
     <release parenthash = "e3fd243f2baf9daaf1aa1b517be5426eaa7bc640" version = "2.0.0" githash = "ea3926887c68d4158c616e176500feccc240649c"></release>
-    <release parenthash = "65f5cd034ebb1da88834fd06515306b8f13ae15b" version = "2.0.1rc0"></release>
+    <release parenthash = "65f5cd034ebb1da88834fd06515306b8f13ae15b" version = "2.0.1rc0" githash = "cf96150b4fad5dd8addbeb6a907b0b613b34cf7e"></release>
+    <release parenthash = "8f2d825bf61a69c59d4f066854ea9a13ec2400d0" version = "3.0.0rc0" githash = "7fea8b948e17e63288891453e92caf2411ddbe87"></release>
+    <release parenthash = "23f532b68733764f459783abf49a9b31cfdbf412" version = "3.0.0rc1" githash = "7070ef5d716d8948240664402c8bee8a8a4ead41"></release>
+    <release parenthash = "7f42220808016c1b91115a817c4f2db8246591f2" version = "3.0.1rc0"></release>
+    <scope>product</scope>
+    <subpartnumber>XM-000074-SW</subpartnumber>
     <vendor>XMOS</vendor>
     <xpd_version>1.0</xpd_version>
 </xpd>

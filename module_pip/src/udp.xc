@@ -17,6 +17,8 @@
 
 // RFC 0768
 
+#if PIP_UDP_CHANNELS != 0
+
 struct {
     unsigned portNr;
     unsigned channel;
@@ -50,6 +52,8 @@ static void serveUDPChannels(unsigned short packet[],
         }
     }
 }
+
+#endif
 
 void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned remoteIP, unsigned localIP) {
     int remotePort =  byterev(packet[offset+0]) >> 16;
@@ -99,6 +103,7 @@ void pipOutgoingUDP(unsigned remoteIP, unsigned localPort, unsigned remotePort, 
 }
 
 
+#if PIP_UDP_CHANNELS != 0
 
 static void doReadUDP(streaming chanend app, int remotePort) {
     appUDP[nAppUDP].portNr = remotePort;
@@ -133,7 +138,6 @@ void pipApplicationUDP(streaming chanend app, int cmd, chanend cOut) {
         break;
     case PIP_UDP_WRITE:
         doWriteUDP(app, localPort);
-        printstr("Writing...\n");
         doTx(cOut);
         break;
     }
@@ -173,3 +177,4 @@ void pipApplicationWriteUDP(streaming chanend stack,
     }
 }
 
+#endif

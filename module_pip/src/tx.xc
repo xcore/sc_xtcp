@@ -13,7 +13,7 @@
 #include "miiClient.h"
 #include "tx.h"
 
-short txbuf[400];
+short txbuf[PIP_ETHTX_WORDS*2];
 static int txbufLength = 0;
 
 void doTx(chanend cOut) {

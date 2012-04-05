@@ -3,6 +3,7 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
+
 #include <xs1.h>
 #include <xclib.h>
 #include <print.h>
@@ -14,6 +15,8 @@
 #include "checksum.h"
 #include "ipv4.h"
 #include "timer.h"
+
+#ifdef PIP_TCP
 
 // RFC 793
 
@@ -1021,3 +1024,6 @@ void pipDebugTCPPrint() {
    }
 }
 #endif
+
+
+#endif      // PIP_TCP

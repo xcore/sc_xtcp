@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.xmos.cdt.toolchain.8642906">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.xmos.cdt.toolchain.8642906" moduleId="org.eclipse.cdt.core.settings" name="Default">
+				<externalSettings/>
+				<extensions>
+					<extension id="com.xmos.cdt.core.XEBinaryParser" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.xmos.cdt.core.XdeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration buildProperties="" description="" id="com.xmos.cdt.toolchain.8642906" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="com.xmos.cdt.toolchain.8642906.1127281840" name="/" resourcePath="">
+						<toolChain id="com.xmos.cdt.toolchain.73929542" name="com.xmos.cdt.toolchain" superClass="com.xmos.cdt.toolchain">
+							<targetPlatform archList="all" binaryParser="com.xmos.cdt.core.XEBinaryParser" id="com.xmos.cdt.core.platform.70341710" isAbstract="false" osList="linux,win32,macosx" superClass="com.xmos.cdt.core.platform"/>
+							<builder arguments="" id="com.xmos.cdt.builder.base.80141838" keepEnvironmentInBuildfile="false" managedBuildOn="false" superClass="com.xmos.cdt.builder.base">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH" kind="outputPath" name="bin"/>
+								</outputEntries>
+							</builder>
+							<tool id="com.xmos.cdt.xc.compiler.87699406" name="com.xmos.cdt.xc.compiler" superClass="com.xmos.cdt.xc.compiler">
+								<option id="com.xmos.c.compiler.option.include.paths.36761326" name="com.xmos.c.compiler.option.include.paths" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${XMOS_DOC_PATH}/../target/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${XMOS_DOC_PATH}/../target/include/gcc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${XMOS_DOC_PATH}/../target/include/c++/4.2.1&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${XMOS_DOC_PATH}/../target/include/c++/4.2.1/xcore-xmos-elf&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+								<inputType id="com.xmos.cdt.xc.compiler.input.51017615" name="XC Sources" superClass="com.xmos.cdt.xc.compiler.input"/>
+								<option id="gnu.c.compiler.option.include.paths.3832923" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+							</tool>
+							<tool id="com.xmos.cdt.xc.compiler.base.87858102" name="com.xmos.cdt.xc.compiler.base" superClass="com.xmos.cdt.xc.compiler.base">
+								<option id="gnu.c.compiler.option.include.paths.89664702" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+								<option id="com.xmos.c.compiler.option.include.paths.55279703" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+							</tool>
+							<tool id="com.xmos.cdt.c.compiler.base.55480077" name="com.xmos.cdt.c.compiler.base" superClass="com.xmos.cdt.c.compiler.base">
+								<option id="gnu.c.compiler.option.include.paths.11175766" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+								<option id="com.xmos.c.compiler.option.include.paths.2949593" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+							</tool>
+							<tool id="com.xmos.cdt.cpp.compiler.base.95492962" name="com.xmos.cdt.cpp.compiler.base" superClass="com.xmos.cdt.cpp.compiler.base">
+								<option id="gnu.c.compiler.option.include.paths.16445567" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+								<option id="com.xmos.c.compiler.option.include.paths.98505112" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+							</tool>
+							<tool id="com.xmos.cdt.core.assembler.base.3825549" name="com.xmos.cdt.core.assembler.base" superClass="com.xmos.cdt.core.assembler.base">
+								<option id="gnu.c.compiler.option.include.paths.58502994" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+								<option id="com.xmos.c.compiler.option.include.paths.7223018" superClass="com.xmos.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/autoip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/dhcpc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/xcore}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/uip}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/xtcp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/mac_custom_filter}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/server}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet/src/client}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_xtcp/src/uip/apps/igmp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_ethernet}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_locks/src}&quot;"/>
+								</option>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="scannerConfiguration">
+				<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+				<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="specsFile">
+						<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+				<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="makefileGenerator">
+						<runAction arguments="-E -P -v -dD" command="" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+				<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="specsFile">
+						<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+				<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="specsFile">
+						<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+				<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="specsFile">
+						<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+				<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="specsFile">
+						<runAction arguments="-c 'gcc -E -P -v -dD &quot;${plugin_state_location}/${specs_file}&quot;'" command="sh" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+				<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileCPP">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="specsFile">
+						<runAction arguments="-c 'g++ -E -P -v -dD &quot;${plugin_state_location}/specs.cpp&quot;'" command="sh" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+				<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileC">
+					<buildOutputProvider>
+						<openAction enabled="true" filePath=""/>
+						<parser enabled="true"/>
+					</buildOutputProvider>
+					<scannerInfoProvider id="specsFile">
+						<runAction arguments="-c 'gcc -E -P -v -dD &quot;${plugin_state_location}/specs.c&quot;'" command="sh" useDefault="true"/>
+						<parser enabled="true"/>
+					</scannerInfoProvider>
+				</profile>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+			<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="app_simple_webserver.null.53826485" name="app_simple_webserver"/>
+	</storageModule>
+</cproject>

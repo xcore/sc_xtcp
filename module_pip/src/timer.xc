@@ -182,6 +182,6 @@ void pipResetTimeOut(int timerNumber) {
 
 void pipPrintTimeOuts() {
     for(int i = 0; i < timeOuts; i++) {
-        printf("%d: [%d] %08x %08x\n", i, timeOut[i].timerNumber, timeOut[i].epoch, timeOut[i].time);
+//        printf("%d: [%d] %08x %08x\n", i, timeOut[i].timerNumber, timeOut[i].epoch, timeOut[i].time);
     }
 }
