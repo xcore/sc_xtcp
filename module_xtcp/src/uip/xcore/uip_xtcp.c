@@ -93,7 +93,10 @@ void xtcpd_init_state(xtcpd_state_t *s,
                       int remote_port,
                       void *conn) {
   int i;
-  if (s->s.connect_request) {
+  int connect_request = s->s.connect_request;
+  memset(s, 0, sizeof(xtcpd_state_t));
+
+  if (connect_request) {
 
   }
   else {
@@ -112,7 +115,6 @@ void xtcpd_init_state(xtcpd_state_t *s,
     }
   }
 
-  memset(s, 0, sizeof(xtcpd_state_t));
   s->conn.id = guid;  
   s->conn.local_port = HTONS(local_port);
   s->conn.remote_port = HTONS(remote_port);
