@@ -14,6 +14,16 @@
 
 #ifdef UIP_USE_SINGLE_THREADED_ETHERNET
 
+#ifndef UIP_SINGLE_THREAD_RX_BUFFER_SIZE
+#define UIP_SINGLE_THREAD_RX_BUFFER_SIZE (3200*4)
+#endif
+
+#define UIP_MIN_SINGLE_THREAD_RX_BUFFER_SIZE (2000*2)
+
+#if (UIP_SINGLE_THREAD_RX_BUFFER_SIZE) < (UIP_MIN_SINGLE_THREAD_RX_BUFFER_SIZE)
+#warning UIP_SINGLE_THREAD_RX_BUFFER_SIZE is set too small for correct operation
+#endif
+
 #include "xtcp_server.h"
 #include "uip_xtcp.h"
 
@@ -109,7 +119,7 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 	struct miiData miiData;
 
 	// The Receive packet buffer
-    int b[3200];
+    int b[UIP_SINGLE_THREAD_RX_BUFFER_SIZE/4];
 
     uip_server_init(xtcp, num_xtcp, ipconfig, mac_address);
 
