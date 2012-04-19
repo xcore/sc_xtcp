@@ -12,6 +12,7 @@
 static void send_cmd(chanend c, xtcp_cmd_t cmd, int conn_id)
 {
   outct(c, XTCP_CMD_TOKEN);
+  outct(c, XS1_CT_PAUSE);
   chkct(c, XS1_CT_END);
   chkct(c, XS1_CT_END);
   outuint(c, cmd);
