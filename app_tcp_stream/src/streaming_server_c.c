@@ -5,10 +5,11 @@
 #include "mutual_thread_comm.h"
 #include "streaming_server.h"
 
-#define STCP_PORT 8002
+#define STCP_PORT_BASE 8002
 #define FIFO_SIZE 32
 #define STCP_MIN_PACKET_SIZE 16
 #define STCP_MAX_PACKET_SIZE 128
+#define STCP_NUM_SOCKETS 8
 
 typedef struct fifo_t {
   char data[FIFO_SIZE];
@@ -79,14 +80,16 @@ typedef struct stcp_state_t {
   int sending;
   mutual_comm_state_t *mstate;
   chanend c_data;
+  int chan_id;
 } stcp_state_t;
 
 
-static stcp_state_t g_state;
+static stcp_state_t g_state[STCP_NUM_SOCKETS];
 
 static void stcpInitState(stcp_state_t *state,
                           chanend c_data,
-                          mutual_comm_state_t *mstate)
+                          mutual_comm_state_t *mstate,
+                          int i)
 {
   state->active = 0;
   initFifo(&state->rx_buffer);
@@ -94,16 +97,20 @@ static void stcpInitState(stcp_state_t *state,
   state->sending = 0;
   state->mstate = mstate;
   state->c_data = c_data;
+  state->chan_id = i;
 }
 
 void stcpInit(chanend c_xtcp, chanend c_data, mutual_comm_state_t *mstate) {
-  xtcp_listen(c_xtcp, STCP_PORT, XTCP_PROTOCOL_TCP);
-  stcpInitState(&g_state, c_data, mstate);
+  for (int i=0;i<STCP_NUM_SOCKETS;i++) {
+    xtcp_listen(c_xtcp, STCP_PORT_BASE+i, XTCP_PROTOCOL_TCP);
+    stcpInitState(&g_state[i], c_data, mstate, i);
+  }
 }
 
 static void stcpInitConnectionState(chanend c_xtcp, xtcp_connection_t *conn)
 {
-  stcp_state_t *state = &g_state;
+  int i = conn->local_port - STCP_PORT_BASE;
+  stcp_state_t *state = &g_state[i];
 
   // If we are already connected we boot off the old connection for the
   // new! This is good for testing but probably not what you want for a
@@ -121,32 +128,35 @@ static void stcpInitConnectionState(chanend c_xtcp, xtcp_connection_t *conn)
   state->conn_id = conn->id;
   state->sending = 0;
   initFifo(&state->tx_buffer);
+
+  xtcp_set_connection_appstate(c_xtcp, conn, (xtcp_appstate_t) state);
 }
 
-static void stcpFreeConnectionState() {
-  stcp_state_t *state = &g_state;
+static void stcpFreeConnectionState(xtcp_connection_t *conn) {
+  stcp_state_t *state = (stcp_state_t *) conn->appstate;
 
   state->active = 0;
 }
 
 static void stcpRecv(chanend c_xtcp, xtcp_connection_t *conn)
 {
-  stcp_state_t *state = &g_state;
+  stcp_state_t *state = (stcp_state_t *) conn->appstate;
   char data[XTCP_CLIENT_BUF_SIZE];
   int len;
   len = xtcp_recv(c_xtcp, data);
 
-
-  for (int i=0;i<len;i++) {
-    if (!isFifoFull(&state->rx_buffer)) {
-      pushItem(&state->rx_buffer, data[i]);
-      mutual_comm_notify(state->c_data, state->mstate);
-    }
-    else {
+  if (state->chan_id ==0) {
+    for (int i=0;i<len;i++) {
+      if (!isFifoFull(&state->rx_buffer)) {
+        pushItem(&state->rx_buffer, data[i]);
+        mutual_comm_notify(state->c_data, state->mstate);
+      }
+      else {
 #ifdef STCP_DEBUG
-      printstrln("stcp: rx buffer overflow");
+        printstrln("stcp: rx buffer overflow");
 #endif
-      //drop the data
+        //drop the data
+      }
     }
   }
 }
@@ -155,7 +165,7 @@ static void stcpSend(chanend c_xtcp, xtcp_connection_t *conn)
 {
   char buf[STCP_MAX_PACKET_SIZE];
   int len;
-  stcp_state_t *state = &g_state;
+  stcp_state_t *state = (stcp_state_t *) conn->appstate;
 
   len = getFillLevel(&state->tx_buffer);
 
@@ -185,7 +195,8 @@ void stcpHandleEvent(chanend c_xtcp, xtcp_connection_t *conn)
       break;
     } 
 
-  if (conn->local_port == STCP_PORT)
+  if (conn->local_port >= STCP_PORT_BASE &&
+      conn->local_port < (STCP_PORT_BASE + STCP_NUM_SOCKETS))
     {
       switch (conn->event)
         {
@@ -197,18 +208,13 @@ void stcpHandleEvent(chanend c_xtcp, xtcp_connection_t *conn)
           break;
         case XTCP_SENT_DATA:
         case XTCP_REQUEST_DATA:
-          stcpSend(c_xtcp, conn);
-          break;
         case XTCP_RESEND_DATA:
-          // retransmit not implemented
-          // It should be though, this could cause problems in a
-          // real application
-          asm("ecallf %0"::"r"(0));
+          stcpSend(c_xtcp, conn);
           break;
         case XTCP_TIMED_OUT:
         case XTCP_ABORTED:
         case XTCP_CLOSED:
-          stcpFreeConnectionState();
+          stcpFreeConnectionState(conn);
           break;
         default:
           // Ignore anything else
@@ -221,7 +227,7 @@ void stcpHandleEvent(chanend c_xtcp, xtcp_connection_t *conn)
 
 void stcpSendDataToClient(chanend c_data, mutual_comm_state_t *mstate)
 {
-  stcp_state_t *state = &g_state;
+  stcp_state_t *state = &g_state[0];
   if (!isFifoEmpty(&state->rx_buffer))
     {
       xc_abi_outuint(c_data, popItem(&state->rx_buffer));
@@ -237,39 +243,41 @@ void stcpSendDataToClient(chanend c_data, mutual_comm_state_t *mstate)
 
 void stcpFlushBuffer(chanend c_xtcp)
 {
-  stcp_state_t *state = &g_state;
-  xtcp_connection_t conn;
-
-  return;
-  if (state->active && !state->sending && !isFifoEmpty(&state->tx_buffer)) {
-    conn.id = state->conn_id;
-    xtcp_init_send(c_xtcp, &conn);
-    state->sending = 1;
+  for (int i=0;i<STCP_NUM_SOCKETS;i++) {
+    stcp_state_t *state = &g_state[i];
+    xtcp_connection_t conn;
+    if (state->active && !state->sending && !isFifoEmpty(&state->tx_buffer)) {
+      conn.id = state->conn_id;
+      xtcp_init_send(c_xtcp, &conn);
+      state->sending = 1;
+    }
   }
 }
 
 void stcpGetDataFromClient(chanend c_xtcp, chanend c_data)
 {
-  stcp_state_t *state = &g_state;
+
   int datum;
   xtcp_connection_t conn;
 
   datum = xc_abi_inuint(c_data);
-  if (!isFifoFull(&state->tx_buffer)) {
-    int fill;
-    pushItem(&state->tx_buffer, datum);
-    fill = getFillLevel(&state->tx_buffer);
-    if (fill >= STCP_MIN_PACKET_SIZE && state->active && !state->sending) {
-      conn.id = state->conn_id;
-      xtcp_init_send(c_xtcp, &conn);
-      state->sending = 1;
+  for (int i=0;i<STCP_NUM_SOCKETS;i++) {
+    stcp_state_t *state = &g_state[i];
+    if (!isFifoFull(&state->tx_buffer)) {
+      int fill;
+      pushItem(&state->tx_buffer, datum);
+      fill = getFillLevel(&state->tx_buffer);
+      if (fill >= STCP_MIN_PACKET_SIZE && state->active && !state->sending) {
+        conn.id = state->conn_id;
+        xtcp_init_send(c_xtcp, &conn);
+        state->sending = 1;
+      }
     }
-
-  }
-  else {
+    else {
 #ifdef STCP_DEBUG
-    printstrln("stcp: tx buffer overflow");
+      printstrln("stcp: tx buffer overflow");
 #endif
-    // Drop the data
+      // Drop the data
+    }
   }
 }
