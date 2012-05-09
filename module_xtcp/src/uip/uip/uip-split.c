@@ -52,6 +52,10 @@
 #include <xclib.h>
 #define BUF ((struct uip_tcpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
+#ifndef UIP_PACKET_SPLIT_THRESHOLD
+#define UIP_PACKET_SPLIT_THRESHOLD ((UIP_BUFSIZE) / 2)
+#endif
+
 
 /*-----------------------------------------------------------------------------*/
 
@@ -88,9 +92,8 @@ uip_split_output(chanend mac_tx)
 {
 	u16_t tcplen, len1, len2;
 
-	/* We only try to split maximum sized TCP segments. */
 	if (BUF->proto == UIP_PROTO_TCP) {
-		if (uip_len + UIP_TCPIP_HLEN > (UIP_BUFSIZE) / 2) {
+          if (uip_len + UIP_TCPIP_HLEN > UIP_PACKET_SPLIT_THRESHOLD) {
 
 			tcplen = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
 			/* Split the segment in two, making sure the first segment is an
