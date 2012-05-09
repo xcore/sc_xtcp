@@ -4,7 +4,7 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #include <string.h>
-
+#include <print.h>
 #include "uip.h"
 #include "xtcp_client.h"
 #include "xtcp_server.h"
@@ -46,14 +46,14 @@ struct listener_info_t udp_listeners[NUM_UDP_LISTENERS] = {{0}};
 static struct xtcpd_state_t  *lookup_xtcpd_state(int conn_id) {
   int i=0;
   for (i=0;i<((UIP_CONNS>UIP_UDP_CONNS) ? UIP_CONNS : UIP_UDP_CONNS);i++) {
-	  if (i < UIP_CONNS) {
-		  xtcpd_state_t *s = (xtcpd_state_t *) &(uip_conns[i].appstate);
-		  if (s->conn.id == conn_id) return s;
-	  }
-	  if (i < UIP_UDP_CONNS) {
-		    xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conns[i].appstate);
-		    if (s->conn.id == conn_id) return s;
-	  }
+    if (i < UIP_CONNS) {
+      xtcpd_state_t *s = (xtcpd_state_t *) &(uip_conns[i].appstate);
+      if (s->conn.id == conn_id) return s;
+    }
+    if (i < UIP_UDP_CONNS) {
+        xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conns[i].appstate);
+        if (s->conn.id == conn_id) return s;
+    }
   } 
   return NULL;
 }
@@ -93,28 +93,27 @@ void xtcpd_init_state(xtcpd_state_t *s,
                       int remote_port,
                       void *conn) {
   int i;
+  int linknum;
   int connect_request = s->s.connect_request;
-  memset(s, 0, sizeof(xtcpd_state_t));
+  int connection_type = s->conn.connection_type;
 
   if (connect_request) {
-
+    linknum = s->linknum;
   }
   else {
-   
-
-    s->conn.connection_type = XTCP_SERVER_CONNECTION;
+    connection_type = XTCP_SERVER_CONNECTION;
     if (protocol == XTCP_PROTOCOL_TCP) {
-      s->linknum = get_listener_linknum(tcp_listeners,
-                                        NUM_TCP_LISTENERS,
-                                        local_port);
+      linknum = get_listener_linknum(tcp_listeners, NUM_TCP_LISTENERS, local_port);
     }
     else {
-      s->linknum = get_listener_linknum(udp_listeners,
-                                        NUM_UDP_LISTENERS,
-                                        local_port);
+      linknum = get_listener_linknum(udp_listeners, NUM_UDP_LISTENERS, local_port);
     }
   }
 
+  memset(s, 0, sizeof(xtcpd_state_t));
+
+  s->conn.connection_type = connection_type;
+  s->linknum = linknum;
   s->conn.id = guid;  
   s->conn.local_port = HTONS(local_port);
   s->conn.remote_port = HTONS(remote_port);
@@ -159,6 +158,7 @@ static void register_listener(struct listener_info_t listeners[],
                               int n)
 {
   int i;
+
     for (i=0;i<n;i++)
       if (!listeners[i].active)
         break;
@@ -174,8 +174,8 @@ static void register_listener(struct listener_info_t listeners[],
 }
 
 void xtcpd_unlisten(int linknum, int port_number){
-	unregister_listener(tcp_listeners, linknum, port_number, NUM_TCP_LISTENERS);
-	uip_unlisten(HTONS(port_number));
+  unregister_listener(tcp_listeners, linknum, port_number, NUM_TCP_LISTENERS);
+  uip_unlisten(HTONS(port_number));
 }
 
 void xtcpd_listen(int linknum, int port_number, xtcp_protocol_t p)
