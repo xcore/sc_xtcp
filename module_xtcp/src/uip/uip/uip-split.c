@@ -56,6 +56,8 @@
 #define UIP_PACKET_SPLIT_THRESHOLD ((UIP_BUFSIZE) / 2)
 #endif
 
+#define ACTUAL_UIP_PACKET_SPLIT_THRESHOLD (UIP_PACKET_SPLIT_THRESHOLD > 4 ? UIP_PACKET_SPLIT_THRESHOLD : 4)
+
 
 /*-----------------------------------------------------------------------------*/
 
@@ -93,8 +95,8 @@ uip_split_output(chanend mac_tx)
 	u16_t tcplen, len1, len2;
 
 	if (BUF->proto == UIP_PROTO_TCP) {
-          if (uip_len + UIP_TCPIP_HLEN > UIP_PACKET_SPLIT_THRESHOLD) {
-
+          int data_len = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
+          if (data_len > ACTUAL_UIP_PACKET_SPLIT_THRESHOLD) {
 			tcplen = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
 			/* Split the segment in two, making sure the first segment is an
 			 * integer number of words */
