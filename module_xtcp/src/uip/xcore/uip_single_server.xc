@@ -55,7 +55,7 @@ extern void igmp_periodic();
 #pragma unsafe arrays
 void xcoredev_send(chanend tx)
 {
-#if 1
+#ifndef UIP_SINGLE_SERVER_SINGLE_BUFFER_TX
 	static int txbuf0[1520/4];
 	static int txbuf1[1520/4];
 	static int tx_buf_in_use=0;
