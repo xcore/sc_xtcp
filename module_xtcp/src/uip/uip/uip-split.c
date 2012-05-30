@@ -93,7 +93,7 @@ uip_split_output(chanend mac_tx)
 	u16_t tcplen, len1, len2;
 
 	if (BUF->proto == UIP_PROTO_TCP) {
-          if (uip_len + UIP_TCPIP_HLEN > UIP_PACKET_SPLIT_THRESHOLD) {
+          if (uip_len > UIP_PACKET_SPLIT_THRESHOLD) {
 
 			tcplen = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
 			/* Split the segment in two, making sure the first segment is an
