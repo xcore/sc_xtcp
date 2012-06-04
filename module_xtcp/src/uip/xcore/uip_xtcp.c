@@ -293,6 +293,7 @@ void xtcpd_ack_recv(int conn_id)
   xtcpd_state_t *s = lookup_xtcpd_state(conn_id);
   if (s != NULL) {
     ((struct uip_conn *) s->s.uip_conn)->tcpstateflags &= ~UIP_STOPPED;
+    s->s.ack_request = 1;
   }
 }
 
@@ -311,11 +312,16 @@ void xtcpd_unpause(int conn_id)
   xtcpd_state_t *s = lookup_xtcpd_state(conn_id);
   if (s != NULL) {
     ((struct uip_conn *) s->s.uip_conn)->tcpstateflags &= ~UIP_STOPPED;
+    s->s.ack_request = 1;
   }
 }
 
 void uip_xtcpd_handle_poll(xtcpd_state_t *s)
 {
+ if (s->s.ack_request) {
+   uip_flags |= UIP_NEWDATA;
+   s->s.ack_request = 0;
+ }
  if (s->s.abort_request) {
     if (uip_udpconnection()) {
       uip_udp_conn->lport = 0;

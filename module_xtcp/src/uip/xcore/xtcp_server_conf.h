@@ -11,6 +11,7 @@ typedef struct xtcp_server_state_t {
   int close_request;  
   int poll_interval;
   int connect_request;
+  int ack_request;
   int closed;
   struct uip_timer tmr;
   int uip_conn;
