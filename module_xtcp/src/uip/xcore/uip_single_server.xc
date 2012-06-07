@@ -123,7 +123,7 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 
     uip_server_init(xtcp, num_xtcp, ipconfig, mac_address);
 
-    miiBufferInit(miiData, mac_rx, cNotifications, b, 3200);
+    miiBufferInit(miiData, mac_rx, cNotifications, b, UIP_SINGLE_THREAD_RX_BUFFER_SIZE/4);
     miiOutInit(mac_tx);
 
     tmr :> timeout;

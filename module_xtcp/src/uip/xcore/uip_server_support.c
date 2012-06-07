@@ -102,7 +102,7 @@ void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, un
 
 static int needs_poll(xtcpd_state_t *s)
 {
-  return (s->s.connect_request | s->s.send_request | s->s.abort_request | s->s.close_request);
+  return (s->s.connect_request | s->s.send_request | s->s.abort_request | s->s.close_request | s->s.ack_request);
 }
 
 static int uip_conn_needs_poll(struct uip_conn *uip_conn)
