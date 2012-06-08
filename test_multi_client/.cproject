@@ -292,6 +292,6 @@
 
     </storageModule>
     <storageModule moduleId="cdtBuildSystem" version="4.0.0">
-        <project id = "app_simple_udp.null.51416477" name="app_simple_udp" />
+        <project id = "test_multi_client.null.51416477" name="test_multi_client" />
     </storageModule>
 </cproject>
