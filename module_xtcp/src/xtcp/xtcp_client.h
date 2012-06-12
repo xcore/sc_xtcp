@@ -18,6 +18,13 @@
 #ifndef XTCP_CLIENT_BUF_SIZE
 #define XTCP_CLIENT_BUF_SIZE (1472)
 #endif
+#ifndef XTCP_MAX_RECEIVE_SIZE
+#ifdef UIP_CONF_RECEIVE_WINDOW
+#define XTCP_MAX_RECEIVE_SIZE (UIP_CONF_RECEIVE_WINDOW)
+#else
+#define XTCP_MAX_RECEIVE_SIZE (1472)
+#endif
+#endif
 
 #include "xtcp_bufinfo.h"
 
