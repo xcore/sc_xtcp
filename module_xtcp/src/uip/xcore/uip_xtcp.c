@@ -320,6 +320,7 @@ void uip_xtcpd_handle_poll(xtcpd_state_t *s)
 {
  if (s->s.ack_request) {
    uip_flags |= UIP_NEWDATA;
+   uip_len = 0;
    s->s.ack_request = 0;
  }
  if (s->s.abort_request) {
