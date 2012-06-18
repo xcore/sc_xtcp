@@ -153,7 +153,7 @@ int main(void) {
             p_reset <: 0x2;
 
             // Start server
-            uipSingleServer(clk_smi, null, smi, mii, xtcp, 1, ipconfig, mac_address);
+            uip_single_server(null, smi, mii, xtcp, 1, ipconfig, mac_address);
           }
 
           on stdcore[0]: udp_server(xtcp[0]);

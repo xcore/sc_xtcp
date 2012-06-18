@@ -14,7 +14,6 @@
  * \note This function should be used in a top level 'par' in the main function.
  *       It will internally create the single MII thread.
  *
- * \param clk_smi        Clock block for controlling the SMI interface
  * \param p_mii_resetn   Optional port which resets the PHY
  * \param smi            Structure describing the SMI ports
  * \param mii            Structure describing the MII ports
