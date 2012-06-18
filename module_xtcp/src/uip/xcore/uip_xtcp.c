@@ -316,11 +316,13 @@ void xtcpd_unpause(int conn_id)
   }
 }
 
+extern u16_t uip_slen;
+
 void uip_xtcpd_handle_poll(xtcpd_state_t *s)
 {
  if (s->s.ack_request) {
    uip_flags |= UIP_NEWDATA;
-   uip_len = 0;
+   uip_slen = 0;
    s->s.ack_request = 0;
  }
  if (s->s.abort_request) {
