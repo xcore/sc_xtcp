@@ -4,7 +4,7 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #include <string.h>
-#include <print.h>
+
 #include "uip.h"
 #include "xtcp_client.h"
 #include "xtcp_server.h"
@@ -158,7 +158,6 @@ static void register_listener(struct listener_info_t listeners[],
                               int n)
 {
   int i;
-
     for (i=0;i<n;i++)
       if (!listeners[i].active)
         break;
@@ -439,6 +438,22 @@ xtcpd_appcall(void)
     }
   }
   
+  if (uip_newdata() && uip_len > 0) {
+  if (s->linknum != -1) {
+    if (!uip_udpconnection() && s->s.ack_recv_mode) {
+      uip_stop();
+    }
+    xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
+
+    xtcpd_recv(xtcp_links, s->linknum, xtcp_num,
+               s,
+               uip_appdata,
+               uip_datalen());
+  }
+
+}
+
+
   if (uip_acked()) {
     int len;
     if (s->linknum != -1) {
@@ -452,22 +467,6 @@ xtcpd_appcall(void)
         uip_send(uip_appdata, len);
     }
   }  
-
-
-    if (uip_newdata() && uip_len > 0) {
-    if (s->linknum != -1) {
-      if (!uip_udpconnection() && s->s.ack_recv_mode) {
-        uip_stop();
-      }      
-      xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
-      
-      xtcpd_recv(xtcp_links, s->linknum, xtcp_num,
-                 s, 
-                 uip_appdata, 
-                 uip_datalen());   
-    }
-
-  }
   
   else if (uip_aborted()) {
     xtcpd_event(XTCP_ABORTED, s);
