@@ -120,7 +120,6 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 
 	// The Receive packet buffer
     int b[UIP_SINGLE_THREAD_RX_BUFFER_SIZE/4];
-
     uip_server_init(xtcp, num_xtcp, ipconfig, mac_address);
 
     miiBufferInit(miiData, mac_rx, cNotifications, b, UIP_SINGLE_THREAD_RX_BUFFER_SIZE/4);
@@ -130,11 +129,11 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
     timeout += 10000000;
 
     while (1) {
-		xtcpd_service_clients(xtcp, num_xtcp);
-		xtcpd_check_connection_poll(mac_tx);
-		uip_xtcp_checkstate();
 
-		xtcp_process_udp_acks(mac_tx);
+      xtcpd_service_clients(xtcp, num_xtcp);
+      xtcpd_check_connection_poll(mac_tx);
+      uip_xtcp_checkstate();
+      xtcp_process_udp_acks(mac_tx);
 
         select {
 		case tmr when timerafter(timeout) :> unsigned:
@@ -143,7 +142,7 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 			// Check for the link state
 			{
 				static int linkstate=0;
-				int status = smiCheckLinkState(smi);
+				int status = smi_check_link_state(smi);
 				if (!status && linkstate) {
 				  uip_linkdown();
 				}
@@ -180,18 +179,26 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 					uip_len = length;
 					copy_packet(uip_buf32, address, length);
 					xtcp_process_incoming_packet(mac_tx);
-		            miiFreeInBuffer(miiData, address);
-		            miiRestartBuffer(miiData);
+                                        miiFreeInBuffer(miiData, address);
+                                        miiRestartBuffer(miiData);
 				}
 			} while (address!=0);
 
             break;
-
 		default:
 			break;
 
         }
+
     }
+
+}
+
+
+// This funciton is just here to stop the compiler warning about an unused
+// chanend.
+static inline void doNothing(chanend c) {
+  asm(""::"r"(c));
 }
 
 void uip_single_server(out port ?p_mii_resetn,
@@ -204,14 +211,15 @@ void uip_single_server(out port ?p_mii_resetn,
     chan notifications;
 	miiInitialise(p_mii_resetn, mii);
 #ifndef MII_NO_SMI_CONFIG
-	smiInit(smi);
+	smi_init(smi);
 	eth_phy_config(1, smi);
 #endif
     par {
-    	miiDriver(mii, cIn, cOut);
-        theServer(cIn, cOut, notifications, smi, xtcp, num_xtcp, ipconfig, mac_address);
+      {doNothing(notifications);miiDriver(mii, cIn, cOut);}
+      theServer(cIn, cOut, notifications, smi, xtcp, num_xtcp, ipconfig, mac_address);
     }
 }
+
 
 #endif
 
