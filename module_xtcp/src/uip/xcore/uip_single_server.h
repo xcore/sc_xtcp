@@ -14,7 +14,6 @@
  * \note This function should be used in a top level 'par' in the main function.
  *       It will internally create the single MII thread.
  *
- * \param clk_smi        Clock block for controlling the SMI interface
  * \param p_mii_resetn   Optional port which resets the PHY
  * \param smi            Structure describing the SMI ports
  * \param mii            Structure describing the MII ports
@@ -24,10 +23,9 @@
  * \param mac_address    The unicast MAC address for this device
  *
  */
-void uipSingleServer(clock clk_smi,
-                     out port ?p_mii_resetn,
-                     smi_interface_t &smi,
-                     mii_interface_t &mii,
-                     chanend xtcp[], int num_xtcp,
-                     xtcp_ipconfig_t& ipconfig,
-                     char mac_address[6]);
+void uip_single_server(out port ?p_mii_resetn,
+                       smi_interface_t &smi,
+                       mii_interface_t &mii,
+                       chanend xtcp[], int num_xtcp,
+                       xtcp_ipconfig_t& ipconfig,
+                       char mac_address[6]);

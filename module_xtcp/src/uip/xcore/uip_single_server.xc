@@ -18,7 +18,7 @@
 #define UIP_SINGLE_THREAD_RX_BUFFER_SIZE (3200*4)
 #endif
 
-#define UIP_MIN_SINGLE_THREAD_RX_BUFFER_SIZE (2000*2)
+#define UIP_MIN_SINGLE_THREAD_RX_BUFFER_SIZE (1524*4)
 
 #if (UIP_SINGLE_THREAD_RX_BUFFER_SIZE) < (UIP_MIN_SINGLE_THREAD_RX_BUFFER_SIZE)
 #warning UIP_SINGLE_THREAD_RX_BUFFER_SIZE is set too small for correct operation
@@ -55,7 +55,7 @@ extern void igmp_periodic();
 #pragma unsafe arrays
 void xcoredev_send(chanend tx)
 {
-#ifndef UIP_SINGLE_SERVER_SINGLE_BUFFER_TX
+#ifdef UIP_SINGLE_SERVER_DOUBLE_BUFFER_TX
 	static int txbuf0[1520/4];
 	static int txbuf1[1520/4];
 	static int tx_buf_in_use=0;
@@ -102,7 +102,7 @@ void copy_packet(unsigned dst[], unsigned src, unsigned len)
 }
 
 static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
-		clock clk_smi, smi_interface_t &smi,
+                      smi_interface_t &smi,
 		chanend xtcp[], int num_xtcp, xtcp_ipconfig_t& ipconfig,
 		char mac_address[6]) {
     int address, length, timeStamp;
@@ -194,23 +194,22 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
     }
 }
 
-void uipSingleServer(clock clk_smi,
-                     out port ?p_mii_resetn,
-                     smi_interface_t &smi,
-                     mii_interface_t &mii,
-                     chanend xtcp[], int num_xtcp,
-                     xtcp_ipconfig_t& ipconfig,
-                     char mac_address[6]) {
+void uip_single_server(out port ?p_mii_resetn,
+                       smi_interface_t &smi,
+                       mii_interface_t &mii,
+                       chanend xtcp[], int num_xtcp,
+                       xtcp_ipconfig_t& ipconfig,
+                       char mac_address[6]) {
     chan cIn, cOut;
     chan notifications;
 	miiInitialise(p_mii_resetn, mii);
 #ifndef MII_NO_SMI_CONFIG
-	smi_port_init(clk_smi, smi);
+	smiInit(smi);
 	eth_phy_config(1, smi);
 #endif
     par {
     	miiDriver(mii, cIn, cOut);
-        theServer(cIn, cOut, notifications, clk_smi, smi, xtcp, num_xtcp, ipconfig, mac_address);
+        theServer(cIn, cOut, notifications, smi, xtcp, num_xtcp, ipconfig, mac_address);
     }
 }
 

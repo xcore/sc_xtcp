@@ -163,6 +163,10 @@ typedef unsigned short uip_stats_t;
 #define UIP_CONF_STATISTICS      0
 #endif
 
+#if !defined(UIP_CONF_RECEIVE_WINDOW) && defined(XTCP_MAX_RECEIVE_SIZE)
+#define UIP_CONF_RECEIVE_WINDOW XTCP_MAX_RECEIVE_SIZE
+#endif
+
 
 #define UIP_CONF_EXTERNAL_BUFFER     1
 
