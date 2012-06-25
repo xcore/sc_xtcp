@@ -1495,9 +1495,6 @@ void uip_process(u8_t flag) {
 			/* Reset length of outstanding data. */
 			uip_connr->len = 0;
 		}
-                else {
-                  uip_flags |= UIP_REXMIT;
-                }
 
 	}
 
@@ -1679,11 +1676,9 @@ void uip_process(u8_t flag) {
 		 put into the uip_appdata and the length of the data should be
 		 put into uip_len. If the application don't have any data to
 		 send, uip_len must be set to 0. */
-		if (uip_flags & (UIP_NEWDATA | UIP_ACKDATA | UIP_REXMIT)) {
+		if (uip_flags & (UIP_NEWDATA | UIP_ACKDATA)) {
 			uip_slen = 0;
 			UIP_APPCALL();
-                        if (uip_flags & UIP_REXMIT)
-                          goto apprexmit;
 
 			appsend:
 
