@@ -28,7 +28,8 @@ typedef enum xtcp_cmd_t {
   XTCP_CMD_ACK_RECV_MODE,
   XTCP_CMD_PAUSE,
   XTCP_CMD_UNPAUSE,
-  XTCP_CMD_UPDATE_BUFINFO
+  XTCP_CMD_UPDATE_BUFINFO,
+  XTCP_CMD_ACCEPT_PARTIAL_ACK
 } xtcp_cmd_t;
 
 #endif // _xtcp_cmd_h_

@@ -1221,6 +1221,9 @@ struct uip_conn {
   u8_t nrtx;          /**< The number of retransmissions for the last
 			 segment sent. */
 
+#if UIP_SLIDING_WINDOW
+  u8_t midpoint;
+#endif
   /** The application state. */
   uip_tcp_appstate_t appstate;
 };

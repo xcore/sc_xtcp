@@ -100,7 +100,7 @@
 #include "igmp.h"
 #endif
 #include <string.h>
-
+#define ACTUAL_UIP_PACKET_SPLIT_THRESHOLD (UIP_PACKET_SPLIT_THRESHOLD > 4 ? UIP_PACKET_SPLIT_THRESHOLD : 4)
 /*---------------------------------------------------------------------------*/
 /* Variable definitions. */
 
@@ -166,6 +166,10 @@ u16_t uip_len, uip_slen;
 /* The uip_len is either 8 or 16 bits,
  depending on the maximum packet
  size. */
+
+#if UIP_SLIDING_WINDOW
+int uip_do_split;
+#endif
 
 u8_t uip_flags; /* The uip_flags variable is used for
  communication between the TCP/IP stack
@@ -298,6 +302,21 @@ static int xtcp_compare_words(const u8_t* a, const u8_t* b)
 		   (*(short*)(&a[2]) == *(short*)(&b[2]));
 }
 
+
+
+#if UIP_SLIDING_WINDOW
+static int xtcp_get_word(const u8_t *a) {
+  unsigned int aw = ((*(unsigned short*)(&a[2])) << 16) + *(unsigned short*)(&a[0]);
+  return byterev(aw);
+}
+
+/*static void xtcp_put_word(const u8_t *a, unsigned int s) {
+  *(short*)(&a[0]) = (short)s;
+  *(short*)(&a[2]) = (short)(s >> 16);
+  }*/
+
+#endif
+
 __attribute__ ((noinline))
 void uip_add32(u8_t *op32, u16_t op16) {
 	  unsigned int *res = (unsigned int *)uip_acc32;
@@ -305,6 +324,8 @@ void uip_add32(u8_t *op32, u16_t op16) {
 	  x = byterev(x);
 	  *res = byterev(x + op16);
 }
+
+
 
 void uip_ipaddr_copy(void *dest, const void *src)
 {
@@ -474,7 +495,9 @@ uip_connect(uip_ipaddr_t *ripaddr, u16_t rport)
 	conn->lport = htons(lastport);
 	conn->rport = rport;
 	uip_ipaddr_copy(&conn->ripaddr, ripaddr);
-
+#if UIP_SLIDING_WINDOW
+        conn->midpoint = 0;
+#endif
 	return conn;
 }
 #endif /* UIP_ACTIVE_OPEN */
@@ -702,6 +725,12 @@ static void uip_add_rcv_nxt(u16_t n) {
 void uip_process(u8_t flag) {
 	register struct uip_conn *uip_connr = uip_conn;
 
+
+        #if UIP_SLIDING_WINDOW
+        uip_do_split = 0;
+        #endif
+
+
 #if UIP_UDP
 	if(flag == UIP_UDP_SEND_CONN) {
 		goto udp_send;
@@ -714,7 +743,12 @@ void uip_process(u8_t flag) {
 	 particular connection. */
 	if (flag == UIP_POLL_REQUEST) {
 		if ((uip_connr->tcpstateflags & UIP_TS_MASK) == UIP_ESTABLISHED
-				&& !uip_outstanding(uip_connr)) {
+                    #if UIP_SLIDING_WINDOW
+                    && ((!uip_outstanding(uip_connr)) || uip_connr->midpoint)
+                    #else
+                    && !uip_outstanding(uip_connr)
+                    #endif
+                    ) {
 			uip_flags = UIP_POLL;
 			UIP_APPCALL();
 			goto appsend;
@@ -1456,7 +1490,7 @@ void uip_process(u8_t flag) {
 	if (!(((uip_connr->tcpstateflags & UIP_TS_MASK) == UIP_SYN_SENT)
 			&& ((BUF->flags & TCP_CTL) == (TCP_SYN | TCP_ACK)))) {
 		if ((uip_len > 0 || ((BUF->flags & (TCP_SYN | TCP_FIN)) != 0))
-				&& (!xtcp_compare_words(BUF->seqno, uip_connr->rcv_nxt))) {
+                    && (!xtcp_compare_words(BUF->seqno, uip_connr->rcv_nxt))) {
 			goto tcp_send_ack;
 		}
 	}
@@ -1466,11 +1500,22 @@ void uip_process(u8_t flag) {
 	 the outstanding data, calculate RTT estimations, and reset the
 	 retransmission timer. */
 	if ((BUF->flags & TCP_ACK) && uip_outstanding(uip_connr)) {
-		uip_add32(uip_connr->snd_nxt, uip_connr->len);
+               uip_add32(uip_connr->snd_nxt, uip_connr->len);
+#if UIP_SLIDING_WINDOW
+               unsigned int ackno = xtcp_get_word(BUF->ackno);
+               int diff = xtcp_get_word(uip_acc32) - ackno;
 
-		if (xtcp_compare_words(BUF->ackno, uip_acc32)) {
+               if (diff >= 0 && diff < uip_connr->len)
+#else
+               if ((xtcp_compare_words(BUF->ackno, uip_acc32)))
+#endif
+                  {
 			/* Update sequence number. */
-			xtcp_copy_word(uip_connr->snd_nxt, uip_acc32);
+#if UIP_SLIDING_WINDOW
+                    xtcp_copy_word(uip_connr->snd_nxt, BUF->ackno);
+#else
+                    xtcp_copy_word(uip_connr->snd_nxt, uip_acc32);
+#endif
 
 			/* Do RTT estimation, unless we have done retransmissions. */
 			if (uip_connr->nrtx == 0) {
@@ -1487,14 +1532,25 @@ void uip_process(u8_t flag) {
 				uip_connr->rto = (uip_connr->sa >> 3) + uip_connr->sv;
 
 			}
-			/* Set the acknowledged flag. */
-			uip_flags = UIP_ACKDATA;
+
+                        /* Set the acknowledged flag. */
+                        uip_flags = UIP_ACKDATA;
+
 			/* Reset the retransmission timer. */
 			uip_connr->timer = uip_connr->rto;
 
 			/* Reset length of outstanding data. */
+#if UIP_SLIDING_WINDOW
+
+
+
+                        uip_connr->midpoint = diff;
+			uip_connr->len = diff;
+
+#else
 			uip_connr->len = 0;
-		}
+#endif
+                    }
 
 	}
 
@@ -1698,9 +1754,26 @@ void uip_process(u8_t flag) {
 				goto tcp_send_nodata;
 			}
 
+
+                        uip_connr->nrtx = 0;
+
 			/* If uip_slen > 0, the application has data to be sent. */
 			if (uip_slen > 0) {
 
+#if UIP_SLIDING_WINDOW
+                          if (uip_connr->midpoint) {
+                            uip_do_split = 0;
+                            uip_connr->len += uip_slen;
+                            uip_len = uip_slen + UIP_TCPIP_HLEN;
+                            BUF->flags = TCP_ACK | TCP_PSH;
+                            goto tcp_send_noopts;
+                          }
+                          else {
+                            /* Decide whether to split this packet and record the fact in the connection data */
+                            uip_do_split = (uip_slen > ACTUAL_UIP_PACKET_SPLIT_THRESHOLD);
+                            uip_connr->midpoint = 0;
+                          }
+#endif
 				/* If the connection has acknowledged data, the contents of
 				 the ->len variable should be discarded. */
 				if ((uip_flags & UIP_ACKDATA) != 0) {
@@ -1710,6 +1783,7 @@ void uip_process(u8_t flag) {
 				/* If the ->len variable is non-zero the connection has
 				 already data in transit and cannot send anymore right
 				 now. */
+
 				if (uip_connr->len == 0) {
 
 					/* The application cannot send more than what is allowed by
@@ -1721,16 +1795,22 @@ void uip_process(u8_t flag) {
 
 					/* Remember how much data we send out now so that we know
 					 when everything has been acknowledged. */
-					uip_connr->len = uip_slen;
+    					  uip_connr->len = uip_slen;
+
 				} else {
 
 					/* If the application already had unacknowledged data, we
 					 make sure that the application does not send (i.e.,
 					 retransmit) out more than it previously sent out. */
-					uip_slen = uip_connr->len;
+
+                                  uip_slen = uip_connr->len;
+
 				}
+
 			}
-			uip_connr->nrtx = 0;
+
+
+
 			apprexmit: uip_appdata = uip_sappdata;
 
 			/* If the application has data to be sent, or if the incoming
@@ -1830,8 +1910,15 @@ void uip_process(u8_t flag) {
 	 headers before calculating the checksum and finally send the
 	 packet. */
 	xtcp_copy_word(BUF->ackno, uip_connr->rcv_nxt);
-	xtcp_copy_word(BUF->seqno, uip_connr->snd_nxt);
 
+	xtcp_copy_word(BUF->seqno, uip_connr->snd_nxt);
+#if UIP_SLIDING_WINDOW
+        if (uip_connr->midpoint && uip_slen) {
+          uip_add32(BUF->seqno, uip_connr->midpoint);
+          xtcp_copy_word(BUF->seqno, uip_acc32);
+          uip_connr->midpoint = 0;
+        }
+#endif
 	BUF->proto = UIP_PROTO_TCP;
 
 	BUF->srcport = uip_connr->lport;

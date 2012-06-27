@@ -283,3 +283,9 @@ void xtcp_get_ipconfig(chanend c_xtcp,
 }
 
 extern inline void xtcp_complete_send(chanend c_xtcp);
+
+void xtcp_accept_partial_ack(chanend c_xtcp,
+                             REFERENCE_PARAM(xtcp_connection_t,conn))
+{
+  send_cmd(c_xtcp, XTCP_CMD_ACCEPT_PARTIAL_ACK, conn.id);
+}
