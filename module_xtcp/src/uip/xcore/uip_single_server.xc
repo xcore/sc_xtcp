@@ -8,9 +8,26 @@
 #include <safestring.h>
 #include <print.h>
 
-#ifdef __xtcp_client_conf_h_exists__
-#include "xtcp_client_conf.h"
-#endif
+
+
+
+#include "xtcp_client.h"
+#define UIP_IPH_LEN    20    /* Size of IP header */
+#define UIP_UDPH_LEN    8    /* Size of UDP header */
+#define UIP_TCPH_LEN   20    /* Size of TCP header */
+#define UIP_IPUDPH_LEN (UIP_UDPH_LEN + UIP_IPH_LEN)    /* Size of IP +
+							  UDP
+							  header */
+#define UIP_IPTCPH_LEN (UIP_TCPH_LEN + UIP_IPH_LEN)    /* Size of IP +
+							  TCP
+							  header */
+#define UIP_TCPIP_HLEN UIP_IPTCPH_LEN
+
+#define UIP_LLH_LEN     14
+
+#define UIP_BUFSIZE     (XTCP_CLIENT_BUF_SIZE + UIP_LLH_LEN + UIP_TCPIP_HLEN)
+
+
 
 #ifdef UIP_USE_SINGLE_THREADED_ETHERNET
 
@@ -22,6 +39,10 @@
 
 #if (UIP_SINGLE_THREAD_RX_BUFFER_SIZE) < (UIP_MIN_SINGLE_THREAD_RX_BUFFER_SIZE)
 #warning UIP_SINGLE_THREAD_RX_BUFFER_SIZE is set too small for correct operation
+#endif
+
+#ifndef UIP_MAX_TRANSMIT_SIZE
+#define UIP_MAX_TRANSMIT_SIZE 1520
 #endif
 
 #include "xtcp_server.h"
@@ -56,12 +77,24 @@ extern void igmp_periodic();
 void xcoredev_send(chanend tx)
 {
 #ifdef UIP_SINGLE_SERVER_DOUBLE_BUFFER_TX
-	static int txbuf0[1520/4];
-	static int txbuf1[1520/4];
+  static int txbuf0[(UIP_MAX_TRANSMIT_SIZE+3)/4];
+	static int txbuf1[(UIP_MAX_TRANSMIT_SIZE+3)/4];
 	static int tx_buf_in_use=0;
 	static int n=0;
 
 	unsigned nWords = (uip_len+3)>>2;
+
+        if (uip_len > UIP_MAX_TRANSMIT_SIZE) {
+#ifdef UIP_DEBUG_MAX_TRANSMIT_SIZE
+          printstr("Error: Trying to send too big a packet: ");
+          printint(uip_len);
+          printstr(" bytes.\n");
+#endif
+          return;
+        }
+
+
+
 	switch (n) {
 	case 0:
 		for (unsigned i=0; i<nWords; ++i) { txbuf0[i] = uip_buf32[i]; }
@@ -78,7 +111,7 @@ void xcoredev_send(chanend tx)
 	}
     tx_buf_in_use=1;
 #else
-    static int txbuf[1520/4];
+    static int txbuf[(UIP_MAX_TRANSMIT_SIZE+3)/4];
     static int tx_buf_in_use=0;
 
 	unsigned nWords = (uip_len+3)>>2;
@@ -176,12 +209,14 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 			do {
 				{address,length,timeStamp} = miiGetInBuffer(miiData);
 				if (address != 0) {
-					static unsigned pcnt=1;
-					uip_len = length;
-					copy_packet(uip_buf32, address, length);
-					xtcp_process_incoming_packet(mac_tx);
-		            miiFreeInBuffer(miiData, address);
-		            miiRestartBuffer(miiData);
+                                  static unsigned pcnt=1;
+                                  uip_len = length;
+                                  if (length <= UIP_BUFSIZE) {
+                                    copy_packet(uip_buf32, address, length);
+                                    xtcp_process_incoming_packet(mac_tx);
+                                  }
+                                  miiFreeInBuffer(miiData, address);
+                                  miiRestartBuffer(miiData);
 				}
 			} while (address!=0);
 
