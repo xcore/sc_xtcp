@@ -82,6 +82,8 @@ uip_split_output_send(chanend mac_tx)
 	xcoredev_send(mac_tx);
 }
 
+void check_time1();
+void check_time2();
 
 // The purpose of this function is to defeat Neagles Algorithm.  For packets
 // over half of the size of the max frame size (which we assume to be part of
@@ -157,7 +159,9 @@ uip_split_output(chanend mac_tx)
 			uip_add32(BUF->seqno, len1);
 			xtcp_copy_word(BUF->seqno, uip_acc32);
 
+                        check_time1();
 			uip_split_output_send(mac_tx);
+                        check_time2();
 		} else {
 			// We didn't compute the checksum earlier
 			BUF->tcpchksum = 0;
