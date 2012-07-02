@@ -722,6 +722,9 @@ static void uip_add_rcv_nxt(u16_t n) {
 	xtcp_copy_word(uip_conn->rcv_nxt, uip_acc32);
 }
 /*---------------------------------------------------------------------------*/
+
+void xtcpd_init_send_from_uip(struct uip_conn *conn);
+
 void uip_process(u8_t flag) {
 	register struct uip_conn *uip_connr = uip_conn;
 
@@ -750,6 +753,8 @@ void uip_process(u8_t flag) {
                     #endif
                     ) {
 			uip_flags = UIP_POLL;
+                        uip_len = 0;
+                        uip_slen = 0;
 			UIP_APPCALL();
 			goto appsend;
 		}
@@ -1917,6 +1922,13 @@ void uip_process(u8_t flag) {
           uip_add32(BUF->seqno, uip_connr->midpoint);
           xtcp_copy_word(BUF->seqno, uip_acc32);
           uip_connr->midpoint = 0;
+        }
+        else if (!uip_do_split && uip_slen) {
+          // This case means we have only sent a half packet, we can send more
+          // if needed
+          uip_connr->midpoint = uip_slen;
+          // A call up to the xtcp stack to initiate a new send request
+          xtcpd_init_send_from_uip(uip_connr);
         }
 #endif
 	BUF->proto = UIP_PROTO_TCP;

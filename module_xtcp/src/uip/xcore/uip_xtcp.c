@@ -259,6 +259,12 @@ void xtcpd_init_send(int linknum, int conn_id)
 }
 
 
+void xtcpd_init_send_from_uip(struct uip_conn *conn)
+{
+  xtcpd_state_t *s = &(conn->appstate);
+  s->s.send_request++;
+}
+
 void xtcpd_set_appstate(int linknum, int conn_id, xtcp_appstate_t appstate)
 {
   xtcpd_state_t *s = lookup_xtcpd_state(conn_id);
