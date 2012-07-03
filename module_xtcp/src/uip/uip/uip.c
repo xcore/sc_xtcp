@@ -731,6 +731,7 @@ void uip_process(u8_t flag) {
 
         #if UIP_SLIDING_WINDOW
         uip_do_split = 0;
+        uip_slen = 0;
         #endif
 
 
