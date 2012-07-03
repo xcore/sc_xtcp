@@ -1698,7 +1698,11 @@ void uip_process(u8_t flag) {
 		 we acknowledge. If the application has stopped the dataflow
 		 using uip_stop(), we must not accept any data packets from the
 		 remote host. */
-		if (uip_len > 0 && !(uip_connr->tcpstateflags & UIP_STOPPED)) {
+		if (uip_len > 0
+                    #ifndef UIP_ACCEPT_PACKETS_AFTER_PAUSE
+                    && !(uip_connr->tcpstateflags & UIP_STOPPED)
+                    #endif
+                    ) {
 			uip_flags |= UIP_NEWDATA;
 			uip_add_rcv_nxt(uip_len);
 		}

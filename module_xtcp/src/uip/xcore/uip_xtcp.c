@@ -504,15 +504,17 @@ xtcpd_appcall(void)
 
   if (uip_newdata() && uip_len > 0) {
     if (s->linknum != -1) {
-      if (!uip_udpconnection() && s->s.ack_recv_mode) {
-        uip_stop();
-      }      
+
       xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
       
       xtcpd_recv(xtcp_links, s->linknum, xtcp_num,
                  s, 
                  uip_appdata, 
-                 uip_datalen());   
+                 uip_datalen());
+
+      if (!uip_udpconnection() && s->s.ack_recv_mode) {
+        uip_stop();
+      }
     }
 
   }
