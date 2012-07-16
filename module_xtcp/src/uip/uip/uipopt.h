@@ -542,4 +542,11 @@ typedef struct httpd_state uip_tcp_appstate_t
 /** @} */
 /** @} */
 
+
+#ifdef UIP_CONF_SLIDING_WINDOW
+#define UIP_SLIDING_WINDOW UIP_CONF_SLIDING_WINDOW
+#else
+#define UIP_SLIDING_WINDOW 0
+#endif
+
 #endif /* __UIPOPT_H__ */

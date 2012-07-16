@@ -43,6 +43,6 @@ void xtcpd_ack_recv_mode(int conn_id);
 
 void xtcpd_pause(int conn_id);
 void xtcpd_unpause(int conn_id);
-
+void xtcpd_accept_partial_ack(int conn_id);
 
 #endif 

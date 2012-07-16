@@ -119,6 +119,9 @@ void xtcpd_init_state(xtcpd_state_t *s,
   s->conn.remote_port = HTONS(remote_port);
   s->conn.protocol = protocol;
   s->s.uip_conn = (int) conn;
+#ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
+  s->s.accepts_partial_ack = 0;
+#endif
   for (i=0;i<4;i++)
     s->conn.remote_addr[i] = remote_addr[i];
   guid++;
@@ -249,11 +252,18 @@ void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr,
 void xtcpd_init_send(int linknum, int conn_id)
 {
   xtcpd_state_t *s = lookup_xtcpd_state(conn_id);
+
   if (s != NULL) {
     s->s.send_request++;
   }
 }
 
+
+void xtcpd_init_send_from_uip(struct uip_conn *conn)
+{
+  xtcpd_state_t *s = &(conn->appstate);
+  s->s.send_request++;
+}
 
 void xtcpd_set_appstate(int linknum, int conn_id, xtcp_appstate_t appstate)
 {
@@ -316,7 +326,60 @@ void xtcpd_unpause(int conn_id)
   }
 }
 
+#ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
+void xtcpd_accept_partial_ack(int conn_id)
+{
+  xtcpd_state_t *s = lookup_xtcpd_state(conn_id);
+  if (s != NULL) {
+    s->s.accepts_partial_ack = 1;
+  }
+}
+#endif
+
 extern u16_t uip_slen;
+
+static int do_xtcpd_send(chanend c,
+                  xtcp_event_type_t event,
+                  xtcpd_state_t *s,
+                  unsigned char data[],
+                  int mss)
+{
+  int len;
+#ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
+  int outstanding=0;
+  if (!uip_udpconnection()) {
+    if (!s->s.accepts_partial_ack && uip_conn->len > 1)
+      return 0;
+
+    outstanding = uip_conn->len;
+    if (outstanding == 1)
+      outstanding = 0;
+    s->conn.outstanding = outstanding;
+
+  }
+#endif
+
+  xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
+  len = xtcpd_send(c,event,s,data,mss);
+
+#ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
+  if (!uip_udpconnection()) {
+    if (outstanding != 0 &&
+        len > outstanding) {
+      len = len - outstanding;
+      memmove((char *) uip_appdata,
+              &((char *)uip_appdata)[outstanding],
+              len);
+    }
+    else if (outstanding > 0) {
+      len = 0;
+    }
+  }
+#endif
+  return len;
+}
+
+
 
 void uip_xtcpd_handle_poll(xtcpd_state_t *s)
 {
@@ -359,8 +422,7 @@ void uip_xtcpd_handle_poll(xtcpd_state_t *s)
   else if (s->s.send_request) {
     int len;
     if (s->linknum != -1) {
-      xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
-      len = xtcpd_send(xtcp_links[s->linknum], 
+      len = do_xtcpd_send(xtcp_links[s->linknum],
                        XTCP_REQUEST_DATA,
                        s, 
                        uip_appdata,
@@ -438,33 +500,21 @@ xtcpd_appcall(void)
 
     }
   }
-  
-  if (uip_acked()) {
-    int len;
-    if (s->linknum != -1) {
-      xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
-      len = xtcpd_send(xtcp_links[s->linknum], 
-                       XTCP_SENT_DATA, 
-                       s, 
-                       uip_appdata,
-                       uip_udpconnection() ? XTCP_CLIENT_BUF_SIZE : uip_mss());
-      if (len != 0)
-        uip_send(uip_appdata, len);
-    }
-  }  
 
 
-    if (uip_newdata() && uip_len > 0) {
+  if (uip_newdata() && uip_len > 0) {
     if (s->linknum != -1) {
-      if (!uip_udpconnection() && s->s.ack_recv_mode) {
-        uip_stop();
-      }      
+
       xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
       
       xtcpd_recv(xtcp_links, s->linknum, xtcp_num,
                  s, 
                  uip_appdata, 
-                 uip_datalen());   
+                 uip_datalen());
+
+      if (!uip_udpconnection() && s->s.ack_recv_mode) {
+        uip_stop();
+      }
     }
 
   }
@@ -477,11 +527,30 @@ xtcpd_appcall(void)
     xtcpd_event(XTCP_TIMED_OUT, s);
     return;
   }
-  
+
+
+  if (uip_acked()) {
+    int len;
+    if (s->linknum != -1) {
+      len =
+        do_xtcpd_send(xtcp_links[s->linknum],
+                      XTCP_SENT_DATA,
+                      s,
+                      uip_appdata,
+                      uip_udpconnection() ? XTCP_CLIENT_BUF_SIZE : uip_mss());
+
+      uip_send(uip_appdata, len);
+    }
+  }  
+
+
   if (uip_rexmit()) {
     int len;
     if (s->linknum != -1) {
-      xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);    
+      xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
+#ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
+      s->conn.outstanding = 0;
+#endif
       len = xtcpd_send(xtcp_links[s->linknum], 
                        XTCP_RESEND_DATA, 
                        s, 

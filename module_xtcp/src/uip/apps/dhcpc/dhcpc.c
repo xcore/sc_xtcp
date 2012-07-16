@@ -68,6 +68,7 @@ struct dhcp_msg {
   u8_t sname[64];
   u8_t file[128];
 #endif
+
   u8_t options[312];
 };
 
@@ -202,7 +203,7 @@ send_request(void)
   end = add_server_id(end);
   end = add_req_ipaddr(end);
   end = add_end(end);
-  
+
   uip_send(uip_appdata, end - (u8_t *)uip_appdata);
 }
 /*---------------------------------------------------------------------------*/

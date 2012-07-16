@@ -201,6 +201,12 @@ static void handle_xtcp_cmd(chanend c,
       break;
     }
 #endif
+#ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
+    case XTCP_CMD_ACCEPT_PARTIAL_ACK: {
+      xtcpd_accept_partial_ack(conn_id);
+      break;
+    }
+#endif
     }
 }
 

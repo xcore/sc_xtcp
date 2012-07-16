@@ -60,6 +60,9 @@
 
 
 /*-----------------------------------------------------------------------------*/
+#if UIP_SLIDING_WINDOW
+extern int uip_do_split;
+#endif
 
 static void
 uip_split_output_send(chanend mac_tx)
@@ -95,8 +98,13 @@ uip_split_output(chanend mac_tx)
 	u16_t tcplen, len1, len2;
 
 	if (BUF->proto == UIP_PROTO_TCP) {
+#if UIP_SLIDING_WINDOW
+          if (uip_do_split)
+#else
           int data_len = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
-          if (data_len > ACTUAL_UIP_PACKET_SPLIT_THRESHOLD) {
+          if (data_len > ACTUAL_UIP_PACKET_SPLIT_THRESHOLD)
+#endif
+            {
 			tcplen = uip_len - UIP_TCPIP_HLEN - UIP_LLH_LEN;
 			/* Split the segment in two, making sure the first segment is an
 			 * integer number of words */

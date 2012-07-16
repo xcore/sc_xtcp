@@ -173,6 +173,9 @@ typedef struct xtcp_connection_t {
   unsigned int local_port;  /**< The local port of the connection. */
   unsigned int mss;  /**< The maximum size in bytes that can be send using
                         xtcp_send() after a send event */
+#ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
+  unsigned int outstanding; /**< The amount left inflight after a partial packet has been acked */
+#endif
 } xtcp_connection_t;
 
 
@@ -536,7 +539,19 @@ void xtcp_pause(chanend c_xtcp,
 void xtcp_unpause(chanend c_xtcp,
                   REFERENCE_PARAM(xtcp_connection_t,conn));
 
+
+/** \brief Enable a connection to accept acknowledgements of partial packets that have been sent.
+ *
+ *  \param c_xtcp	chanend connected to the xtcp server
+ *  \param conn		tcp connection structure
+ */
+void xtcp_accept_partial_ack(chanend c_xtcp,
+                             REFERENCE_PARAM(xtcp_connection_t,conn));
+
+
 //!@}
+
+
 
 #endif // _xtcp_client_h_
 
