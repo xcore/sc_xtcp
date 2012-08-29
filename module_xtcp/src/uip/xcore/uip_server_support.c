@@ -146,7 +146,9 @@ void xtcp_process_incoming_packet(chanend mac_tx)
 		uip_arp_ipin();
 		uip_input();
 		if (uip_len > 0) {
-			if (uip_udpconnection())
+			if (uip_udpconnection()
+				&& (TCPBUF->proto != UIP_PROTO_ICMP)
+				&& (TCPBUF->proto != UIP_PROTO_IGMP))
 				uip_arp_out( uip_udp_conn);
 			else
 				uip_arp_out( NULL);

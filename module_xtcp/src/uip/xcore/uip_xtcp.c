@@ -25,6 +25,10 @@
 #define MAX_GUID 200
 static int guid = 1;
 
+#if ((UIP_UDP_CONNS+UIP_CONNS) > MAX_GUID)
+  #error "Cannot have more connections than GUIDs"
+#endif
+
 static chanend *xtcp_links;
 static int xtcp_num;
 
@@ -112,6 +116,14 @@ void xtcpd_init_state(xtcpd_state_t *s,
 
   memset(s, 0, sizeof(xtcpd_state_t));
 
+  // Find and use a GUID that is not being used by another connection
+  while (lookup_xtcpd_state(guid) != NULL)
+  {
+    guid++;
+    if (guid > MAX_GUID) 
+      guid = 1;
+  }
+
   s->conn.connection_type = connection_type;
   s->linknum = linknum;
   s->conn.id = guid;  
@@ -124,10 +136,6 @@ void xtcpd_init_state(xtcpd_state_t *s,
 #endif
   for (i=0;i<4;i++)
     s->conn.remote_addr[i] = remote_addr[i];
-  guid++;
-  if (guid>MAX_GUID) 
-    guid = 1;
-
 }
 
 
