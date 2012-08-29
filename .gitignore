@@ -1,9 +1,5 @@
-app_*/.build*
-app_*/bin
-test_*/.build*
-test_*/bin
-doc/.doxygen
-doc/.linked_dirs
-doc/.sources
-doc/Doxyfile-e
-doc/_build
+*.build*
+*/bin/*
+experimental/*/bin/*
+tests/*/bin/*
+*_build/*
