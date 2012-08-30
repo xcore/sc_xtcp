@@ -1,11 +1,6 @@
-DEPENDENT_MODULES = module_ethernet
+DEPENDENT_MODULES = module_ethernet module_otp_board_info
 
-XTCP_SOURCE_DIRS =  src/uip/uip \
-	       src/uip/xcore \
-               src/uip/apps/dhcpc \
-               src/uip/apps/autoip \
-               src/uip/apps/igmp \
-               src/xtcp 
+XTCP_SOURCE_DIRS = src src/xtcp_uip/*
 
 SOURCE_DIRS += $(XTCP_SOURCE_DIRS)
 
@@ -13,7 +8,7 @@ INCLUDE_DIRS += $(XTCP_SOURCE_DIRS)
 
 EXCLUDE_FILES += uip-fw.c uip-neighbor.c
 
-OPTIONAL_HEADERS += xtcp_client_conf.h
+OPTIONAL_HEADERS += xtcp_client_conf.h xtcp_conf.h
 
 ifeq ($(USE_XTCP_MAC_CUSTOM_FILTER),1)
 INCLUDE_DIRS += src/mac_custom_filter
