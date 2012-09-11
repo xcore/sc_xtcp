@@ -3,17 +3,19 @@
 #include "uip_server.h"
 #include <xccompat.h>
 #include "otp_board_info.h"
-#include "ethernet_quickstart.h"
+#include "ethernet.h"
 
 typedef struct ethernet_xtcp_ports_s {
-  otp_ports_t otp_ports;  
+  otp_ports_t otp_ports;
   smi_interface_t smi;    
   mii_interface_lite_t mii;
+  ethernet_reset_interface_t eth_rst;
 } ethernet_xtcp_ports_t;
 
-#define XTCP_ETHERNET_PORTS_INIT {OTP_PORTS_INITIALIZER, \
-                                 ETH_QUICKSTART_SMI_INIT, \
-                                 ETH_QUICKSTART_MII_LITE_INIT}
+#define ETHERNET_XTCP_DEFAULT_PORTS_INIT {OTP_PORTS_INITIALIZER, \
+      ETHERNET_DEFAULT_SMI_INIT,                                 \
+      ETHERNET_DEFAULT_MII_INIT_lite,                            \
+      ETHERNET_DEFAULT_RESET_INTERFACE_INIT}
 
 
 void ethernet_xtcp_server(REFERENCE_PARAM(ethernet_xtcp_ports_t, ports),

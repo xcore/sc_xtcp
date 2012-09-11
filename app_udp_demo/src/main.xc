@@ -5,10 +5,9 @@
 
 #include <platform.h>
 #include "print.h"
-#include "ethernet_xtcp_server.h"
-#include "xtcp_client.h"
+#include "xtcp.h"
 
-ethernet_xtcp_ports_t xtcp_ports = XTCP_ETHERNET_PORTS_INIT;
+ethernet_xtcp_ports_t xtcp_ports = ETHERNET_XTCP_DEFAULT_PORTS_INIT;
 
 // IP Config - change this to suit your network.  Leave with all
 // 0 values to use DHCP/AutoIP
@@ -207,10 +206,10 @@ int main(void) {
 	par
 	{
 		// The TCP/IP server thread
-               on stdcore[ETH_CORE]: ethernet_xtcp_server(xtcp_ports,
-                                                          ipconfig,
-                                                          xtcp,
-                                                          1);
+               on ETHERNET_DEFAULT_TILE: ethernet_xtcp_server(xtcp_ports,
+                                                              ipconfig,
+                                                              xtcp,
+                                                              1);
                 // The simple udp reflector thread
                 on stdcore[0]: udp_reflect(xtcp[0]);
 

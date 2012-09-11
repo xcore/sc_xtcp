@@ -8,6 +8,7 @@
 #include <safestring.h>
 #include <print.h>
 
+#include "xtcp_conf_derived.h"
 
 #if !XTCP_SEPARATE_MAC
 

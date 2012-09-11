@@ -1,13 +1,9 @@
-// Copyright (c) 2011, XMOS Ltd, All rights reserved
-// This software is freely distributable under a derivative of the
-// University of Illinois/NCSA Open Source License posted in
-// LICENSE.txt and at <http://github.xcore.com/>
+#ifndef __standalone_xtcp_server_h__
+#define __standalone_xtcp_server_h__
 
-#ifndef _uip_server_h_
-#define _uip_server_h_
-#include "xtcp_client.h"
-
-/**  uIP based xtcp server.
+#include "xccompat.h"
+#include "uip_server.h"
+/**  xtcp TCP/IP server.
  *
  *  \param mac_rx           Rx channel connected to ethernet server
  *  \param mac_tx           Tx channel connected to ethernet server
@@ -33,23 +29,14 @@
  *
  *  \sa  xtcp_event()
  **/
-#ifdef __XC__
 void
-xtcp_server_uip(chanend mac_rx,
-                chanend mac_tx,
-                chanend xtcp[],
-                int num_xtcp_clients,
-                xtcp_ipconfig_t &?ipconfig,
-                chanend connect_status);
-#else
-void xtcp_server_uip(chanend mac_rx,
-                     chanend mac_tx,
-                     chanend xtcp[],
-                     int num_xtcp_clients,
-                     xtcp_ipconfig_t *ipconfig,
-                     chanend connect_status);
-#endif
+xtcp_server(chanend mac_rx,
+           chanend mac_tx, 
+           chanend xtcp[], 
+           int num_xtcp_clients,
+           NULLABLE_REFERENCE_PARAM(xtcp_ipconfig_t, ipconfig),
+           chanend connect_status);
 
-#define uip_server xtcp_server_uip
+#define xtcp_server xtcp_server_uip
 
-#endif // _uip_server_h_
+#endif // __standalone_xtcp_server_h__

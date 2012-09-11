@@ -39,8 +39,8 @@ extern xtcp_ipconfig_t uip_static_ipconfig;
 
 #if XTCP_SEPARATE_MAC
 
-void uip_server(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
-		xtcp_ipconfig_t *ipconfig, chanend connect_status) {
+void xtcp_server_uip(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
+                     xtcp_ipconfig_t *ipconfig, chanend connect_status) {
 
 	struct uip_timer periodic_timer, arp_timer, autoip_timer;
 	unsigned char hwaddr[6];

@@ -1,3 +1,10 @@
+Simple webserver demo
+=====================
+
+:scope: Early Development
+:description: A demo of the TCP/IP stack that provides a simple webserver
+:keywords: ethernet, tcp/ip, webserver, http
+
 This application uses the tcp/ip stack to produce a simple
 webserver. It is here as an illustration on how to use the xtcp stack.
 
@@ -15,12 +22,4 @@ Now build the project and connect the XC-2 to the network. You should
 be able to connect to the ip address you specified with a web browser
 and see a "Hello World" message.
 
-Key Source Files:
-
-    main.xc : top-level file showing what threads are running
-
-    xhttpd.xc : The mainloop of the http server (communicating with
-                the tcp/ip server over a channel)
-
-    httpd.c : The logic that handles events (page requests etc.) for
-              the httpd server. 
+<Add description of software block>

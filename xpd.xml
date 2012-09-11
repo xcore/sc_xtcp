@@ -1,14 +1,19 @@
 <?xml version="1.0" ?>
 <xpd>
+    <components>
+        <component description = "Software Block: module_zeroconf" scope = "Experimental" path = "module_zeroconf" type = "demoCode" id = "module_zeroconf" name = "module_zeroconf"></component>
+        <component description = "Software Block: module_tftp" scope = "Experimental" path = "module_tftp" type = "demoCode" id = "module_tftp" name = "module_tftp"></component>
+        <component description = "Software Block: app_udp_demo" scope = "Experimental" path = "app_udp_demo" type = "demoCode" id = "app_udp_demo" name = "app_udp_demo"></component>
+        <component description = "Software Block: app_simple_webserver" scope = "Experimental" path = "app_simple_webserver" type = "demoCode" id = "app_simple_webserver" name = "app_simple_webserver"></component>
+        <component description = "Software Block: module_xtcp" scope = "Experimental" path = "module_xtcp" type = "demoCode" id = "module_xtcp" name = "module_xtcp"></component>
+    </components>
     <dependency repo = "sc_ethernet">
-        <githash>e0d8f57a0f817547484f00be5231b536439397d2</githash>
+        <githash>7dbb6591ee35aadc015b1b6aac3742d39d14c038</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.1.2rc0</version>
     </dependency>
     <dependency repo = "xcommon">
-        <githash>3416f530590333980bbe152a9123b16becdb441f</githash>
+        <githash>cdcfc87c8c6047bf8d21f13222cbe9e84c6c5e01</githash>
         <uri>https://github.com/xcore/xcommon.git</uri>
-        <version>1.0.0rc1</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>doc</docdir>
@@ -29,9 +34,9 @@
     <release parenthash = "65f5cd034ebb1da88834fd06515306b8f13ae15b" version = "2.0.1rc0" githash = "cf96150b4fad5dd8addbeb6a907b0b613b34cf7e"></release>
     <release parenthash = "8f2d825bf61a69c59d4f066854ea9a13ec2400d0" version = "3.0.0rc0" githash = "7fea8b948e17e63288891453e92caf2411ddbe87"></release>
     <release parenthash = "23f532b68733764f459783abf49a9b31cfdbf412" version = "3.0.0rc1" githash = "7070ef5d716d8948240664402c8bee8a8a4ead41"></release>
-    <release parenthash = "7f42220808016c1b91115a817c4f2db8246591f2" version = "3.0.1rc0"></release>
-    <scope>product</scope>
+    <release parenthash = "7f42220808016c1b91115a817c4f2db8246591f2" version = "3.0.1rc0" githash = "65cd05d017456b067f12487dd0ed05aff113a800"></release>
     <subpartnumber>XM-000074-SW</subpartnumber>
     <vendor>XMOS</vendor>
     <xpd_version>1.0</xpd_version>
+    <scope>product</scope>
 </xpd>
