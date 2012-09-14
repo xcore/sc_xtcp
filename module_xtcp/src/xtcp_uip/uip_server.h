@@ -39,15 +39,13 @@ xtcp_server_uip(chanend mac_rx,
                 chanend mac_tx,
                 chanend xtcp[],
                 int num_xtcp_clients,
-                xtcp_ipconfig_t &?ipconfig,
-                chanend connect_status);
+                xtcp_ipconfig_t &?ipconfig);
 #else
 void xtcp_server_uip(chanend mac_rx,
                      chanend mac_tx,
                      chanend xtcp[],
                      int num_xtcp_clients,
-                     xtcp_ipconfig_t *ipconfig,
-                     chanend connect_status);
+                     xtcp_ipconfig_t *ipconfig);
 #endif
 
 #define uip_server xtcp_server_uip

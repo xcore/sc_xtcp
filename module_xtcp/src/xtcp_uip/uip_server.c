@@ -40,7 +40,7 @@ extern xtcp_ipconfig_t uip_static_ipconfig;
 #if XTCP_SEPARATE_MAC
 
 void xtcp_server_uip(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtcp,
-                     xtcp_ipconfig_t *ipconfig, chanend connect_status) {
+                     xtcp_ipconfig_t *ipconfig) {
 
 	struct uip_timer periodic_timer, arp_timer, autoip_timer;
 	unsigned char hwaddr[6];
@@ -63,7 +63,6 @@ void xtcp_server_uip(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtc
 		xtcpd_check_connection_poll(mac_tx);
 
 		uip_xtcp_checkstate();
-		uip_xtcp_checklink(connect_status);
 		uip_len = xcoredev_read(mac_rx, UIP_CONF_BUFFER_SIZE);
 		if (uip_len > 0) {
 			xtcp_process_incoming_packet(mac_tx);

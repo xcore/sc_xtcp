@@ -5,7 +5,7 @@
 
 #include <print.h>
 #include <xs1.h>
-
+#include "uip_xtcp.h"
 #include "xtcp_conf_derived.h"
 
 #if XTCP_SEPARATE_MAC
@@ -24,6 +24,7 @@ xcoredev_init(chanend rx, chanend tx)
   // Configure the mac link to send the server anything
   // arp or ip
   mac_set_custom_filter(rx, MAC_FILTER_ARPIP);
+  mac_request_status_packets(rx);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -36,6 +37,15 @@ xcoredev_read(chanend rx, int n)
   select 
     {
     case safe_mac_rx(rx, (uip_buf32, unsigned char[]), len, src_port, n):
+      if (len == STATUS_PACKET_LEN) {
+        if ((uip_buf32, unsigned char[])[0]) {
+          uip_linkup();
+        }
+        else {
+          uip_linkdown();
+        }
+        return 0;
+      }
       break;
     default:      
       break;
