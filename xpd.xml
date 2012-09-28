@@ -29,18 +29,16 @@
         </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>c32177d0564e2153e9e54cb7905b2d8c2a475264</githash>
+        <githash>a88339a89849daf6a2a4b9ba543594577a64c4c0</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.2.0alpha12</version>
     </dependency>
     <dependency repo = "xcommon">
         <githash>cdcfc87c8c6047bf8d21f13222cbe9e84c6c5e01</githash>
         <uri>https://github.com/xcore/xcommon.git</uri>
     </dependency>
     <dependency repo = "sc_otp">
-        <githash>f859001b0882223ed8f836499a396f26f6acedbd</githash>
+        <githash>2dc4b25aceaf52d61b8bb41575a53c399043413e</githash>
         <uri>git@github.com:xcore/sc_otp</uri>
-        <version>1.0.0beta0</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>doc</docdir>
@@ -66,5 +64,8 @@
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
     <xpd_version>1.0</xpd_version>
+    <xsoftip_exclude>module_zeroconf</xsoftip_exclude>
+    <xsoftip_exclude>module_tftp</xsoftip_exclude>
+    <xsoftip_exclude>app_udp_demo</xsoftip_exclude>
     <scope>product</scope>
 </xpd>
