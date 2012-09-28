@@ -1,6 +1,11 @@
 TCP/IP Component Changelog
 ==========================
 
+3.1.0
+~~~~~
+  * Compatible with 2.2 module_ethernet
+  * Updated to new intializer api and integrated ethernet server
+
 3.0.1
 ~~~~~
 
