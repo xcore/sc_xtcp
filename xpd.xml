@@ -51,7 +51,6 @@
     <location>ssh://git@github.com/davelxmos/sc_xtcp</location>
     <name>sc_xtcp</name>
     <maintainer>davidn@xmos.com</maintainer>
-    <partnumber>XM-001640-DH</partnumber>
     <release parenthash = "33e5b987446bbbd97e17cbc4089efce5d903b131" version = "1.3.1beta0" githash = "f814b4d48ab22c2475e17a6b743c912e7e4d1d79"></release>
     <release parenthash = "8362ada5fe9cec24f7afad2fd7847e3c44bdb8ba" version = "1.3.1beta1" githash = "bb2affe1c1319538bd430e8165e459b98a253c2b"></release>
     <release parenthash = "e3fd243f2baf9daaf1aa1b517be5426eaa7bc640" version = "2.0.0rc0" githash = "ea3926887c68d4158c616e176500feccc240649c"></release>
@@ -61,7 +60,6 @@
     <release parenthash = "23f532b68733764f459783abf49a9b31cfdbf412" version = "3.0.0rc1" githash = "7070ef5d716d8948240664402c8bee8a8a4ead41"></release>
     <release parenthash = "7f42220808016c1b91115a817c4f2db8246591f2" version = "3.0.1rc0" githash = "65cd05d017456b067f12487dd0ed05aff113a800"></release>
     <release parenthash = "3bfff1ac614b83079dd5e717b54fdb5a3de3f94b" version = "3.1.0alpha0"></release>
-    <subpartnumber>XM-000074-SW</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
     <xpd_version>1.0</xpd_version>
