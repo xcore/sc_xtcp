@@ -3,6 +3,6 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
-#include "mac_custom_filter.h"
+#include "xtcp_mac_filter.h"
 
 extern int mac_custom_filter(unsigned int buf[]);

@@ -5,7 +5,7 @@
 
 #include <print.h>
 #include "config.h"
-#include "ethernet.h"
+#include "pip_ethernet.h"
 #include "ipv4.h"
 #include "arp.h"
 #include "tx.h"

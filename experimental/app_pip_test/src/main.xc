@@ -7,14 +7,14 @@
 #include <print.h>
 #include <stdio.h>
 #include "smi.h"
-#include "miiDriver.h"
+#include "mii_driver.h"
 #include "mii.h"
-#include "getmac.h"
 #include "xscope.h"
 #include "pipServer.h"
 #include "tcpApplication.h"
 #include "udpApplication.h"
 #include "pip_conf.h"
+#include "otp_board_info.h"
 
 #define ETHCORE 1
 
@@ -44,7 +44,7 @@ on stdcore[ETHCORE]: smi_interface_t smi = { 0, PORT_ETH_MDIO, PORT_ETH_MDC };
 
 on stdcore[ETHCORE]: clock clk_smi = XS1_CLKBLK_5;
 
-on stdcore[ETHCORE]: struct otp_ports p = {XS1_PORT_32B, XS1_PORT_16C, XS1_PORT_16D };
+on stdcore[ETHCORE]: otp_ports_t otp_ports = OTP_PORTS_INITIALIZER;
 
 static void httpServer(streaming chanend tcpStack) {
     unsigned char buf[12];
@@ -151,8 +151,8 @@ int main(void) {
 	par
 	{
 	 	on stdcore[ETHCORE]: {
-	 		ethernet_getmac_otp(p, myMacAddress);
-            p_mii_resetn <: 2;            
+            otp_board_info_get_mac(otp_ports, 0, myMacAddress);
+                        p_mii_resetn <: 2;
 	 		pipServer(clk_smi, p_mii_resetn, smi, mii, tcpApps, udpApps);
 	 	}
 

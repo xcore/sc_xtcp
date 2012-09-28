@@ -11,7 +11,7 @@
 #include "rx.h"
 #include "tx.h"
 #include "udp.h"
-#include "ethernet.h"
+#include "pip_ethernet.h"
 #include "timer.h"
 
 

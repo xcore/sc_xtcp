@@ -12,7 +12,7 @@
 #include "ipv4.h"
 #include "rx.h"
 #include "tx.h"
-#include "ethernet.h"
+#include "pip_ethernet.h"
 #include "timer.h"
 #include "linklocal.h"
 

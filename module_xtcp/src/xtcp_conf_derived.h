@@ -13,6 +13,9 @@
 #define XTCP_SEPARATE_MAC 0
 #endif
 
+#ifndef ETHERNET_USE_XTCP_FILTER
+#define ETHERNET_USE_XTCP_FILTER 1
+#endif
 
 
 #endif // __xtcp_conf_derived_h__

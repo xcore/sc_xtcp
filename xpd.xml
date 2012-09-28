@@ -1,19 +1,46 @@
 <?xml version="1.0" ?>
 <xpd>
     <components>
-        <component description = "Software Block: module_zeroconf" scope = "Experimental" path = "module_zeroconf" type = "demoCode" id = "module_zeroconf" name = "module_zeroconf"></component>
-        <component description = "Software Block: module_tftp" scope = "Experimental" path = "module_tftp" type = "demoCode" id = "module_tftp" name = "module_tftp"></component>
-        <component description = "Software Block: app_udp_demo" scope = "Experimental" path = "app_udp_demo" type = "demoCode" id = "app_udp_demo" name = "app_udp_demo"></component>
-        <component description = "Software Block: app_simple_webserver" scope = "Experimental" path = "app_simple_webserver" type = "demoCode" id = "app_simple_webserver" name = "app_simple_webserver"></component>
-        <component description = "Software Block: module_xtcp" scope = "Experimental" path = "module_xtcp" type = "demoCode" id = "module_xtcp" name = "module_xtcp"></component>
+        <component name = "Ethernet/TCP Module" type = "component" buildresults_path = "module_xtcp/.module_xtcp.buildinfo" scope = "General Use" path = "module_xtcp" metainfo_path = "module_xtcp/module_xtcp.metainfo" local = "false" id = "module_xtcp" description = "An ethernet stack with TCP/IP">
+            <board>XC-2</board>
+            <componentDependency>module_locks</componentDependency>
+            <componentDependency>module_ethernet_smi</componentDependency>
+            <componentDependency>module_ethernet</componentDependency>
+            <componentDependency>module_otp_board_info</componentDependency>
+            <keyword>ethernet</keyword>
+            <keyword>TCP/IP</keyword>
+            <keyword>mac</keyword>
+            <keyword>mii</keyword>
+            <keyword>IP</keyword>
+            <keyword>UDP</keyword>
+            <keyword>ICMP</keyword>
+            <keyword>UDP</keyword>
+        </component>
+        <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple webserver demo">
+            <componentDependency>module_ethernet_smi</componentDependency>
+            <componentDependency>module_xtcp</componentDependency>
+            <componentDependency>module_otp_board_info</componentDependency>
+            <componentDependency>module_locks</componentDependency>
+            <componentDependency>module_ethernet</componentDependency>
+            <keyword>ethernet</keyword>
+            <keyword>tcp/ip</keyword>
+            <keyword>webserver</keyword>
+            <keyword>http</keyword>
+        </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>7dbb6591ee35aadc015b1b6aac3742d39d14c038</githash>
+        <githash>c32177d0564e2153e9e54cb7905b2d8c2a475264</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
+        <version>2.2.0alpha12</version>
     </dependency>
     <dependency repo = "xcommon">
         <githash>cdcfc87c8c6047bf8d21f13222cbe9e84c6c5e01</githash>
         <uri>https://github.com/xcore/xcommon.git</uri>
+    </dependency>
+    <dependency repo = "sc_otp">
+        <githash>f859001b0882223ed8f836499a396f26f6acedbd</githash>
+        <uri>git@github.com:xcore/sc_otp</uri>
+        <version>1.0.0beta0</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>doc</docdir>
@@ -37,6 +64,7 @@
     <release parenthash = "7f42220808016c1b91115a817c4f2db8246591f2" version = "3.0.1rc0" githash = "65cd05d017456b067f12487dd0ed05aff113a800"></release>
     <subpartnumber>XM-000074-SW</subpartnumber>
     <vendor>XMOS</vendor>
+    <xcore_repo>sc_xtcp</xcore_repo>
     <xpd_version>1.0</xpd_version>
     <scope>product</scope>
 </xpd>

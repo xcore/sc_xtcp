@@ -13,7 +13,7 @@
 #include "udp.h"
 #include "linklocal.h"
 #include "ipv4.h"
-#include "ethernet.h"
+#include "pip_ethernet.h"
 #include "timer.h"
 
 #define DHCP_CLIENT_PORT     68

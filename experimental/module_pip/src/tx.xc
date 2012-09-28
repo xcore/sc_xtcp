@@ -8,9 +8,9 @@
 #include <xclib.h>
 #include <print.h>
 #include "config.h"
-#include "miiDriver.h"
+#include "mii_driver.h"
 #include "mii.h"
-#include "miiClient.h"
+#include "mii_client.h"
 #include "tx.h"
 
 short txbuf[PIP_ETHTX_WORDS*2];
@@ -21,8 +21,8 @@ void doTx(chanend cOut) {
         if (txbufLength < 64) {
             txbufLength = 64;
         }
-        miiOutPacket(cOut, (txbuf, int[]), 0, txbufLength);
-        miiOutPacketDone(cOut);
+        mii_out_packet(cOut, (txbuf, int[]), 0, txbufLength);
+        mii_out_packet_done(cOut);
         txbufLength = 0;
     }
 }

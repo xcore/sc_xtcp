@@ -9,12 +9,12 @@
 #include <print.h>
 #include "config.h"
 #include "smi.h"
-#include "miiDriver.h"
+#include "mii_driver.h"
 #include "mii.h"
-#include "miiClient.h"
+#include "mii_client.h"
 #include "pipServer.h"
 #include "tx.h"
-#include "ethernet.h"
+#include "pip_ethernet.h"
 #include "dhcp.h"
 #include "timer.h"
 #include "tcp.h"
@@ -51,8 +51,8 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
     timer t, t2;
     struct miiData miiData;
 
-    miiBufferInit(miiData, cIn, cNotifications, b, 3200);
-    miiOutInit(cOut);
+    mii_buffer_init(miiData, cIn, cNotifications, b, 3200);
+    mii_out_init(cOut);
 
     t2 :> thetime;
 
@@ -111,16 +111,16 @@ static void theServer(chanend cIn, chanend cOut, chanend cNotifications,
 #endif
         }
         if (!havePacket) {
-            {a,nBytes,timeStamp} = miiGetInBuffer(miiData);
+            {a,nBytes,timeStamp} = mii_get_in_buffer(miiData);
             if (a != 0) {
                 pipIncomingEthernetC(a);//TODO, nBytes);
-                miiFreeInBuffer(miiData, a);
-                miiRestartBuffer(miiData);
+                mii_free_in_buffer(miiData, a);
+                mii_restart_buffer(miiData);
             }
         }
         doTx(cOut);
     }
-    miiClose(cNotifications, cIn, cOut);
+    mii_close(cNotifications, cIn, cOut);
 }
 
 
@@ -132,13 +132,13 @@ void pipServer(clock clk_smi,
                streaming chanend udpApps[]) {
     chan cIn, cOut;
     chan notifications;
-    miiInitialise(p_mii_resetn, m);
+    mii_initialise(p_mii_resetn, m);
 #ifndef MII_NO_SMI_CONFIG
 	smi_port_init(clk_smi, smi);
 	eth_phy_config(1, smi);
 #endif
     par {
-        miiDriver(m, cIn, cOut);
+        mii_driver(m, cIn, cOut);
         theServer(cIn, cOut, notifications, tcpApps, udpApps);
         {
             while(1) {
@@ -147,7 +147,7 @@ void pipServer(clock clk_smi,
             t :> tu;
                 t when timerafter(tu + 100000000) :> void;
                 printstr("Link stat ");
-                printintln(smiCheckLinkState(smi));
+                printintln(smi_check_link_state(smi));
             }
         }
     }

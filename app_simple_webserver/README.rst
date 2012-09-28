@@ -1,7 +1,7 @@
 Simple webserver demo
 =====================
 
-:scope: Early Development
+:scope: Example
 :description: A demo of the TCP/IP stack that provides a simple webserver
 :keywords: ethernet, tcp/ip, webserver, http
 
@@ -22,4 +22,3 @@ Now build the project and connect the XC-2 to the network. You should
 be able to connect to the ip address you specified with a web browser
 and see a "Hello World" message.
 
-<Add description of software block>

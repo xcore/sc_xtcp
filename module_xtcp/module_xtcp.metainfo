@@ -1,0 +1,248 @@
+-- -*- mode: lua -*-
+
+configPoints = {
+   separate_mac = {
+      short = "Use a separate layer 2 MAC",
+      long = "The underlying implementation of the Ethernet MAC",
+      help = [[
+This component includes an ethernet MAC by default. If you want to connect it to a different MAC in your system then set this parameter to true.
+              ]],
+      type = "bool",
+      default = false,
+      define = "XTCP_SEPARATE_MAC";
+   },
+   num_clients = {
+      short = "Number of clients",
+      long = "Number of tasks that will connect to the xtcp server",
+      help = [[
+Number of tasks that will connect to the MAC for receiving packets. These tasks connect to the MAC via channels.
+              ]],
+      type = "int",
+      min = 1,
+      max = 8,
+      default = 1,
+      resourceUsageFlags = {"linear"},
+   },
+   combine_smi_ports = {
+      short = "Combine SMI ports on single port",
+      long = "Combine the MDC and MDIO ports for controlling the phy onto one 4 bit port",
+      help =
+[[
+If this option is selected then the SMI interface will use a single 4-bit port. Otherwise, two 1-bit ports are used.
+]],
+      type = "bool",
+      default = false,
+      resourceUsageFlags = {"noeffect"},
+      define = "SMI_COMBINE_MDC_MDIO",
+      enabled = not swblock.params.separate_mac
+   },
+   use_reset = {
+      short = "Use PHY reset signal",
+      long = "Use PHY reset signal",
+      help =
+[[
+   This option can be used if you want the MAC to assert a reset signal to
+the phy (using a 1-bit port).
+]],
+      type = "bool",
+      default = true,
+      resourceUsageFlags = {"noeffect"},
+      enabled = not swblock.params.separate_mac
+   },
+}
+
+derivedValues = {}
+
+
+ports = {
+  p_eth_rxclk = {
+    short   = "MII RX Clock",
+    long    = "Clock signal for MII RX",
+    help    = "",
+    width   = 1,
+    value   = "XS1_PORT_1A",
+    enabled = not swblock.params.separate_mac
+  },
+  p_eth_txclk = {
+    short   = "MII TX Clock",
+    long    = "Clock signal for MII TX",
+    help    = "",
+    width   = 1,
+    value   = "XS1_PORT_1C",
+    enabled = not swblock.params.separate_mac
+  },
+  p_eth_rxer = {
+    short   = "MII RX Error",
+    long    = "Error signal for MII RX",
+    help    = "",
+    width   = 1,
+    value   = "XS1_PORT_1B",
+    enabled = not swblock.params.separate_mac
+  },
+  p_eth_txd = {
+    short   = "MII TX Data",
+    long    = "Data line for transmit (mac to phy)",
+    help    = "",
+    width   = 4,
+    value   = "XS1_PORT_4D",
+    enabled = not swblock.params.separate_mac
+  },
+  p_eth_rxd = {
+    short   = "MII RX Data",
+    long    = "Data line for receive (phy to mac)",
+    help    = "",
+    width   = 4,
+    value   = "XS1_PORT_4C",
+    enabled = not swblock.params.separate_mac
+  },
+  p_eth_rstn = {
+    short   = "MII Reset",
+    long    = "MII Reset",
+    help    = "",
+    width   = 1,
+    value   = "XS1_PORT_1H",
+    enabled = not swblock.params.separate_mac and swblock.params.use_reset
+  },
+  p_eth_txen = {
+    short   = "MII TX enable",
+    long    = "Enable line for MII TX",
+    help    = "",
+    width   = 1,
+    value   = "XS1_PORT_1E",
+    enabled = not swblock.params.separate_mac
+  },
+  p_eth_rxdv = {
+    short   = "MII RX Data Valid",
+    long    = "Valid line for MII RX",
+    help    = "",
+    width   = 1,
+    value   = "XS1_PORT_1D",
+    enabled = not swblock.params.separate_mac
+  },
+  p_eth_fake = {
+    short   = "MII fake port",
+    long    = "MII lite fake port",
+    help    = "This port does not connect to any outside stimulus (hence is a 'fake'). However it is used internally by the implementation.",
+    width   = 8,
+    value   = "XS1_PORT_8A",
+    enabled = not swblock.params.separate_mac
+  },
+  p_eth_mdc = {
+    short   = "SMI MDC",
+    long    = "MDC clock signal for SMI phy configuration interface",
+    help    = "",
+    width   = 1,
+    value   = "XS1_PORT_1I",
+    enabled = not swblock.params.separate_mac and not swblock.params.combine_smi_ports
+  },
+  p_eth_mdio = {
+    short   = "SMI MDIO",
+    long    = "MDIO I/O signal for SMI phy configuration interface",
+    help    = "",
+    width   = 1,
+    value   = "XS1_PORT_1G",
+    enabled = not swblock.params.separate_mac and not swblock.params.combine_smi_ports
+  },
+  p_eth_mdc_mdio = {
+    short   = "SMI Combined MDC/MDIO",
+    long    = "Combined MDC/MDIO signal for SMI phy configuration",
+    help    = "This port combines the MDC/MDIO signals with the MDC signal being the top bit of the 4-bit port",
+    width   = 4,
+    value   = "XS1_PORT_4C",
+    enabled = not swblock.params.separate_mac and swblock.params.combine_smi_ports,
+  }
+}
+
+channels = {
+   c_xtcp = {
+      short = "xtcp client channel array",
+      long = "Channels for connection to tcp server",
+      help = "",
+      arraySize = swblock.params.num_clients
+   },
+   c_mac_tx = {
+      short = "MAC TX Channel",
+      long = "Channel for connecting to ethernet mac (tx)",
+      help = "",
+      enabled = swblock.params.separate_mac
+   },
+   c_mac_rx = {
+      short = "MAC RX Channel",
+      long = "Channel for connecting to ethernet mac (rx)",
+      help = "",
+      enabled = swblock.params.separate_mac
+   }
+}
+
+function getConfigStatus()
+   return "Trusted", {}
+end
+
+if swblock.params.separate_mac then
+generatedCode = {
+   includes = {"xtcp.h"},
+   globals  =  [[
+
+    xtcp_ipconfig_t ipconfig = {
+                { 0, 0, 0, 0 }, // ip address (eg 192,168,0,2)
+                { 0, 0, 0, 0 }, // netmask (eg 255,255,255,0)
+                { 0, 0, 0, 0 }  // gateway (eg 192,168,0,1)
+    };
+  ]],
+    body  =
+      [[
+          {
+            xtcp_server_uip(${swblock.chanends.c_mac_rx},
+                            ${swblock.chanends.c_mac_tx},
+                            ${swblock.chanends.c_xtcp},
+                            ${swblock.params.num_clients},
+                            ipconfig);
+          }
+      ]]
+}
+else
+
+generatedCode = {
+   includes = {"xtcp.h","otp_board_info.h"},
+   globals  =
+      [[  ethernet_xtcp_ports_t xtcp_ports = {
+            OTP_PORTS_INITIALIZER,
+            // SMI ports
+              {${swblock.params.phy_id},
+               ${swblock.ports.p_eth_mdio},
+               ${swblock.ports.p_eth_mdc}},
+            // MII ports
+              {${swblock.clocks[0]},
+               ${swblock.clocks[1]},
+               ${swblock.ports.p_eth_rxclk},
+               ${swblock.ports.p_eth_rxer},
+               ${swblock.ports.p_eth_rxd},
+               ${swblock.ports.p_eth_rxdv},
+               ${swblock.ports.p_eth_txclk},
+               ${swblock.ports.p_eth_txen},
+               ${swblock.ports.p_eth_txd},
+               ${swblock.ports.p_eth_rxdv},
+               ${swblock.ports.p_eth_fake}}
+             };
+
+
+           xtcp_ipconfig_t ipconfig = {
+                { 0, 0, 0, 0 }, // ip address (eg 192,168,0,2)
+                { 0, 0, 0, 0 }, // netmask (eg 255,255,255,0)
+                { 0, 0, 0, 0 }  // gateway (eg 192,168,0,1)
+           };
+
+      ]],
+    body  =
+      [[
+          {
+           ethernet_xtcp_server(xtcp_ports,
+                                ipconfig,
+                                ${swblock.chanends.c_xtcp},
+                                ${swblock.params.num_clients});
+          }
+      ]]
+}
+end
+
+files = {["module_xtcp/xtcp_conf_example.h"] = "src/xtcp_conf.h"}

@@ -12,7 +12,7 @@
 
 #include "ethernet_rx_client.h"
 #include "ethernet_tx_client.h"
-#include "mac_custom_filter.h"
+#include "xtcp_mac_filter.h"
 
 extern unsigned short uip_len;
 extern unsigned int uip_buf32[];
