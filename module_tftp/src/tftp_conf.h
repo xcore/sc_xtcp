@@ -34,7 +34,7 @@
 
 // By default, the TFTP client only accepts an image with the filename TFTP_IMAGE_FILENAME.
 // Setting TFTP_ACCEPT_ANY_FILENAME to non-zero allows the client to accept any filename
-#ifdef TFTP_ACCEPT_ANY_FILENAME
+#ifndef TFTP_ACCEPT_ANY_FILENAME
 #define TFTP_ACCEPT_ANY_FILENAME 	0
 #endif
 
