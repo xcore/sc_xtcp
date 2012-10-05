@@ -5,12 +5,18 @@
 
 #include <platform.h>
 #include <print.h>
-#include "uip_server.h"
-#include "getmac.h"
-#include "ethernet_server.h"
-#include "xtcp_client.h"
-#include "stdlib.h"
-#include "xtcp_blocking_client.h"
+#include <stdlib.h>
+#include "ethernet_board_support.h"
+#include "xtcp.h"
+
+// These intializers are taken from the ethernet_board_support.h header for
+// XMOS dev boards. If you are using a different board you will need to
+// supply explicit port structure intializers for these values
+ethernet_xtcp_ports_t xtcp_ports =
+    {OTP_PORTS_INITIALIZER,
+     ETHERNET_DEFAULT_SMI_INIT,
+     ETHERNET_DEFAULT_MII_INIT_lite,
+     ETHERNET_DEFAULT_RESET_INTERFACE_INIT};
 
 #ifndef DEVICE_ADDRESS
 #define DEVICE_ADDRESS 10,0,102,200
@@ -34,46 +40,13 @@ xtcp_ipaddr_t host_addrs[] = {{HOST1_ADDRESS}, {HOST2_ADDRESS}};
 int host_port = 49454;
 int src_port = 49468;
 
-// Ethernet Ports
-on stdcore[2]: port otp_data = XS1_PORT_32B; 		// OTP_DATA_PORT
-on stdcore[2]: out port otp_addr = XS1_PORT_16C;	// OTP_ADDR_PORT
-on stdcore[2]: port otp_ctrl = XS1_PORT_16D;		// OTP_CTRL_PORT
-
-on stdcore[2]: clock clk_smi = XS1_CLKBLK_5;
-
-on stdcore[2]: mii_interface_t mii =
-  {
-    XS1_CLKBLK_1,
-    XS1_CLKBLK_2,
-
-    PORT_ETH_RXCLK,
-    PORT_ETH_RXER,
-    PORT_ETH_RXD,
-    PORT_ETH_RXDV,
-
-    PORT_ETH_TXCLK,
-    PORT_ETH_TXEN,
-    PORT_ETH_TXD,
-  };
-
-#ifdef PORT_ETH_RST_N
-on stdcore[2]: out port p_mii_resetn = PORT_ETH_RST_N;
-on stdcore[2]: smi_interface_t smi = { PORT_ETH_MDIO, PORT_ETH_MDC, 0 };
-#else
-on stdcore[2]: smi_interface_t smi = { PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1 };
-#endif
-
 // Static IP Config - change this to suit your network
-#if 1
 xtcp_ipconfig_t ipconfig =
 {
   {DEVICE_ADDRESS}, // ip address
   {255,255,255,0},   // netmask
   {0,0,0,0}        // gateway
 };
-#else
-xtcp_ipconfig_t ipconfig = {0};
-#endif
 
 int socket_send(chanend xtcp, xtcp_connection_t &conn, unsigned char buf[], int len) {
 	return xtcp_write(xtcp, conn, buf, len);
@@ -410,34 +383,18 @@ void runtests(chanend xtcp[], int links){
 
 int main(void)
 {
-  chan mac_rx[1], mac_tx[1], xtcp[2], connect_status;
+  chan xtcp[2];
 
   par
     {
-      // XCore 0
-      on stdcore[0]: runtests(xtcp, 2);
+      on tile[0]: runtests(xtcp, 2);
 
-      // XCore 2
-      on stdcore[2]: uip_server(mac_rx[0], mac_tx[0], xtcp, 2, 
-                                ipconfig, connect_status);
-      on stdcore[2]:
-      {
-        int mac_address[2];
+      on ETHERNET_DEFAULT_TILE: ethernet_xtcp_server(xtcp_ports,
+                                                     ipconfig,
+                                                     xtcp,
+                                                     1);
 
-        ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl,
-                            (mac_address, char[]));
 
-        phy_init(clk_smi, 
-#ifdef PORT_ETH_RST_N
-                 p_mii_resetn,
-#else
-                 null,
-#endif
-                 smi, mii);
-
-        ethernet_server(mii, mac_address,
-                        mac_rx, 1, mac_tx, 1, smi, connect_status);
-      }
 
     }
   return 0;

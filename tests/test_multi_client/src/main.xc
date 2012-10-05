@@ -4,44 +4,19 @@
 // LICENSE.txt and at <http://github.xcore.com/>
 
 #include <platform.h>
-#if (XSCOPE_ENABLED)
 #include <xscope.h>
-#endif
 #include "print.h"
-#include "uip_server.h"
-#include "getmac.h"
-#include "ethernet_server.h"
+#include "ethernet_board_support.h"
+#include "xtcp.h"
 
-
-// Ethernet Ports
-on stdcore[ETH_CORE_ID]: port otp_data = XS1_PORT_32B; // OTP_DATA_PORT
-on stdcore[ETH_CORE_ID]: out port otp_addr = XS1_PORT_16C; // OTP_ADDR_PORT
-on stdcore[ETH_CORE_ID]: port otp_ctrl = XS1_PORT_16D; // OTP_CTRL_PORT
-
-
-on stdcore[ETH_CORE_ID]: clock clk_smi = XS1_CLKBLK_5;
-
-on stdcore[ETH_CORE_ID]: mii_interface_t mii =
-{
-	XS1_CLKBLK_1,
-	XS1_CLKBLK_2,
-
-	PORT_ETH_RXCLK,
-	PORT_ETH_RXER,
-	PORT_ETH_RXD,
-	PORT_ETH_RXDV,
-
-	PORT_ETH_TXCLK,
-	PORT_ETH_TXEN,
-	PORT_ETH_TXD,
-};
-
-#ifdef PORT_ETH_RST_N
-on stdcore[ETH_CORE_ID]: out port p_mii_resetn = PORT_ETH_RST_N;
-on stdcore[ETH_CORE_ID]: smi_interface_t smi = {PORT_ETH_MDIO, PORT_ETH_MDC, 0};
-#else
-on stdcore[ETH_CORE_ID]: smi_interface_t smi = {PORT_ETH_RST_N_MDIO, PORT_ETH_MDC, 1};
-#endif
+// These intializers are taken from the ethernet_board_support.h header for
+// XMOS dev boards. If you are using a different board you will need to
+// supply explicit port structure intializers for these values
+ethernet_xtcp_ports_t xtcp_ports =
+    {OTP_PORTS_INITIALIZER,
+     ETHERNET_DEFAULT_SMI_INIT,
+     ETHERNET_DEFAULT_MII_INIT_lite,
+     ETHERNET_DEFAULT_RESET_INTERFACE_INIT};
 
 // IP Config - change this to suit your network.  Leave with all
 // 0 values to use DHCP/AutoIP
@@ -209,40 +184,18 @@ void xscope_user_init(void)
 
 // Program entry point
 int main(void) {
-	chan mac_rx[1], mac_tx[1], xtcp[NUM_CLIENTS], connect_status;
+	chan c_xtcp[NUM_CLIENTS];
 
 	par
 	{
-		// The ethernet server
-		on stdcore[ETH_CORE_ID]:
-		{
-			int mac_address[2];
 
-      #if (XSCOPE_ENABLED)
-      xscope_config_io(XSCOPE_IO_BASIC);
-      #endif
+               on ETHERNET_DEFAULT_TILE: ethernet_xtcp_server(xtcp_ports,
+                                                              ipconfig,
+                                                              c_xtcp,
+                                                              1);
 
-			ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl,
-					(mac_address, char[]));
-
-			phy_init(clk_smi,
-#ifdef PORT_ETH_RST_N
-					p_mii_resetn,
-#else
-					null,
-#endif
-					smi, mii);
-
-			ethernet_server(mii, mac_address,
-					mac_rx, 1, mac_tx, 1, smi,
-					connect_status);
-		}
-
-		// The TCP/IP server thread
-		on stdcore[0]: uip_server(mac_rx[0], mac_tx[0], xtcp, NUM_CLIENTS, ipconfig, connect_status);
-
-    par (int i=0; i < NUM_CLIENTS; i++)
-      on stdcore[0]: udp_reflect(xtcp[i], INCOMING_PORT+i, BROADCAST_PORT+i);
+          par (int i=0; i < NUM_CLIENTS; i++)
+            on tile[0]: udp_reflect(c_xtcp[i], INCOMING_PORT+i, BROADCAST_PORT+i);
 
 	}
 	return 0;

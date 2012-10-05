@@ -1,2 +1,0 @@
-#define MII_NO_RESET
-#define MII_NO_SMI_CONFIG

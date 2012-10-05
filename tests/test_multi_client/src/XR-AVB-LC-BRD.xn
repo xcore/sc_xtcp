@@ -8,7 +8,7 @@ xsi:schemaLocation="http://www.xmos.com http://www.xmos.com">
   <!-- File Version 1V0 -->
 
   <Declarations>
-    <Declaration>core stdcore[2]</Declaration>
+    <Declaration>core tile[2]</Declaration>
   </Declarations>
 
   <Nodes>
@@ -17,7 +17,7 @@ xsi:schemaLocation="http://www.xmos.com http://www.xmos.com">
         <Source Location="SPI:bootFlash"/>
         <Bootee NodeId="1"/>
       </Boot>
-      <Core Number="0" Reference="stdcore[0]">
+      <Core Number="0" Reference="tile[0]">
         <!-- SPI FLASH -->
   	<Port Location="XS1_PORT_1A" Name="PORT_SPI_MISO"/>
 	<Port Location="XS1_PORT_1B" Name="PORT_SPI_SS"/>
@@ -51,7 +51,7 @@ xsi:schemaLocation="http://www.xmos.com http://www.xmos.com">
       <Boot>
         <Source Location="XMOSLINK"/>
       </Boot>
-      <Core Number="0" Reference="stdcore[1]">
+      <Core Number="0" Reference="tile[1]">
       	<!-- ETHERNET -->
 	<Port Location="XS1_PORT_1A" Name="PORT_ETH_RXCLK"/>
 	<Port Location="XS1_PORT_1B" Name="PORT_ETH_RXER"/>

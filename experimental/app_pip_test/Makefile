@@ -3,7 +3,7 @@ TARGET = XP-DSC-BLDC
 
 APP_NAME =
 XCC_FLAGS = -Os -g -report -save-temps -lxscope
-USED_MODULES = module_pip module_ethernet module_ethernet_smi module_otp_board_info
+USED_MODULES = module_pip module_ethernet module_otp_board_info module_ethernet_board_support
 
 # This change to the module path is so that this application can be in the
 # tests sub-directory in it's git repo

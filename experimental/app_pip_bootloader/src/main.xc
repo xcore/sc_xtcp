@@ -6,7 +6,7 @@
 #include <platform.h>
 #include <print.h>
 #include "smi.h"
-#include "miiDriver.h"
+#include "mii_driver.h"
 #include "mii.h"
 #include "pipServer.h"
 #include "tcpApplication.h"

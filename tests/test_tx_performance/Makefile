@@ -1,10 +1,13 @@
-TARGET ?= XP-MC-CTRL-L2
+TARGET ?= SLICEKIT-L2
 APP_NAME =
 XCC_FLAGS = -g -O3 -lxscope
-USED_MODULES = module_xtcp module_mii_singlethread \
-               module_mii_singlethread_server module_ethernet_smi
+USED_MODULES = module_xtcp module_ethernet_board_support
 
-USE_XTCP_MAC_CUSTOM_FILTER = 1
+ifeq ($(notdir $(abspath ..)),tests)
+PATHSEP = $(if $(findstring Windows, $(OS))$(findstring WINDOWS,$(OS)),;,:)
+XMOS_MODULE_PATH := $(XMOS_MODULE_PATH)$(PATHSEP)../../..
+endif
+
 
 
 #=============================================================================

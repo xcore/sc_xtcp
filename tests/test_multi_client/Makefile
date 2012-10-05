@@ -1,7 +1,7 @@
 # The TARGET variable determines what target system the application is
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling
-TARGET ?= XR-AVB-LC-BRD
+TARGET = XR-AVB-LC-BRD
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -9,29 +9,25 @@ TARGET ?= XR-AVB-LC-BRD
 APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_xtcp module_ethernet module_locks
-
-# This uses the tcp mac filtering in module_xtcp
-USE_XTCP_MAC_CUSTOM_FILTER=1
-
-ifeq ($(TARGET),XR-AVB-LC-BRD)
-	TARGET_FLAGS += -DPORT_ETH_RST_N=PORT_ETH_RSTN
-	TARGET_FLAGS += -DPHY_ADDRESS=0
-	TARGET_FLAGS += -DETH_CORE_ID=1
-	TARGET_FLAGS += -DXSCOPE_ENABLED=1
-	TARGET_FLAGS += -lxscope
-endif
+USED_MODULES = module_xtcp module_ethernet_board_support
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS = $(TARGET_FLAGS) -g -O2
+XCC_FLAGS = -g -O2 -save-temps
 
 # The VERBOSE variable, if set to 1, enables verbose output from the make
 # system.
 VERBOSE = 0
+
+# This change to the module path is so that this application can be in the
+# tests sub-directory in it's git repo
+ifeq ($(notdir $(abspath ..)),tests)
+PATHSEP = $(if $(findstring Windows, $(OS))$(findstring WINDOWS,$(OS)),;,:)
+XMOS_MODULE_PATH := $(XMOS_MODULE_PATH)$(PATHSEP)../../..
+endif
 
 
 #=============================================================================

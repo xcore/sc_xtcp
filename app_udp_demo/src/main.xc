@@ -6,8 +6,16 @@
 #include <platform.h>
 #include "print.h"
 #include "xtcp.h"
+#include "ethernet_board_support.h"
 
-ethernet_xtcp_ports_t xtcp_ports = ETHERNET_XTCP_DEFAULT_PORTS_INIT;
+// These intializers are taken from the ethernet_board_support.h header for
+// XMOS dev boards. If you are using a different board you will need to
+// supply explicit port structure intializers for these values
+ethernet_xtcp_ports_t xtcp_ports =
+    {OTP_PORTS_INITIALIZER,
+     ETHERNET_DEFAULT_SMI_INIT,
+     ETHERNET_DEFAULT_MII_INIT_lite,
+     ETHERNET_DEFAULT_RESET_INTERFACE_INIT};
 
 // IP Config - change this to suit your network.  Leave with all
 // 0 values to use DHCP/AutoIP

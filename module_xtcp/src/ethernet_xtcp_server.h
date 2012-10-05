@@ -12,12 +12,6 @@ typedef struct ethernet_xtcp_ports_s {
   ethernet_reset_interface_t eth_rst;
 } ethernet_xtcp_ports_t;
 
-#define ETHERNET_XTCP_DEFAULT_PORTS_INIT {OTP_PORTS_INITIALIZER, \
-      ETHERNET_DEFAULT_SMI_INIT,                                 \
-      ETHERNET_DEFAULT_MII_INIT_lite,                            \
-      ETHERNET_DEFAULT_RESET_INTERFACE_INIT}
-
-
 void ethernet_xtcp_server(REFERENCE_PARAM(ethernet_xtcp_ports_t, ports),
                           REFERENCE_PARAM(xtcp_ipconfig_t, ipconfig),
                           chanend xtcp[],

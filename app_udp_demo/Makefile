@@ -9,7 +9,7 @@ TARGET = XC-2
 APP_NAME =
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = module_xtcp
+USED_MODULES = module_xtcp module_ethernet_board_support
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
@@ -21,7 +21,6 @@ XCC_FLAGS = -g -O3 -save-temps
 # The VERBOSE variable, if set to 1, enables verbose output from the make
 # system.
 VERBOSE = 0
-
 
 #=============================================================================
 # The following part of the Makefile includes the common build infrastructure

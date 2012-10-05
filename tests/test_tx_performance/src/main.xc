@@ -7,39 +7,17 @@
 
 #include <print.h>
 #include <xscope.h>
+#include "xtcp.h"
+#include "ethernet_board_support.h"
 
-#include "smi.h"
-#include "getmac.h"
-#include "uip_server.h"
-#include "miiSingleServer.h"
-
-#define PORT_ETH_FAKE    XS1_PORT_8C
-
-#define PORT_ETH_RST_N_MDIO  XS1_PORT_1P
-
-on stdcore[0]: struct otp_ports p = { XS1_PORT_32B, XS1_PORT_16C, XS1_PORT_16D };
-
-on stdcore[0]: mii_interface_t mii =
-  {
-    XS1_CLKBLK_1,
-    XS1_CLKBLK_2,
-
-    PORT_ETH_RXCLK,
-    PORT_ETH_RXER,
-    PORT_ETH_RXD,
-    PORT_ETH_RXDV,
-
-    PORT_ETH_TXCLK,
-    PORT_ETH_TXEN,
-    PORT_ETH_TXD,
-
-    PORT_ETH_FAKE,
-  };
-
-on stdcore[0]: port p_reset = PORT_SHARED_RS;
-on stdcore[0]: smi_interface_t smi = { 0, PORT_ETH_MDIO, PORT_ETH_MDC };
-on stdcore[0]: clock clk_smi = XS1_CLKBLK_5;
-
+// These intializers are taken from the ethernet_board_support.h header for
+// XMOS dev boards. If you are using a different board you will need to
+// supply explicit port structure intializers for these values
+ethernet_xtcp_ports_t xtcp_ports =
+    {OTP_PORTS_INITIALIZER,
+     ETHERNET_DEFAULT_SMI_INIT,
+     ETHERNET_DEFAULT_MII_INIT_lite,
+     ETHERNET_DEFAULT_RESET_INTERFACE_INIT};
 
 xtcp_ipconfig_t ipconfig = {
 #if 1
@@ -47,16 +25,17 @@ xtcp_ipconfig_t ipconfig = {
 		{ 255, 255, 255, 0 }, // netmask (eg 255,255,255,0)
 		{ 0, 0, 0, 0 } // gateway (eg 192,168,0,1)
 #else
-		{ 0, 0, 0, 0 },
-		{ 0, 0, 0, 0 },
-		{ 0, 0, 0, 0 }
+		{ 0,0,0,0 },
+		{ 0,0,0,0 },
+		{ 0,0,0,0 }
 #endif
 };
 
 #define RX_BUFFER_SIZE 1200
-#define INCOMING_PORT_CONTINUOUS 100
-#define INCOMING_PORT_SINGLE 101
-#define INCOMING_PORT_TCP 102
+#define TX_BUFFER_SIZE 1200
+
+#define INCOMING_PORT_UDP 100
+#define INCOMING_PORT_TCP 101
 
 
 /*
@@ -82,14 +61,16 @@ xtcp_ipconfig_t ipconfig = {
 void udp_server(chanend c_xtcp)
 {
   xtcp_connection_t conn;
-  unsigned total_len=0;
 
   char rx_buffer[RX_BUFFER_SIZE];
+  char tx_buffer[TX_BUFFER_SIZE];
 
   int response_len;
+  static unsigned send_count = 0;
 
-  xtcp_listen(c_xtcp, INCOMING_PORT_CONTINUOUS, XTCP_PROTOCOL_UDP);
-  xtcp_listen(c_xtcp, INCOMING_PORT_SINGLE, XTCP_PROTOCOL_UDP);
+  for (unsigned i=0; i<(sizeof(tx_buffer)+3)/4; ++i) (tx_buffer,unsigned[])[i] = i;
+
+  xtcp_listen(c_xtcp, INCOMING_PORT_UDP, XTCP_PROTOCOL_UDP);
   xtcp_listen(c_xtcp, INCOMING_PORT_TCP, XTCP_PROTOCOL_TCP);
 
   while (1) {
@@ -108,22 +89,30 @@ void udp_server(chanend c_xtcp)
 		case XTCP_RECV_DATA:
 		  response_len = xtcp_recv_count(c_xtcp, rx_buffer, RX_BUFFER_SIZE);
 		  switch (conn.local_port) {
-		  case INCOMING_PORT_SINGLE:
-			  xscope_probe_data(0, (rx_buffer,unsigned[])[0]);
-			  xtcp_close(c_xtcp, conn);
-			  break;
-		  case INCOMING_PORT_CONTINUOUS:
-			  xscope_probe_data(0, (rx_buffer,unsigned[])[0]);
+		  case INCOMING_PORT_UDP:
+			  send_count = 0;
+			  xtcp_init_send(c_xtcp, conn);
 			  break;
 		  case INCOMING_PORT_TCP:
-			  total_len += response_len;
-			  xscope_probe_data(0, total_len);
+			  send_count = 0;
+			  xtcp_init_send(c_xtcp, conn);
 			  break;
 		  }
 		  break;
 	  case XTCP_REQUEST_DATA:
 	  case XTCP_RESEND_DATA:
 	  case XTCP_SENT_DATA:
+		  if (conn.event != XTCP_RESEND_DATA) {
+			  send_count++;
+		  }
+		  if (send_count > 100000) {
+			  // Done sending
+			  xtcp_complete_send(c_xtcp);
+		  } else {
+			  (tx_buffer,unsigned[])[0] = send_count;
+			  xtcp_send(c_xtcp, tx_buffer, sizeof(tx_buffer));
+		  }
+		  break;
 	  case XTCP_TIMED_OUT:
 	  case XTCP_ABORTED:
 	  case XTCP_CLOSED:
@@ -135,34 +124,29 @@ void udp_server(chanend c_xtcp)
   }
 }
 
+void xscope_user_init(void) {
+  xscope_register(6,
+                  XSCOPE_DISCRETE, "0", XSCOPE_UINT, "i",
+                  XSCOPE_DISCRETE, "1", XSCOPE_UINT, "i",
+                  XSCOPE_DISCRETE, "2", XSCOPE_UINT, "i",
+                  XSCOPE_DISCRETE, "3", XSCOPE_UINT, "i",
+                  XSCOPE_DISCRETE, "4", XSCOPE_UINT, "i",
+                  XSCOPE_DISCRETE, "5", XSCOPE_UINT, "i");
+  xscope_config_io(XSCOPE_IO_BASIC);
+}
 
 
 int main(void) {
-	chan mac_rx[1], mac_tx[1], xtcp[1], connect_status;
+	chan xtcp[1];
 
 	par
 	{
-	 	on stdcore[0]: {
-            char mac_address[6];
+          on ETHERNET_DEFAULT_TILE: ethernet_xtcp_server(xtcp_ports,
+                                                         ipconfig,
+                                                         xtcp,
+                                                         1);
 
-            xscope_register(1, XSCOPE_DISCRETE, "n", XSCOPE_UINT, "i");
-            xscope_config_io(XSCOPE_IO_BASIC);
-
-            ethernet_getmac_otp(p, mac_address);
-
-	 		// Bring PHY out of reset
-	 		p_reset <: 0x2;
-
-	 		// Start server
-	 		miiSingleServer(clk_smi, null, smi, mii, mac_rx[0], mac_tx[0], connect_status, mac_address);
-	 	}
-
-		// The TCP/IP server thread
-		on stdcore[0]: uip_server(mac_rx[0], mac_tx[0],
-				xtcp, 1, ipconfig,
-				connect_status);
-
-		on stdcore[0]: udp_server(xtcp[0]);
+          on stdcore[0]: udp_server(xtcp[0]);
 	}
 	return 0;
 }

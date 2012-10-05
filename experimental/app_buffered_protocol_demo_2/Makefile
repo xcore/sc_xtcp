@@ -2,7 +2,7 @@
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling.
 
-TARGET ?= XC-2
+TARGET = SLICEKIT-L2
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to 
@@ -20,18 +20,14 @@ APP_NAME =
 
 XCC_FLAGS = -g -O3
 
-ifeq ($(TARGET),XR-AVB-LC-BRD)
-XCC_FLAGS += -DETHERNET_CORE=1
-endif
-
-
-
 # The USED_MODULES variable lists other module used by the application. 
 
-USED_MODULES = module_xtcp module_ethernet module_locks
+USED_MODULES = module_xtcp module_ethernet_board_support
 
-USE_XTCP_MAC_CUSTOM_FILTER = 1
-
+ifeq ($(notdir $(abspath ..)),experimental)
+PATHSEP = $(if $(findstring Windows, $(OS))$(findstring WINDOWS,$(OS)),;,:)
+XMOS_MODULE_PATH := $(XMOS_MODULE_PATH)$(PATHSEP)../../..
+endif
 
 #=============================================================================
 # The following part of the Makefile includes the common build infrastructure

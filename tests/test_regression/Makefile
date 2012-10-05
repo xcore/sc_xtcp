@@ -2,7 +2,7 @@
 # compiled for. It either refers to an XN file in the source directories
 # or a valid argument for the --target option when compiling.
 
-TARGET = XC-2
+TARGET = SLICEKIT-L2
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to 
@@ -21,10 +21,15 @@ APP_NAME =
 XCC_FLAGS = -O3 -save-temps -g -report -Xmapper --map -Xmapper MAPFILE
 
 # The USED_MODULES variable lists other module used by the application. 
-USED_MODULES = module_xtcp module_ethernet module_locks
+USED_MODULES = module_xtcp module_ethernet_board_support
 
-# This uses the tcp mac filtering in module_xtcp
-USE_XTCP_MAC_CUSTOM_FILTER=1
+# This change to the module path is so that this application can be in the
+# tests sub-directory in it's git repo
+ifeq ($(notdir $(abspath ..)),tests)
+PATHSEP = $(if $(findstring Windows, $(OS))$(findstring WINDOWS,$(OS)),;,:)
+XMOS_MODULE_PATH := $(XMOS_MODULE_PATH)$(PATHSEP)../../..
+endif
+
 
 
 #=============================================================================
