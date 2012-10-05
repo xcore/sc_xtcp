@@ -5,7 +5,9 @@
 
 #ifndef _mac_cusom_filter_h_
 #define _mac_cusom_filter_h_
+#include "xtcp_conf_derived.h"
 
+#if ETHERNET_USE_XTCP_FILTER
 #define MAC_FILTER_ARPIP 0x1
 
 inline int mac_custom_filter(unsigned int buf[])
@@ -30,5 +32,5 @@ inline int mac_custom_filter(unsigned int buf[])
 
   return result;
 }
-
+#endif
 #endif

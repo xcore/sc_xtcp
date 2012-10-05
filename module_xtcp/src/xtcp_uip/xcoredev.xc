@@ -13,6 +13,9 @@
 #include "ethernet_rx_client.h"
 #include "ethernet_tx_client.h"
 #include "xtcp_mac_filter.h"
+#ifdef __mac_custom_filter_h_exists__
+#include "mac_custom_filter.h"
+#endif
 
 extern unsigned short uip_len;
 extern unsigned int uip_buf32[];
