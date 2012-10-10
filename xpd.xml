@@ -30,16 +30,18 @@
         </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>c18a697ceb57474bec34fdb3b96540c795cfacc4</githash>
+        <githash>7f4ea62f76a9b161503d5809ac0f395c391c29ba</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
+        <version>2.2.0alpha16</version>
     </dependency>
     <dependency repo = "xcommon">
         <githash>cdcfc87c8c6047bf8d21f13222cbe9e84c6c5e01</githash>
         <uri>https://github.com/xcore/xcommon.git</uri>
     </dependency>
     <dependency repo = "sc_otp">
-        <githash>90f4fc18c4cce71a32f933c67179ef273dbb7253</githash>
+        <githash>c58cd84295fdbdd72a970417bb4cc54342a9d71c</githash>
         <uri>git@github.com:xcore/sc_otp</uri>
+        <version>1.0.0alpha0</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>doc/xtcp_guide</docdir>
@@ -65,6 +67,7 @@
     <release parenthash = "3bfff1ac614b83079dd5e717b54fdb5a3de3f94b" version = "3.1.0alpha0" githash = "04bd53a15d1cf4ce07b17d8d521565238f7fd98d"></release>
     <release parenthash = "40a0a0fb5da96827047aeb255520d25440004495" version = "3.1.0alpha1" githash = "b2070e3bc7cbac7b26ac941b837441817090bf1c"></release>
     <release parenthash = "b2070e3bc7cbac7b26ac941b837441817090bf1c" version = "3.1.0alpha2" githash = "84086623e57b463f68f51a618dd31e884a6232ca"></release>
+    <release parenthash = "a18467cf8cd79b215c0863c790bef63f5b0ed7e2" version = "3.1.0alpha3"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
