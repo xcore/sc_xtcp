@@ -195,7 +195,16 @@ void httpd_handle_event(chanend tcp_svr, xtcp_connection_t *conn)
   // Ignore events that are not directly relevant to http
   switch (conn->event) 
     {
-    case XTCP_IFUP:
+    case XTCP_IFUP: {
+      xtcp_ipconfig_t ipconfig;
+      xtcp_get_ipconfig(tcp_svr, &ipconfig);
+      printstr("IP Address: ");
+      printint(ipconfig.ipaddr[0]);printstr(".");
+      printint(ipconfig.ipaddr[1]);printstr(".");
+      printint(ipconfig.ipaddr[2]);printstr(".");
+      printint(ipconfig.ipaddr[3]);printstr("\n");
+      }
+      return;
     case XTCP_IFDOWN:
     case XTCP_ALREADY_HANDLED:
       return;

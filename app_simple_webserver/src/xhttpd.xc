@@ -12,7 +12,7 @@
 void xhttpd(chanend tcp_svr)
 {
   xtcp_connection_t conn;
-  
+  printstrln("**WELCOME TO THE SIMPLE WEBSERVER DEMO**");
   // Initiate the HTTP state
   httpd_init(tcp_svr);
    

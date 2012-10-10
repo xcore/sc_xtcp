@@ -63,7 +63,7 @@ into the xCORE multicore microcontroller.
       circle). The debug console window in xTimeComposer should then
       display the message::
 
-       **WELCOME TO SIMPLE WEBSERVER DEMO**
+       **WELCOME TO THE SIMPLE WEBSERVER DEMO**
 
       This has been generated from the application code via a call to
       the ``printstr()`` function.
