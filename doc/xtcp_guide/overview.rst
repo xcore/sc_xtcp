@@ -10,14 +10,13 @@ provides a complete stack including ARP, IP, UDP, TCP, DHCP, IPv4LL,
 ICMP and IGMP protocols.
 
 The stack is based on the open-source stack uIP with modifications to
-work efficiently on XMOS architecture and communicate between threads
+work efficiently on XMOS architecture and communicate between tasks
 using XC channels.
 
-The TCP stack interfaces to the 5-thread XMOS ethernet stack via a pair
-of channels.  Alternatively, an integrated 2-thread Ethernet plus TCP/IP
-is available for use in resource limited applications.
+The TCP stack can either interface to a separate ethernet MAC or work
+with an integrated MAC taking only 2 logical cores.
 
-5 thread Ethernet plus separate TCP/IP stack properties
+Seperate MAC + TCP/IP stack properties
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   * Layer 2 packets can be sent and received independently of layer 3
@@ -26,10 +25,10 @@ is available for use in resource limited applications.
   * Packet filtering in an independent threads
   * Works on a 400 MHz part
 
-Two thread ethernet plus integrated TCP/IP stack properties
+Two core ethernet plus integrated TCP/IP stack properties
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-  * Uses only 2 threads
+  * Uses only 2 logical cores
   * High throughput
   * Uses lower memory footprint
   * Only TCP/IP sourced packets can be transmitted
@@ -55,9 +54,9 @@ Component Summary
  +------------------------------+------------------------------------+
  |                       **Requirements**                            |
  +------------------------------+------------------------------------+
- | XMOS Desktop Tools           | v10.4 or later                     |
+ | XMOS Desktop Tools           | v12.0 or later                     |
  +------------------------------+------------------------------------+
- | XMOS Ethernet Component      | 2v0                                |
+ | XMOS Ethernet Component      | 2.2.0 or later                     |
  +------------------------------+------------------------------------+
  |                       **Licensing and Support**                   |
  +-------------------------------------------------------------------+
@@ -65,38 +64,4 @@ Component Summary
  | Component code is maintained by XMOS.                             |
  +-------------------------------------------------------------------+
 
-Resource requirements
-=====================
-
-The resource requirements for the XTCP stack alone are:
-
-+--------------------------------------------------+
-| Resource     | Usage                             |
-+==============+===================================+
-| Channels     | 1 per client                      |
-+--------------+-----------------------------------+
-| Memory       | Between 20 and 45 KBytes          |
-+--------------+-----------------------------------+
-| Timers       | 2                                 |
-+--------------+-----------------------------------+
-| Clocks       | 0                                 |
-+--------------------------------------------------+
-
-When used with the single thread ethernet MII module,
-the combined usage is:
-
-+--------------------------------------------------+
-| Resource     | Usage                             |
-+==============+===================================+
-| Channels     | 3 plus 1 per client               |
-+--------------+-----------------------------------+
-| Memory       | Between 26 and 50 KBytes          |
-+--------------+-----------------------------------+
-| Timers       | 4                                 |
-+--------------+-----------------------------------+
-| Clocks       | 1                                 |
-+--------------------------------------------------+
-
-The memory usage depends on the selection of different options
-at compile time, and on the amount of buffering chosen.
 

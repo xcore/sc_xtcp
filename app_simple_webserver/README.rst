@@ -1,5 +1,5 @@
-Simple webserver demo
-=====================
+Simple HTTP Demo
+================
 
 :scope: Example
 :description: A demo of the TCP/IP stack that provides a simple webserver

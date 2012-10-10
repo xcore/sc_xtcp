@@ -25,6 +25,7 @@ void xhttpd(chanend tcp_svr)
           httpd_handle_event(tcp_svr, conn);
           break;
         }
+
     }
 }
 

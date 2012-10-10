@@ -5,7 +5,7 @@ Software Architecture
 ---------------------
 
 The following Figure shows the architecture of the TCP/IP stack when
-attaching to an independent Ethernet stack through XC channel:
+attaching to an independent Ethernet MAC through XC channel:
 
 .. only:: html
 
@@ -22,28 +22,24 @@ attaching to an independent Ethernet stack through XC channel:
 
      XTCP software architecture
 
-The server runs in a single thread and connects to the XMOS Ethernet
-MAC component (see [XEth10]_). It can then connect to several client
-threads over XC channels.
-
+The server runs on a single logical core and connects to the XMOS Ethernet
+MAC component. It can then connect to several client
+tasks over XC channels. To enable this option the define
+``XTCP_USE_SEPARATE_MAC`` needs to be set to ``1`` in the
+``xtcp_conf.h`` file in your application and run the
+:c:func:`xtcp_server` function.
 
 Alternatively, the TCP/IP server and Ethernet server can be run as
-an integrated system of two threads.  To enable this, the header
-file ``uip_single_server.h`` should be included, and the function
-:c:func:`uipSingleServer` used in place of the :c:func:`uip_server` and
-``ethernet_server`` function from the ethernet repository.  In addition,
-the ``module_mii_singlethread`` should be used instead of ``module_ethernet``
-and ``module_locks`` in the Makefile. Finally, define the constant
-``UIP_USE_SINGLE_THREADED_ETHERNET`` in your application's ``xtcp_client_config.h``
-file.
-
+an integrated system on two logical cores. This can be started by
+running the :c:func:`ethernet_xtcp_server` function.
 
 
 IP Configuration
 ----------------
 
 The server will determine its IP configuration based on the arguments
-passed into the :c:func:`uip_server` or :c:func:`uipSingleServer` function.
+passed into the :c:func:`xtcp_server` or :c:func:`ethernet_xtcp_server`
+function.
 If an address is supplied then that address will be used (a static IP address
 configuration).
 
@@ -53,9 +49,9 @@ automatically. If it cannot obtain an address from DHCP, it will determine
 a link local address (in the range 169.254/16) automatically using the
 Zeroconf IPV4LL protocol.
 
-To use dynamic address, the :c:func:`uip_server` can be passed a *null* to
-the ip configuration parameter. The :c:func:`uipSingleServer` must be
-passed a structure with 0 for all fields of the addresses.
+To use dynamic address, the :c:func:`xtcp_server` or
+:c:func:`ethernet_xtcp_server` function can be passed a *null* to
+the ip configuration parameter.
 
 Events and Connections
 ----------------------
@@ -86,7 +82,7 @@ usually have an associated *connection*. In addition to receiving
 these events the client can send *commands* to the server to initiate
 new connections and so on.
 
-Figure 2 shows an example event/command sequence of a
+The above Figure shows an example event/command sequence of a
 client making a connection, sending some data, receiving some data and
 then closing the connection. Note that sending and receiving may be
 split into several events/commands since the server itself performs no
@@ -184,7 +180,7 @@ Configuration
 -------------
 
 The server is configured via arguments passed to the
-:c:func:`uip_server` function and the defines described in Section 
+:c:func:`xtcp_server` function and the defines described in Section
 :ref:`sec_config_defines`.
 
 Client connections are configured via the client API described in

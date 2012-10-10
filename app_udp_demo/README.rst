@@ -1,9 +1,10 @@
-<Add title here>
+Simple UDP Demo
 ================
 
-:scope: <Put one of Roadmap, Experimental, Early Development or General Use>
-:description: <Add one line here>
-:keywords: <Add comma separated list of keywords>
-:boards: <Add comma separated list of supported boards>
+:scope: Example
+:description: A simple example using the UDP protocol
+:keywords: ethernet, udp, tcp, ip
 
-<Add description of software block>
+This is a simple example that reflects a particular type of UDP
+messages using the TCP/IP stack component.
+

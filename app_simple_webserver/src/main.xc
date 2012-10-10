@@ -38,7 +38,7 @@ int main(void) {
 
 
 		// The webserver
-		on stdcore[0]: xhttpd(xtcp[0]);
+		on tile[0]: xhttpd(xtcp[0]);
 
 	}
 	return 0;

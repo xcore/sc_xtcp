@@ -138,9 +138,9 @@ Data Structures/Types
 Server API
 ----------
 
-.. doxygenfunction:: uip_server
+.. doxygenfunction:: xtcp_server
 
-.. doxygenfunction:: uipSingleServer
+.. doxygenfunction:: ethernet_xtcp_server
 
 .. _sec_client_api:
 
