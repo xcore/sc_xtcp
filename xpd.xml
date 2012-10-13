@@ -16,6 +16,18 @@
             <keyword>ICMP</keyword>
             <keyword>UDP</keyword>
         </component>
+        <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver_separate_mac" local = "false" id = "app_simple_webserver_separate_mac" name = "Simple HTTP Demo">
+            <componentDependency>module_ethernet_smi</componentDependency>
+            <componentDependency>module_xtcp</componentDependency>
+            <componentDependency>module_ethernet_board_support</componentDependency>
+            <componentDependency>module_otp_board_info</componentDependency>
+            <componentDependency>module_locks</componentDependency>
+            <componentDependency>module_ethernet</componentDependency>
+            <keyword>ethernet</keyword>
+            <keyword>tcp/ip</keyword>
+            <keyword>webserver</keyword>
+            <keyword>http</keyword>
+        </component>
         <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple HTTP Demo">
             <componentDependency>module_ethernet_smi</componentDependency>
             <componentDependency>module_xtcp</componentDependency>
@@ -30,9 +42,9 @@
         </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>7f4ea62f76a9b161503d5809ac0f395c391c29ba</githash>
+        <githash>b4d5f2932cce0d0d8c5fa49636509c1b1b77fd0b</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.2.0alpha16</version>
+        <version>2.2.0alpha17</version>
     </dependency>
     <dependency repo = "xcommon">
         <githash>cdcfc87c8c6047bf8d21f13222cbe9e84c6c5e01</githash>
@@ -67,7 +79,8 @@
     <release parenthash = "3bfff1ac614b83079dd5e717b54fdb5a3de3f94b" version = "3.1.0alpha0" githash = "04bd53a15d1cf4ce07b17d8d521565238f7fd98d"></release>
     <release parenthash = "40a0a0fb5da96827047aeb255520d25440004495" version = "3.1.0alpha1" githash = "b2070e3bc7cbac7b26ac941b837441817090bf1c"></release>
     <release parenthash = "b2070e3bc7cbac7b26ac941b837441817090bf1c" version = "3.1.0alpha2" githash = "84086623e57b463f68f51a618dd31e884a6232ca"></release>
-    <release parenthash = "a18467cf8cd79b215c0863c790bef63f5b0ed7e2" version = "3.1.0alpha3"></release>
+    <release parenthash = "a18467cf8cd79b215c0863c790bef63f5b0ed7e2" version = "3.1.0alpha3" githash = "b6ca5c71a67a0db90adc565722f1cf5af34198dc"></release>
+    <release parenthash = "b4426677752bb4f3d1800ded283d3cb4ef704585" version = "3.1.0alpha4"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
