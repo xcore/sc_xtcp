@@ -16,18 +16,6 @@
             <keyword>ICMP</keyword>
             <keyword>UDP</keyword>
         </component>
-        <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver_separate_mac" local = "false" id = "app_simple_webserver_separate_mac" name = "Simple HTTP Demo">
-            <componentDependency>module_ethernet_smi</componentDependency>
-            <componentDependency>module_xtcp</componentDependency>
-            <componentDependency>module_ethernet_board_support</componentDependency>
-            <componentDependency>module_otp_board_info</componentDependency>
-            <componentDependency>module_locks</componentDependency>
-            <componentDependency>module_ethernet</componentDependency>
-            <keyword>ethernet</keyword>
-            <keyword>tcp/ip</keyword>
-            <keyword>webserver</keyword>
-            <keyword>http</keyword>
-        </component>
         <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple HTTP Demo">
             <componentDependency>module_ethernet_smi</componentDependency>
             <componentDependency>module_xtcp</componentDependency>
@@ -80,7 +68,7 @@
     <release parenthash = "40a0a0fb5da96827047aeb255520d25440004495" version = "3.1.0alpha1" githash = "b2070e3bc7cbac7b26ac941b837441817090bf1c"></release>
     <release parenthash = "b2070e3bc7cbac7b26ac941b837441817090bf1c" version = "3.1.0alpha2" githash = "84086623e57b463f68f51a618dd31e884a6232ca"></release>
     <release parenthash = "a18467cf8cd79b215c0863c790bef63f5b0ed7e2" version = "3.1.0alpha3" githash = "b6ca5c71a67a0db90adc565722f1cf5af34198dc"></release>
-    <release parenthash = "b4426677752bb4f3d1800ded283d3cb4ef704585" version = "3.1.0alpha4"></release>
+    <release parenthash = "b4426677752bb4f3d1800ded283d3cb4ef704585" version = "3.1.0alpha4" githash = "66e81c71c66217dee6fcb561960ca05a19a29518"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
