@@ -34,8 +34,7 @@ xtcp_server(chanend mac_rx,
            chanend mac_tx, 
            chanend xtcp[], 
            int num_xtcp_clients,
-           NULLABLE_REFERENCE_PARAM(xtcp_ipconfig_t, ipconfig),
-           chanend connect_status);
+           NULLABLE_REFERENCE_PARAM(xtcp_ipconfig_t, ipconfig));
 
 #define xtcp_server xtcp_server_uip
 

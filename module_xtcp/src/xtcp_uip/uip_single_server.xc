@@ -77,46 +77,56 @@ void xcoredev_send(chanend tx)
 {
 #ifdef UIP_SINGLE_SERVER_DOUBLE_BUFFER_TX
   static int txbuf0[(UIP_MAX_TRANSMIT_SIZE+3)/4];
-	static int txbuf1[(UIP_MAX_TRANSMIT_SIZE+3)/4];
-	static int tx_buf_in_use=0;
-	static int n=0;
+  static int txbuf1[(UIP_MAX_TRANSMIT_SIZE+3)/4];
+  static int tx_buf_in_use=0;
+  static int n=0;
+  int len = uip_len;
+  unsigned nWords;
+  if (len<60) {
+    for (int i=len;i<60;i++)
+      (uip_buf32, unsigned char[])[i] = 0;
+    len=60;
+  }
+  nWords = (len+3)>>2;
 
-	unsigned nWords = (uip_len+3)>>2;
-
-        if (uip_len > UIP_MAX_TRANSMIT_SIZE) {
+  if (len > UIP_MAX_TRANSMIT_SIZE) {
 #ifdef UIP_DEBUG_MAX_TRANSMIT_SIZE
-          printstr("Error: Trying to send too big a packet: ");
-          printint(uip_len);
-          printstr(" bytes.\n");
+    printstr("Error: Trying to send too big a packet: ");
+    printint(len);
+    printstr(" bytes.\n");
 #endif
-          return;
-        }
-
-
-
-	switch (n) {
-	case 0:
-		for (unsigned i=0; i<nWords; ++i) { txbuf0[i] = uip_buf32[i]; }
-		if (tx_buf_in_use) mii_out_packet_done(tx);
-	    mii_out_packet(tx, txbuf0, 0, (uip_len<60)?60:uip_len);
-	    n = 1;
-		break;
-	case 1:
-		for (unsigned i=0; i<nWords; ++i) { txbuf1[i] = uip_buf32[i]; }
-		if (tx_buf_in_use) mii_out_packet_done(tx);
-	    mii_out_packet(tx, txbuf1, 0, (uip_len<60)?60:uip_len);
-	    n = 0;
-		break;
-	}
-    tx_buf_in_use=1;
+    return;
+  }
+  switch (n) {
+  case 0:
+    for (unsigned i=0; i<nWords; ++i) { txbuf0[i] = uip_buf32[i]; }
+    if (tx_buf_in_use) mii_out_packet_done(tx, txbuf1);
+    mii_out_packet(tx, txbuf0, 0, len);
+    n = 1;
+    break;
+  case 1:
+    for (unsigned i=0; i<nWords; ++i) { txbuf1[i] = uip_buf32[i]; }
+    if (tx_buf_in_use) mii_out_packet_done(tx, txbuf0);
+    mii_out_packet(tx, txbuf1, 0, len);
+    n = 0;
+    break;
+  }
+  tx_buf_in_use=1;
 #else
     static int txbuf[(UIP_MAX_TRANSMIT_SIZE+3)/4];
     static int tx_buf_in_use=0;
-
-	unsigned nWords = (uip_len+3)>>2;
-	if (tx_buf_in_use) mii_out_packet_done(tx);
-	for (unsigned i=0; i<nWords; ++i) { txbuf[i] = uip_buf32[i]; }
-    mii_out_packet(tx, txbuf, 0, (uip_len<60)?60:uip_len);
+    unsigned nWords;
+    int len=uip_len;
+    if (tx_buf_in_use)
+      mii_out_packet_done(tx);
+    if (len<60) {
+      for (int i=len;i<60;i++)
+        (uip_buf32, unsigned char[])[i] = 0;
+      len=60;
+    }
+    nWords = (len+3)>>2;
+    for (unsigned i=0; i<nWords; ++i) { txbuf[i] = uip_buf32[i]; }
+    mii_out_packet(tx, txbuf, 0, len);
     tx_buf_in_use=1;
 #endif
 }
@@ -152,6 +162,7 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 
 	// The Receive packet buffer
     int b[UIP_SINGLE_THREAD_RX_BUFFER_SIZE/4];
+
     uip_server_init(xtcp, num_xtcp, ipconfig, mac_address);
 
     mii_buffer_init(miiData, mac_rx, cNotifications, b, UIP_SINGLE_THREAD_RX_BUFFER_SIZE/4);
@@ -208,8 +219,8 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 				{address,length,timeStamp} = mii_get_in_buffer(miiData);
 				if (address != 0) {
                                   static unsigned pcnt=1;
-                                  uip_len = length;
                                   if (length <= UIP_BUFSIZE) {
+                                    uip_len = length;
                                     copy_packet(uip_buf32, address, length);
                                     xtcp_process_incoming_packet(mac_tx);
                                   }

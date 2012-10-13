@@ -201,7 +201,7 @@ typedef struct xtcpd_state_t uip_udp_appstate_t;
 #endif
 
 
-#ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
+#if XTCP_ENABLE_PARTIAL_PACKET_ACK
 #define UIP_CONF_SLIDING_WINDOW 1
 #endif
 
