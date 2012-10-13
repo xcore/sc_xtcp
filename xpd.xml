@@ -69,6 +69,7 @@
     <release parenthash = "a18467cf8cd79b215c0863c790bef63f5b0ed7e2" version = "3.1.0alpha3" githash = "b6ca5c71a67a0db90adc565722f1cf5af34198dc"></release>
     <release parenthash = "b4426677752bb4f3d1800ded283d3cb4ef704585" version = "3.1.0alpha4" githash = "66e81c71c66217dee6fcb561960ca05a19a29518"></release>
     <release parenthash = "e0ed96d13f9fe47dcce2674f62d9c825feacba18" version = "3.1.0alpha5" githash = "532ce4a0f3241a0d3ff4b222beff52ab53861fea"></release>
+    <release parenthash = "ba4f152eccf906597aedc65beb4a031bee6c15c5" version = "3.1.0alpha6"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
