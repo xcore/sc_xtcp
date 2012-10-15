@@ -17,7 +17,7 @@
  *                          (ip address, netmask and gateway) of the device.
  *                          Leave NULL for automatic address allocation.
  *
- *  This function implements an xtcp tcp/ip server in a thread.
+ *  This function implements an xtcp tcp/ip server in a logical core.
  *  It uses a port of the uIP stack which is then interfaces over the
  *  xtcp channel array.
  *

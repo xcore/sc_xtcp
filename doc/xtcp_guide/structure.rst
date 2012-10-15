@@ -1,7 +1,7 @@
 Source code structure
 ---------------------
 
-All the files for the stack are contains in the ``module_xtcp``
+All the files for the stack are contained in the ``module_xtcp``
 directory. The important header files that are used by applications
 are:
 

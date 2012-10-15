@@ -10,7 +10,7 @@ provides a complete stack including ARP, IP, UDP, TCP, DHCP, IPv4LL,
 ICMP and IGMP protocols.
 
 The stack is based on the open-source stack uIP with modifications to
-work efficiently on XMOS architecture and communicate between tasks
+work efficiently on the XMOS architecture and communicate between tasks
 using XC channels.
 
 The TCP stack can either interface to a separate ethernet MAC or work
@@ -22,7 +22,7 @@ Seperate MAC + TCP/IP stack properties
   * Layer 2 packets can be sent and received independently of layer 3
   * Integrated support for high priority Qtagged packets
   * Integrated support for 802.1 Qav rate control
-  * Packet filtering in an independent threads
+  * Packet filtering in an independent logical core
   * Works on a 400 MHz part
 
 Two core ethernet plus integrated TCP/IP stack properties
@@ -32,7 +32,7 @@ Two core ethernet plus integrated TCP/IP stack properties
   * High throughput
   * Uses lower memory footprint
   * Only TCP/IP sourced packets can be transmitted
-  * 500 MHz parts only (MII thread requires 62.5 MIPS)
+  * 500 MHz parts only (MII core requires 62.5 MIPS)
 
 Component Summary
 +++++++++++++++++
@@ -58,10 +58,4 @@ Component Summary
  +------------------------------+------------------------------------+
  | XMOS Ethernet Component      | 2.2.0 or later                     |
  +------------------------------+------------------------------------+
- |                       **Licensing and Support**                   |
- +-------------------------------------------------------------------+
- | Component code provided without charge from XMOS.                 |
- | Component code is maintained by XMOS.                             |
- +-------------------------------------------------------------------+
-
 
