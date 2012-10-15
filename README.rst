@@ -1,7 +1,7 @@
 XCORE.com xTcp SOFTWARE COMPONENT
 .................................
 
-:Latest release: 3.1.0alpha7
+:Latest release: 3.1.0rc0
 :Maintainer: davidn@xmos.com
 :Description: Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.
 
@@ -37,6 +37,5 @@ Required software (dependencies)
 ================================
 
   * sc_ethernet (git@github.com:xcore/sc_ethernet.git)
-  * xcommon (if using development tools earlier than 11.11.0)
   * sc_otp (git@github.com:xcore/sc_otp)
 

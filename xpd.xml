@@ -16,11 +16,11 @@
             <keyword>UDP</keyword>
         </component>
         <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple HTTP Demo">
-            <componentDependency>module_ethernet_smi</componentDependency>
-            <componentDependency>module_xtcp</componentDependency>
-            <componentDependency>module_ethernet_board_support</componentDependency>
             <componentDependency>module_otp_board_info</componentDependency>
             <componentDependency>module_locks</componentDependency>
+            <componentDependency>module_xtcp</componentDependency>
+            <componentDependency>module_ethernet_board_support</componentDependency>
+            <componentDependency>module_ethernet_smi</componentDependency>
             <componentDependency>module_ethernet</componentDependency>
             <keyword>ethernet</keyword>
             <keyword>tcp/ip</keyword>
@@ -29,14 +29,14 @@
         </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>2e041b400855f2197b8f8babca2a4d53fb9a7e0a</githash>
+        <githash>14bbe0d826fe36c6f2b44d95e277fe120e1ba350</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.2.0alpha18</version>
+        <version>2.2.0rc0</version>
     </dependency>
     <dependency repo = "sc_otp">
-        <githash>c58cd84295fdbdd72a970417bb4cc54342a9d71c</githash>
+        <githash>062aa923a78bc603b254b2a99b78593ab3a816ec</githash>
         <uri>git@github.com:xcore/sc_otp</uri>
-        <version>1.0.0alpha0</version>
+        <version>1.0.0rc0</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>doc/xtcp_guide</docdir>
@@ -66,7 +66,8 @@
     <release parenthash = "b4426677752bb4f3d1800ded283d3cb4ef704585" version = "3.1.0alpha4" githash = "66e81c71c66217dee6fcb561960ca05a19a29518"></release>
     <release parenthash = "e0ed96d13f9fe47dcce2674f62d9c825feacba18" version = "3.1.0alpha5" githash = "532ce4a0f3241a0d3ff4b222beff52ab53861fea"></release>
     <release parenthash = "ba4f152eccf906597aedc65beb4a031bee6c15c5" version = "3.1.0alpha6" githash = "82a51eb74defe9ac8c640b660f9e439d1db38e35"></release>
-    <release parenthash = "5b591e1d73dc95e571374323265d685d9f7e2807" version = "3.1.0alpha7"></release>
+    <release parenthash = "5b591e1d73dc95e571374323265d685d9f7e2807" version = "3.1.0alpha7" githash = "ef3ee16cc70d6dc21096f6c0eb3428dad47964f5"></release>
+    <release parenthash = "a808a7e874886f1ef6940269fff8a319f9b26f44" version = "3.1.0rc0"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
