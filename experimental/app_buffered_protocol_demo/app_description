@@ -1,6 +1,0 @@
-Example of TCP server utilising the buffered API.  It uses the fixed length buffered reading
-to fetch a packet header from the port, decode the length field, and fetch the remaining
-bytes from the packet.  It prints those bytes, and then sends a fixed length response.  The
-'test' subdirectory contains a python script that operates the PC end of the link.
-
-

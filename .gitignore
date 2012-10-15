@@ -2,4 +2,6 @@
 */bin/*
 experimental/*/bin/*
 tests/*/bin/*
-*_build/*
+*_build*
+*.zip
+__generated*
