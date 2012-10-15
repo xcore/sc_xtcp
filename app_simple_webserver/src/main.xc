@@ -27,18 +27,19 @@ xtcp_ipconfig_t ipconfig = {
 
 // Program entry point
 int main(void) {
-       chan xtcp[1];
+       chan c_xtcp[1];
 
 	par
 	{
-               on ETHERNET_DEFAULT_TILE: ethernet_xtcp_server(xtcp_ports,
-                                                              ipconfig,
-                                                              xtcp,
-                                                              1);
+          // The main ethernet/tcp server
+          on ETHERNET_DEFAULT_TILE: ethernet_xtcp_server(xtcp_ports,
+                                                         ipconfig,
+                                                         c_xtcp,
+                                                         1);
 
 
-		// The webserver
-		on tile[0]: xhttpd(xtcp[0]);
+          // The webserver
+          on tile[0]: xhttpd(c_xtcp[0]);
 
 	}
 	return 0;

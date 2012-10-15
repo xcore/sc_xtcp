@@ -76,7 +76,7 @@ typedef enum xtcp_event_type_t {
                               connection is created.        **/ 
 
   XTCP_RECV_DATA,       /**<  This event occurs when the connection has received
-                              some data. The client *must* follow receipt of 
+                              some data. The client **must** follow receipt of 
                               this event with a call to xtcp_recv() before
                               any other interaction with the server. **/
 
@@ -84,7 +84,7 @@ typedef enum xtcp_event_type_t {
                               data and is requesting that the client send data.
                               This event happens after a call to 
                               xtcp_init_send() from the client.
-                              The client *must* follow receipt of this event 
+                              The client **must** follow receipt of this event 
                               with a call to xtcp_send() before any other
                               interaction with the server. */
                                                     
@@ -92,7 +92,7 @@ typedef enum xtcp_event_type_t {
                               sent the previous piece of data that was given
                               to it via a call to xtcp_send(). The server
                               is now requesting more data so the client 
-                              *must* follow receipt of this event 
+                              **must** follow receipt of this event 
                               with a call to xtcp_send() before any other
                               interaction with the server. */
 
@@ -101,7 +101,7 @@ typedef enum xtcp_event_type_t {
                               to it via a call to xtcp_send(). The server
                               is now requesting for the same data to be sent
                               again. The client 
-                              *must* follow receipt of this event 
+                              **must** follow receipt of this event 
                               with a call to xtcp_send() before any other
                               interaction with the server. */
 

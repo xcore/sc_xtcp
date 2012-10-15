@@ -12,21 +12,19 @@ The toplevel main of the application sets up the different components
 running on different threads on the device. It can be found in the
 file ``main.xc``.
 
-First the ethernet MAC is run on core 2. Details of the ethernet
-component can be found in [XEth10]_.
+First the TCP/IP server is run on the tile given by the define
+``ETHERNET_DEFAULT_TILE`` (supplied by the
+``ethernet_board_support.h`` header which gives defines for common
+XMOS development boards.). It is run via the function
+:c:func:`ethernet_xtcp_server`. The server runs both the ethernet code to
+communicate with the ethernet phy and the tcp server on two logical cores.
 
 .. literalinclude:: app_simple_webserver/src/main.xc
-   :start-after: // The ethernet server
-   :end-before: // The TCP/IP
-
-The TCP/IP server is run using the :c:func:`uip_server` function.
-
-.. literalinclude:: app_simple_webserver/src/main.xc
-   :start-after: // The TCP/IP
+   :start-after: // The main ethernet/tcp
    :end-before: // The webserver
 
-Finally, the client to the TCP/IP server is run on a separate thread
-and connected to the TCP/IP server via the first element ``xtcp``
+The client to the TCP/IP server is run as a separate task
+and connected to the TCP/IP server via the first element ``c_xtcp``
 channel array. The function ``xhttpd`` implements the web server.
 
 .. literalinclude:: app_simple_webserver/src/main.xc
@@ -233,39 +231,5 @@ Once the data is sent, all that is left to do is update the ``dptr``,
 .. literalinclude:: app_simple_webserver/src/httpd.c
    :start-after: // We need to send some
    :end-before: ////
-
-
-Converting to use the two thread version of the stack
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In order to convert the application to use the two threaded version, the following changes
-would be made.
-
-First, add the *UIP_USE_SINGLE_THREADED_ETHERNET* constant to the *xtcp_client_config.h* file
-found in the application's source code.
-
-::
-  #define UIP_USE_SINGLE_THREADED_ETHERNET
-
-Next, replace the 5-thread ethernet server, and the TCP/IP server, with a single call to the
-2 thread stack.
-
-::
-  on stdcore[0]:
-  {
-    char mac_address[6];
-
-    ethernet_getmac_otp(otp_ports, mac_address);
-
-    // Bring PHY out of reset
-    p_reset <: 0x2;
-
-    // Start server
-    uipSingleServer(clk_smi, null, smi, mii, xtcp, 1, ipconfig, mac_address);
-    }
-
-
-All other parts of the system will remain the same, as the client-server interface between
-the XTCP server and the application remains the same.
 
 
