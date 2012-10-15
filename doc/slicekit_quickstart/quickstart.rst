@@ -40,7 +40,7 @@ Import and Build the Application
       click on the build icon (hammer) in xTimeComposer. Check the
       console window to verify that the application has built successfully.
 
-For help in using xTimeComposer, try the xTimeComposer tutorial. FIXME add link.
+For help in using xTimeComposer, try the xTimeComposer tutorials, which you can find by selecting Help->Tutorials from the xTimeComposer menu.
 
 Note that the Developer Column in the xTimeComposer on the right hand
 side of your screen provides information on the xSOFTip components you

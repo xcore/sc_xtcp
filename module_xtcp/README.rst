@@ -4,7 +4,6 @@ Ethernet/TCP Module
 :scope: General Use
 :description: An ethernet stack with TCP/IP
 :keywords: ethernet, TCP/IP, mac, mii, IP, UDP, ICMP, UDP
-:boards: XC-2
 
 This module provides an ethernet stack with IP/UDP/TCP protocols. It
 can run as a standalone server that takes two cores and connects to an
