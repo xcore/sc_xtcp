@@ -19,7 +19,7 @@
  *  \param connect_status   This chanend needs to be connected to the connect
  *                          status output of the ethernet mac.
  *
- *  This function implements an xtcp tcp/ip server in a thread.
+ *  This function implements an xtcp tcp/ip server in a logical core.
  *  It uses a port of the uIP stack which is then interfaces over the
  *  xtcp channel array.
  *

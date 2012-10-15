@@ -15,7 +15,7 @@ within that file.
 ``XTCP_CLIENT_BUF_SIZE``
        The buffer size used for incoming packets. This has a maximum
        value of 1472 which can handle any incoming packet. If it is 
-       set to less larger incoming packets will be truncated. Default
+       set to a smaller value, larger incoming packets will be truncated. Default
        is 1472.
 
 ``UIP_CONF_MAX_CONNECTIONS``

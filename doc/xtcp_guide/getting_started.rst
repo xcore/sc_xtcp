@@ -20,7 +20,7 @@ applications. These all start with the prefix ``app_`` and are
 described in the package README. This can be built in the XDE or from
 the command line by executing the command ``xmake all``.
 
-An example of the two-thread TCP plus Ethernet implementation can
+An example of the two logical core (aka thread) TCP plus Ethernet implementation can
 be found in the test_2_thread_example.
 
 

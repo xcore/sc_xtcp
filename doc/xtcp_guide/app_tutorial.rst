@@ -1,7 +1,7 @@
 An XTCP application (tutorial)
 ----------------------------------
 
-This tutorial walks through the a simple webserver application that
+This tutorial walks through a simple webserver application that
 uses the XMOS TCP/IP component. This can be found in the
 ``app_simple_webserver`` directory.
 
@@ -9,7 +9,7 @@ The toplevel main
 +++++++++++++++++
 
 The toplevel main of the application sets up the different components
-running on different threads on the device. It can be found in the
+running on different logical cores on the device. It can be found in the
 file ``main.xc``.
 
 First the ethernet MAC is run on core 2. Details of the ethernet
@@ -25,7 +25,7 @@ The TCP/IP server is run using the :c:func:`uip_server` function.
    :start-after: // The TCP/IP
    :end-before: // The webserver
 
-Finally, the client to the TCP/IP server is run on a separate thread
+Finally, the client to the TCP/IP server is run on a separate logical core
 and connected to the TCP/IP server via the first element ``xtcp``
 channel array. The function ``xhttpd`` implements the web server.
 
@@ -75,7 +75,7 @@ type. Firstly, link status events are ignored:
    :start-after: // HTTP event handler
    :end-before: // Check if the connection
 
-For other events, we first check that the connection is definitely a
+For other events, we first check that the connection is definitely an
 http connection (is directed at port 80) and then call one of several
 event handlers for each type of event. The is a separate function for
 new connections, receiving data, sending data and closing connections:
@@ -127,7 +127,7 @@ Receiving Data
 ~~~~~~~~~~~~~~
 
 
-When a :c:member:`XTCP_RECV_DATA` event occurs the ``httpd_recv``
+When an :c:member:`XTCP_RECV_DATA` event occurs the ``httpd_recv``
 function is called. The first thing this function does is call the
 :c:func:`xtcp_recv` function to place the received data in the
 ``data`` array. (Note that all TCP/IP clients *must* call
@@ -199,7 +199,7 @@ To send data the connection state keeps track of three variables:
 We keep the previous value of ``dptr`` in case the tcp/ip server asks
 for a resend.
 
-On receiving a :c:member:`XTCP_REQUEST_DATA`,
+On receiving an :c:member:`XTCP_REQUEST_DATA`,
 :c:member:`XTCP_SENT_DATA` or :c:member:`XTCP_RESEND_DATA` event the 
 function ``httpd_send`` is called.
 
@@ -235,10 +235,10 @@ Once the data is sent, all that is left to do is update the ``dptr``,
    :end-before: ////
 
 
-Converting to use the two thread version of the stack
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Converting to use the two-core version of the stack
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to convert the application to use the two threaded version, the following changes
+In order to convert the application to use the two logical core (aka thread) version, the following changes
 would be made.
 
 First, add the *UIP_USE_SINGLE_THREADED_ETHERNET* constant to the *xtcp_client_config.h* file
@@ -247,8 +247,8 @@ found in the application's source code.
 ::
   #define UIP_USE_SINGLE_THREADED_ETHERNET
 
-Next, replace the 5-thread ethernet server, and the TCP/IP server, with a single call to the
-2 thread stack.
+Next, replace the 5-core (aka thread) ethernet server, and the TCP/IP server, with a single call to the
+2-core stack.
 
 ::
   on stdcore[0]:

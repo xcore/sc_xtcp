@@ -5,7 +5,7 @@ Software Architecture
 ---------------------
 
 The following Figure shows the architecture of the TCP/IP stack when
-attaching to an independent Ethernet MAC through XC channel:
+attaching to an independent Ethernet MAC through an XC channel:
 
 .. only:: html
 
