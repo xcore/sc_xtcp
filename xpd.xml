@@ -33,10 +33,6 @@
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
         <version>2.2.0alpha18</version>
     </dependency>
-    <dependency repo = "xcommon">
-        <githash>cdcfc87c8c6047bf8d21f13222cbe9e84c6c5e01</githash>
-        <uri>https://github.com/xcore/xcommon.git</uri>
-    </dependency>
     <dependency repo = "sc_otp">
         <githash>c58cd84295fdbdd72a970417bb4cc54342a9d71c</githash>
         <uri>git@github.com:xcore/sc_otp</uri>
