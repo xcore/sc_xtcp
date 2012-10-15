@@ -16,8 +16,6 @@
  *  \param ipconfig         An data structure representing the IP config 
  *                          (ip address, netmask and gateway) of the device.
  *                          Leave NULL for automatic address allocation.
- *  \param connect_status   This chanend needs to be connected to the connect
- *                          status output of the ethernet mac.
  *
  *  This function implements an xtcp tcp/ip server in a thread.
  *  It uses a port of the uIP stack which is then interfaces over the

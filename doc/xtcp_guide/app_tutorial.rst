@@ -22,6 +22,7 @@ communicate with the ethernet phy and the tcp server on two logical cores.
 .. literalinclude:: app_simple_webserver/src/main.xc
    :start-after: // The main ethernet/tcp
    :end-before: // The webserver
+   :strip-leading-whitespace:
 
 The client to the TCP/IP server is run as a separate task
 and connected to the TCP/IP server via the first element ``c_xtcp``
@@ -30,6 +31,7 @@ channel array. The function ``xhttpd`` implements the web server.
 .. literalinclude:: app_simple_webserver/src/main.xc
    :start-after: // The webserver
    :end-before: }
+   :strip-leading-whitespace:
 
 
 The webserver mainloop

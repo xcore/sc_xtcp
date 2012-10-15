@@ -32,10 +32,11 @@ int main(void) {
 	par
 	{
           // The main ethernet/tcp server
-          on ETHERNET_DEFAULT_TILE: ethernet_xtcp_server(xtcp_ports,
-                                                         ipconfig,
-                                                         c_xtcp,
-                                                         1);
+          on ETHERNET_DEFAULT_TILE:
+             ethernet_xtcp_server(xtcp_ports,
+                                  ipconfig,
+                                  c_xtcp,
+                                  1);
 
 
           // The webserver
