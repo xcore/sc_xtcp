@@ -13,7 +13,7 @@
 // XMOS dev boards. If you are using a different board you will need to
 // supply explicit port structure intializers for these values
 ethernet_xtcp_ports_t xtcp_ports =
-    {OTP_PORTS_INITIALIZER,
+    {on ETHERNET_DEFAULT_TILE: OTP_PORTS_INITIALIZER,
      ETHERNET_DEFAULT_SMI_INIT,
      ETHERNET_DEFAULT_MII_INIT_lite,
      ETHERNET_DEFAULT_RESET_INTERFACE_INIT};

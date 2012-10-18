@@ -1,6 +1,11 @@
 TCP/IP Component Changelog
 ==========================
 
+3.1.1
+~~~~~
+  * Minor code demo app fixes (port structures should be declared on
+    specific tiles)
+
 3.1.0
 ~~~~~
   * Compatible with 2.2 module_ethernet
