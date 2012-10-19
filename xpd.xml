@@ -43,6 +43,7 @@
     <docdir>doc/slicekit_quickstart</docdir>
     <exclude_dir>test_3_thread_example</exclude_dir>
     <exclude_dir>tests</exclude_dir>
+    <exclude_dir>experimental</exclude_dir>
     <exclude_dir>doc_pip</exclude_dir>
     <exclude_dir>app_pip_bootloader</exclude_dir>
     <exclude_dir>app_pip_test</exclude_dir>
