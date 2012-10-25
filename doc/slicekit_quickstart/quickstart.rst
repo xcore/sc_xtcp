@@ -92,6 +92,24 @@ into the xCORE multicore microcontroller.
       display a "hello world" webpage. You have now got the ethernet
       slice up and running.
 
+Troubleshooting
++++++++++++++++
+
+If the demo does not work try the following:
+
+  * Ensure the sliceKIT Ethernet Slice is connected to the CIRCLE
+    connector of the core board.
+  * Ensure the slice network cable is fully connected. There are
+    activity LEDs next to the ethernet connector that should
+    illuminate if connected.
+  * Ensure that both the PC and Ethernet Slice are connected to the
+    same network and can route to each other. If you are using a
+    dynamically allocated address, make sure your DHCP server is
+    configured correctly. If using a static address, make sure your PC
+    is configured to talk to that address (in Windows you need to
+    check your Network Adapter TCP/IP settings).
+
+
 Next Steps
 ++++++++++
 
