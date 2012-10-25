@@ -4,7 +4,7 @@ Ethernet Slice Simple Webserver Application Quickstart
 ------------------------------------------------------
 
 This simple demonstration of xTimeComposer Studio functionality uses
-the XA-SK-ETH100 Slice Card together with the xSOFTip TCP/IP Ethernet
+the sliceKIT Ethernet Slice together with the xSOFTip TCP/IP Ethernet
 component to:
 
    * Run a TCP/IP stack on the XCore
@@ -17,12 +17,13 @@ The sliceKIT Core Board has four slots with edge conectors: ``SQUARE``, ``CIRCLE
 
 To setup up the system:
 
-   #. Connect XA-SK-ETH100 Slice Card to the sliceKIT Core Board using the connector marked with the ``CIRCLE``.
+   #. Connect the sliceKIT Ethernet Slice to the sliceKIT Core Board using the connector marked with the ``CIRCLE``.
    #. Connect the XTAG Adapter to sliceKIT Core Board and connect XTAG-2 to the adapter.
    #. Connect the XTAG-2 to host PC. Note that a USB cable is not provided with the sliceKIT starter kit.
-   #. Switch on the power supply to the sliceKIT Core Board.
+   #. Plug the power supply into the sliceKIT Core Board and turn the
+      power supply on.
 
-.. figure:: images/slicekit_eth_setup.png
+.. figure:: images/slicekit_eth_setup.jpg
    :align: center
 
    Hardware Setup for Simple HTTP Demo
@@ -31,7 +32,10 @@ To setup up the system:
 Import and Build the Application
 ++++++++++++++++++++++++++++++++
 
-   #. On your PC, open xTIMEcomposer. Open the edit perspective (Window->Open Perspective->XMOS Edit).
+   #. On your PC, open xTIMEcomposer. You need to be in the
+      edit perspective (Window->Open Perspective->XMOS Edit).
+      If the XMOS Edit option isn't in the list, you are
+      already in the edit perspective.
    #. Locate the ``'Simple HTTP Demo'`` item in the xSOFTip pane on the
       bottom left of the window and drag it into the Project Explorer
       window in the xTimeComposer. This will also cause the modules on
@@ -67,7 +71,7 @@ into the xCORE multicore microcontroller.
 
       This has been generated from the application code via a call to
       the ``printstr()`` function.
-   #. Connect the XA-SK-ETH100 Slice to your network via an ethernet
+   #. Connect the sliceKIT Ethernet Slice your network via an ethernet
       cable. The application is configured by default to use DHCP to
       obtain an IP address. If you wish to change this to a static IP
       address edit the ``main.xc`` file in the application (you can
