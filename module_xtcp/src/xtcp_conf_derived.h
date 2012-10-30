@@ -21,5 +21,8 @@
 #define ETHERNET_USE_XTCP_FILTER 1
 #endif
 
+#if ETHERNET_USE_XTCP_FILTER
+#define ETHERNET_CUSTOM_FILTER_HEADER "xtcp_mac_filter.h"
+#endif
 
 #endif // __xtcp_conf_derived_h__
