@@ -2,7 +2,7 @@ TARGET = XP-DSC-BLDC
 # TARGET = XP-MC-CTRL-L2
 
 APP_NAME =
-XCC_FLAGS = -Os -g -report -save-temps -lxscope
+XCC_FLAGS = -Os -g -report -save-temps -fxscope
 USED_MODULES = module_pip module_ethernet module_otp_board_info module_ethernet_board_support
 
 # This change to the module path is so that this application can be in the
