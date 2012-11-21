@@ -17,7 +17,7 @@
 #include <platform.h>
 #include "print.h"
 #include "uip_server.h"
-#include "getmac.h"
+#include "otp_board_info.h"
 #include "ethernet_server.h"
 #include "tftp.h"
 #include "tftp_app.h"
