@@ -87,6 +87,15 @@ typedef uint8_t u8_t;
 typedef uint16_t u16_t;
 
 /**
+ * 32 bit datatype
+ *
+ * This typedef defines the 32-bit type used throughout uIP.
+ *
+ * \hideinitializer
+ */
+typedef uint32_t u32_t;
+
+/**
  * Statistics datatype
  *
  * This typedef defines the dataype used for keeping statistics in

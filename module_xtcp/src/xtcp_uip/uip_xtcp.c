@@ -572,7 +572,11 @@ xtcpd_appcall(void)
   if (uip_poll()) {
     uip_xtcpd_handle_poll(s);
   }  
-  
+
+  if (uip_tcp_push()) {
+    xtcpd_event(XTCP_PUSH_DATA, s);
+  }
+
   if (uip_closed()) {
     if (!s->s.closed){
       s->s.closed = 1;

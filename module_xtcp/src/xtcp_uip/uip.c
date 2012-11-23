@@ -171,7 +171,7 @@ u16_t uip_len, uip_slen;
 int uip_do_split;
 #endif
 
-u8_t uip_flags; /* The uip_flags variable is used for
+u32_t uip_flags; /* The uip_flags variable is used for
  communication between the TCP/IP stack
  and the application program. */
 struct uip_conn *uip_conn; /* uip_conn always points to the current
@@ -1559,6 +1559,10 @@ void uip_process(u8_t flag) {
                     }
 
 	}
+
+        if (BUF->flags & TCP_PSH) {
+          uip_flags |= UIP_TCP_PUSH;
+        }
 
 	/* Do different things depending on in what state the connection is. */
 	switch (uip_connr->tcpstateflags & UIP_TS_MASK) {

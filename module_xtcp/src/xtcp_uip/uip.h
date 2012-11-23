@@ -713,6 +713,14 @@ void uip_send(const void *data, int len);
  */
 #define uip_closed()    (uip_flags & UIP_CLOSE)
 
+
+/**
+ * Has the other end just sent a packet with the PUSH flag sent
+ *
+ * \hideinitializer
+ */
+#define uip_tcp_push()    (uip_flags & UIP_TCP_PUSH)
+
 /**
  * Has the connection been aborted by the other end?
  *
@@ -1363,7 +1371,7 @@ extern struct uip_stats uip_stat;
  * that are defined in this file. Please read below for more
  * infomation.
  */
-extern u8_t uip_flags;
+extern u32_t uip_flags;
 
 /* The following flags may be set in the global variable uip_flags
    before calling the application callback. The UIP_ACKDATA,
@@ -1400,6 +1408,9 @@ extern u8_t uip_flags;
 
 #define UIP_TIMEDOUT  128   /* The connection has been aborted due to
 			       too many retransmissions. */
+
+#define UIP_TCP_PUSH   256   /* Flags the fact that the other side set the
+                               TCP_PUSH flag. */
 
 /* uip_process(flag):
  *
