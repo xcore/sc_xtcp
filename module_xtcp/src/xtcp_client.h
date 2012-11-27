@@ -80,10 +80,12 @@ typedef enum xtcp_event_type_t {
                               this event with a call to xtcp_recv() before
                               any other interaction with the server. **/
 
+#if XTCP_ENABLE_PUSH_FLAG_NOTIFICATION
   XTCP_PUSH_DATA,       /**<  This event occurs when the connection has received
                               a packet with the TCP push flag set indicating
                               that the other side has temporarily finished
                               sending data.    **/
+#endif
 
   XTCP_REQUEST_DATA,    /**<  This event occurs when the server is ready to send
                               data and is requesting that the client send data.

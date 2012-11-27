@@ -25,4 +25,8 @@
 #define ETHERNET_CUSTOM_FILTER_HEADER "xtcp_mac_filter.h"
 #endif
 
+#ifndef XTCP_ENABLE_PUSH_FLAG_NOTIFICATION
+#define XTCP_ENABLE_PUSH_FLAG_NOTIFICATION 0
+#endif
+
 #endif // __xtcp_conf_derived_h__

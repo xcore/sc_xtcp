@@ -573,9 +573,11 @@ xtcpd_appcall(void)
     uip_xtcpd_handle_poll(s);
   }  
 
+#if XTCP_ENABLE_PUSH_FLAG_NOTIFICATION
   if (uip_tcp_push()) {
     xtcpd_event(XTCP_PUSH_DATA, s);
   }
+#endif
 
   if (uip_closed()) {
     if (!s->s.closed){
