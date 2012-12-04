@@ -192,6 +192,20 @@ struct uip_udp_conn *uip_udp_conn;
 struct uip_udp_conn uip_udp_conns[UIP_UDP_CONNS];
 #endif /* UIP_UDP */
 
+// local network address
+static uip_ipaddr_t subnetaddr = { 0xffff, 0xffff };
+
+void uip_setsubnetaddr(void)
+{
+	uip_ipaddr_t newmask;
+
+	newmask[0]=~uip_netmask[0];
+	newmask[1]=~uip_netmask[1];
+
+	subnetaddr[0]=uip_hostaddr[0]|newmask[0];
+	subnetaddr[1]=uip_hostaddr[1]|newmask[1];
+}
+
 static u16_t ipid; /* Ths ipid variable is an increasing
  number that is used for the IP ID
  field. */
@@ -982,6 +996,7 @@ void uip_process(u8_t flag) {
 		DEBUG_PRINTF("UDP IP checksum 0x%04x\n", uip_ipchksum());
 		if(BUF->proto == UIP_PROTO_UDP &&
 				(uip_ipaddr_cmp(BUF->destipaddr, all_ones_addr) ||
+				uip_ipaddr_cmp(BUF->destipaddr, subnetaddr) ||
                 uip_ipaddr_is_multicast(BUF->destipaddr)) // Fix for UDP multicast traffic
 				/*&&
 				 uip_ipchksum() == 0xffff*/) {
@@ -1164,7 +1179,7 @@ void uip_process(u8_t flag) {
 	 UDP/IP headers, but let the UDP application do all the hard
 	 work. If the application sets uip_slen, it has a packet to
 	 send. */
-     
+
 #if UIP_UDP_CHECKSUMS
 	uip_len = uip_len - UIP_IPUDPH_LEN;
 	uip_appdata = &uip_buf[UIP_LLH_LEN + UIP_IPUDPH_LEN];
@@ -1190,7 +1205,7 @@ void uip_process(u8_t flag) {
 		 connection is bound to a remote IP address, the source IP
 		 address of the packet is checked. */
 
-#if 0	  	  
+#if 0
 		if(uip_udp_conn->lport != 0 &&
 				UDPBUF->destport == uip_udp_conn->lport &&
 				(uip_udp_conn->rport == 0 ||
@@ -1199,6 +1214,7 @@ void uip_process(u8_t flag) {
 				((uip_udp_conn->udpflags & UDP_IS_SERVER_CONN) ||
 						uip_ipaddr_cmp(uip_udp_conn->ripaddr, all_zeroes_addr) ||
 						uip_ipaddr_cmp(uip_udp_conn->ripaddr, all_ones_addr) ||
+						uip_ipaddr_cmp(uip_udp_conn->ripaddr, subnetaddr) ||
 						uip_ipaddr_cmp(BUF->srcipaddr, uip_udp_conn->ripaddr) ||
 						uip_ipaddr_is_multicast(uip_udp_conn->ripaddr))) {
 
@@ -1278,7 +1294,7 @@ void uip_process(u8_t flag) {
 
 	uip_ipaddr_copy(BUF->srcipaddr, uip_hostaddr);
 	uip_ipaddr_copy(BUF->destipaddr, uip_udp_conn->ripaddr);
-    
+
 	uip_appdata = &uip_buf[UIP_LLH_LEN + UIP_IPTCPH_LEN];
 
 #if UIP_UDP_CHECKSUMS

@@ -74,11 +74,13 @@ void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, un
 		uip_sethostaddr(ipaddr);
 		uip_setdraddr(ipaddr);
 		uip_setnetmask(ipaddr);
+		uip_setsubnetaddr();
 	} else {
 
 		uip_sethostaddr(ipconfig->ipaddr);
 		uip_setdraddr(ipconfig->gateway);
 		uip_setnetmask(ipconfig->netmask);
+		uip_setsubnetaddr();
 
 #ifdef XTCP_VERBOSE_DEBUG
 		printstr("Address: ");uip_printip4(uip_hostaddr);printstr("\n");
@@ -219,6 +221,7 @@ void dhcpc_configured(const struct dhcpc_state *s) {
 	uip_sethostaddr(s->ipaddr);
 	uip_setdraddr(s->default_router);
 	uip_setnetmask(s->netmask);
+	uip_setsubnetaddr();
 	uip_xtcp_up();
 	dhcp_done = 1;
 }
@@ -236,6 +239,7 @@ void autoip_configured(uip_ipaddr_t autoip_ipaddr) {
 		uip_sethostaddr(autoip_ipaddr);
 		uip_ipaddr(ipaddr, 255, 255, 0, 0);
 		uip_setnetmask(ipaddr);
+		uip_setsubnetaddr();
 		uip_ipaddr(ipaddr, 0, 0, 0, 0);
 		uip_setdraddr(ipaddr);
 		uip_xtcp_up();
@@ -268,10 +272,12 @@ void uip_linkup() {
 				uip_static_ipconfig.netmask[2],
 				uip_static_ipconfig.netmask[3]);
 		uip_setnetmask(ipaddr);
+		uip_setsubnetaddr();
 #else
 		uip_sethostaddr(uip_static_ipconfig.ipaddr);
 		uip_setdraddr(uip_static_ipconfig.gateway);
 		uip_setnetmask(uip_static_ipconfig.netmask);
+		uip_setsubnetaddr();
 #endif
 		uip_xtcp_up();
 	} else {
