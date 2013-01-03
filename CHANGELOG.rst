@@ -1,6 +1,11 @@
 TCP/IP Component Changelog
 ==========================
 
+3.1.2
+~~~~~
+  * Fixed auto-ip bug for 2-core xtcp server
+
+
 3.1.1
 ~~~~~
   * Minor code demo app fixes (port structures should be declared on
