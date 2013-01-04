@@ -29,9 +29,9 @@
         </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>95e20abf6ed73901f13cdd883a164dc1a7370eed</githash>
+        <githash>3db65a9cd09d968d0f8e59550f900cc8b6b77401</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.2.1rc1</version>
+        <version>2.2.2rc0</version>
     </dependency>
     <dependency repo = "sc_otp">
         <githash>062aa923a78bc603b254b2a99b78593ab3a816ec</githash>
@@ -72,7 +72,7 @@
     <release parenthash = "3f1efebd81c6ccace6143af5df1df0f9205dc86a" version = "3.1.1rc0" githash = "67f627e9f832e4088abe960e2163efff7bb20a88"></release>
     <release parenthash = "9921fa0d774ea0086ffdea450e03fb0f7d969c70" version = "3.1.1rc1" githash = "de29e033408ae3bcbeb1a515d9346a91be2e87fd"></release>
     <release parenthash = "de29e033408ae3bcbeb1a515d9346a91be2e87fd" version = "3.1.1rc2" githash = "6d4caf30161924bee1ecab698a6e4b204d8d9f73"></release>
-    <release parenthash = "34b3bfe41b9be8c21f8d786543ad7cf30cc0f55d" version = "3.1.1rc3"></release>
+    <release parenthash = "34b3bfe41b9be8c21f8d786543ad7cf30cc0f55d" version = "3.1.1rc3" githash = "dd577c606e5760abc2e3a44d81a1837d3d421987"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
