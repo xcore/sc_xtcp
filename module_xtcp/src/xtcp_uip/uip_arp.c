@@ -111,6 +111,7 @@ struct arp_entry {
   u16_t ipaddr[2];
   struct uip_eth_addr ethaddr;
   u8_t time;
+  int interface;
 };
 
 static const u16_t broadcast_ipaddr[2] = {0xffff,0xffff};
@@ -164,7 +165,7 @@ uip_arp_timer(void)
 }
 /*-----------------------------------------------------------------------------------*/
 static void
-uip_arp_update(u16_t *ipaddr, struct uip_eth_addr *ethaddr)
+uip_arp_update(u16_t *ipaddr, struct uip_eth_addr *ethaddr, int interface)
 {
   register struct arp_entry *tabptr;
   /* Walk through the ARP mapping table and try to find an entry to
@@ -185,6 +186,7 @@ uip_arp_update(u16_t *ipaddr, struct uip_eth_addr *ethaddr)
 	/* An old entry found, update this and return. */
 	memcpy(tabptr->ethaddr.addr, ethaddr->addr, 6);
 	tabptr->time = arptime;
+        tabptr->interface = interface;
 
 	return;
       }
@@ -241,7 +243,7 @@ uip_arp_update(u16_t *ipaddr, struct uip_eth_addr *ethaddr)
 /*-----------------------------------------------------------------------------------*/
 #if 0
 void
-uip_arp_ipin(void)
+uip_arp_ipin(int interface)
 {
   uip_len -= sizeof(struct uip_eth_hdr);
 	
@@ -255,7 +257,7 @@ uip_arp_ipin(void)
      (uip_hostaddr[1] & uip_netmask[1])) {
     return;
   }
-  uip_arp_update(IPBUF->srcipaddr, &(IPBUF->ethhdr.src));
+  uip_arp_update(IPBUF->srcipaddr, &(IPBUF->ethhdr.src), interface);
 
   return;
 }
@@ -284,7 +286,7 @@ uip_arp_ipin(void)
  */
 /*-----------------------------------------------------------------------------------*/
 void
-uip_arp_arpin(void)
+uip_arp_arpin(int interface)
 {
   
   if(uip_len < sizeof(struct arp_hdr)) {
@@ -305,7 +307,7 @@ uip_arp_arpin(void)
       /* First, we register the one who made the request in our ARP
 	 table, since it is likely that we will do more communication
 	 with this host in the future. */
-      uip_arp_update(BUF->sipaddr, &BUF->shwaddr);
+      uip_arp_update(BUF->sipaddr, &BUF->shwaddr, interface);
       
       /* The reply opcode is 2. */
       BUF->opcode = HTONS(2);
@@ -328,7 +330,7 @@ uip_arp_arpin(void)
     /* ARP reply. We insert or update the ARP table if it was meant
        for us. */
     if(uip_ipaddr_cmp(BUF->dipaddr, uip_hostaddr)) {
-      uip_arp_update(BUF->sipaddr, &BUF->shwaddr);
+      uip_arp_update(BUF->sipaddr, &BUF->shwaddr, interface);
     }
     break;
   }
@@ -363,11 +365,11 @@ uip_arp_arpin(void)
  * uip_len.
  */
 /*-----------------------------------------------------------------------------------*/
-void
+int
 uip_arp_out(struct uip_udp_conn *conn)
 {
   struct arp_entry *tabptr;
-  
+  int interface;
   /* Find the destination IP address in the ARP table and construct
      the Ethernet header. If the destination IP addres isn't on the
      local network, we use the default router's IP address instead.
@@ -378,13 +380,15 @@ uip_arp_out(struct uip_udp_conn *conn)
   /* First check if destination is a local broadcast. */
   if(uip_ipaddr_cmp(IPBUF->destipaddr, broadcast_ipaddr)) {
     memset(IPBUF->ethhdr.dest.addr, 0xFF, 6);
+    interface = BROADCAST_INTERFACE;
   } else  if(uip_ipaddr_is_multicast(IPBUF->destipaddr)) {
     IPBUF->ethhdr.dest.addr[0] = 0x01;
     IPBUF->ethhdr.dest.addr[1] = 0x00;
     IPBUF->ethhdr.dest.addr[2] = 0x5e;
     IPBUF->ethhdr.dest.addr[3] = IPBUF->destipaddr[0] >> 8; 
     IPBUF->ethhdr.dest.addr[4] = IPBUF->destipaddr[1] & 0xf;
-    IPBUF->ethhdr.dest.addr[5] = IPBUF->destipaddr[1] >> 8;     
+    IPBUF->ethhdr.dest.addr[5] = IPBUF->destipaddr[1] >> 8;
+    interface = BROADCAST_INTERFACE;
   }
   else  {
     /* Check if the destination address is on the local network. */
@@ -433,11 +437,13 @@ uip_arp_out(struct uip_udp_conn *conn)
       if (conn != NULL)
         conn->udpflags |= UDP_PENDING_ARP;
 
-      return;
+      interface = BROADCAST_INTERFACE;
+      return interface;
     }
 
     /* Build an ethernet header. */
     memcpy(IPBUF->ethhdr.dest.addr, tabptr->ethaddr.addr, 6);
+    interface = tabptr->interface;
   }
   memcpy(IPBUF->ethhdr.src.addr, uip_ethaddr.addr, 6);
   
@@ -447,6 +453,7 @@ uip_arp_out(struct uip_udp_conn *conn)
     conn->udpflags |= UDP_SENT;
 
   uip_len += sizeof(struct uip_eth_hdr);
+  return interface;
 }
 /*-----------------------------------------------------------------------------------*/
 

@@ -60,8 +60,8 @@ extern xtcp_ipconfig_t uip_static_ipconfig;
 // Functions from uip_server_support
 extern void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t& ipconfig, unsigned char mac_address[6]);
 extern void xtcpd_check_connection_poll(chanend mac_tx);
-extern void xtcp_tx_buffer(chanend mac_tx);
-extern void xtcp_process_incoming_packet(chanend mac_tx);
+extern void xtcp_tx_buffer(chanend mac_tx, int dst_port);
+extern void xtcp_process_incoming_packet(chanend mac_tx, int src_port);
 extern void xtcp_process_udp_acks(chanend mac_tx);
 extern void xtcp_process_periodic_timer(chanend mac_tx);
 
@@ -75,7 +75,7 @@ extern void autoip_periodic();
 extern void igmp_periodic();
 
 #pragma unsafe arrays
-void xcoredev_send(chanend tx)
+void xcoredev_send(chanend tx, int dst_port)
 {
 #ifdef UIP_SINGLE_SERVER_DOUBLE_BUFFER_TX
   static int txbuf0[(UIP_MAX_TRANSMIT_SIZE+3)/4];
@@ -207,7 +207,7 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
 				autoip_timer = 0;
 				autoip_periodic();
 				if (uip_len > 0) {
-					xtcp_tx_buffer(mac_tx);
+                                  xtcp_tx_buffer(mac_tx,0);
 				}
 			}
 #endif
@@ -224,7 +224,7 @@ static void theServer(chanend mac_rx, chanend mac_tx, chanend cNotifications,
                                   if (length <= UIP_BUFSIZE) {
                                     uip_len = length;
                                     copy_packet(uip_buf32, address, length);
-                                    xtcp_process_incoming_packet(mac_tx);
+                                    xtcp_process_incoming_packet(mac_tx,0);
                                   }
                                   mii_free_in_buffer(miiData, address);
                                   mii_restart_buffer(miiData);

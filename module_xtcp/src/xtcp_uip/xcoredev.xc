@@ -55,7 +55,7 @@ xcoredev_read(chanend rx, int n)
 
 /*---------------------------------------------------------------------------*/
 void
-xcoredev_send(chanend tx)
+xcoredev_send(chanend tx, int dst_port)
 {
   int len = uip_len;
   if (len != 0) {
@@ -65,7 +65,7 @@ xcoredev_send(chanend tx)
       len=64;
     }
 
-    mac_tx(tx, uip_buf32, len, -1);
+    mac_tx(tx, uip_buf32, len, dst_port);
   }
 }
 /*---------------------------------------------------------------------------*/

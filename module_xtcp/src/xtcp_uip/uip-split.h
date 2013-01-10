@@ -94,7 +94,7 @@
  * uip_len variable.
  *
  */
-void uip_split_output(chanend mac_tx);
+void uip_split_output(chanend mac_tx, int dst_port);
 
 #endif /* __UIP_SPLIT_H__ */
 

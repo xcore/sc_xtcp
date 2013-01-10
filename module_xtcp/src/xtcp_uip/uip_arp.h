@@ -94,8 +94,11 @@ void uip_arp_init(void);
    Ethernet frame is present in the uip_buf buffer. When the
    uip_arp_arpin() function returns, the contents of the uip_buf
    buffer should be sent out on the Ethernet if the uip_len variable
-   is > 0. */
-void uip_arp_arpin(void);
+   is > 0.
+
+   The argument to the function should be the interface that the packet came
+   in on.*/
+void uip_arp_arpin(int interface);
 
 /* The uip_arp_out() function should be called when an IP packet
    should be sent out on the Ethernet. This function creates an
@@ -113,8 +116,10 @@ void uip_arp_arpin(void);
    existing packet then the PENDING_ARP flag is set in that udp 
    connection so that when an arp reply comes back the application layer
    is asked to retransmit the udp packet.
+
+   The function returns the interface that the packet should be sent on.
 */
-void uip_arp_out(struct uip_udp_conn* conn);
+int uip_arp_out(struct uip_udp_conn* conn);
 
 /* The uip_arp_timer() function should be called every ten seconds. It
    is responsible for flushing old entries in the ARP table. */
@@ -153,5 +158,7 @@ void uip_arp_timer(void);
 
 /** @} */
 /** @} */
+
+#define BROADCAST_INTERFACE (-1)
 
 #endif /* __UIP_ARP_H__ */

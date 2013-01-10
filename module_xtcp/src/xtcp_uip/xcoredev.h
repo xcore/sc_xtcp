@@ -10,6 +10,6 @@
 
 void xcoredev_init(chanend mac_rx, chanend mac_tx);
 unsigned int xcoredev_read(chanend mac_rx, int n);
-void xcoredev_send(chanend mac_tx);
+void xcoredev_send(chanend mac_tx, int dst_port);
 
 #endif /* __XCOREDEV_H__ */

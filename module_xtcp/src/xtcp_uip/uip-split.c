@@ -65,7 +65,7 @@ extern int uip_do_split;
 #endif
 
 static void
-uip_split_output_send(chanend mac_tx)
+uip_split_output_send(chanend mac_tx, int dst_port)
 {
 	/* Recalculate the TCP checksum. */
 	BUF->tcpchksum = 0;
@@ -79,7 +79,7 @@ uip_split_output_send(chanend mac_tx)
 	uip_len += UIP_LLH_LEN;
 
 	/* Transmit the first packet. */
-	xcoredev_send(mac_tx);
+	xcoredev_send(mac_tx, dst_port);
 }
 
 
@@ -93,7 +93,7 @@ uip_split_output_send(chanend mac_tx)
 // transmit packet 2 until packet 1 has been acknowledged, we have to wait
 // until the other end times out of the 300ms delay before sending us an ACK.
 void
-uip_split_output(chanend mac_tx)
+uip_split_output(chanend mac_tx, int dst_port)
 {
 	u16_t tcplen, len1, len2;
 
@@ -123,7 +123,7 @@ uip_split_output(chanend mac_tx)
 			BUF->len[1] = uip_len & 0xff;
 #endif
 
-			uip_split_output_send(mac_tx);
+			uip_split_output_send(mac_tx, dst_port);
 
 			/* Now, create the second packet. To do this, it is not enough to
 			 just alter the length field, but we must also update the TCP
@@ -157,15 +157,15 @@ uip_split_output(chanend mac_tx)
 			uip_add32(BUF->seqno, len1);
 			xtcp_copy_word(BUF->seqno, uip_acc32);
 
-			uip_split_output_send(mac_tx);
+			uip_split_output_send(mac_tx, dst_port);
 		} else {
 			// We didn't compute the checksum earlier
 			BUF->tcpchksum = 0;
 			BUF->tcpchksum = ~(uip_tcpchksum());
-			xcoredev_send(mac_tx);
+			xcoredev_send(mac_tx, dst_port);
 		}
 	} else {
-		xcoredev_send(mac_tx);
+          xcoredev_send(mac_tx, dst_port);
 	}
 }
 /*-----------------------------------------------------------------------------*/
