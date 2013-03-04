@@ -6,13 +6,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>TCP/IP Stack System Description &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <title>TCP/IP Stack System Description &mdash; Ethernet TCP/IP Component Programming Guide v documentation</title>
     <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2v0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -21,11 +21,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
     <script type="text/javascript" src="_static/xcomment.js"></script>
-    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
+    <link rel="top" title="Ethernet TCP/IP Component Programming Guide v documentation" href="index.html" />
     <link rel="next" title="Programming Guide" href="programming.html" />
-    <link rel="prev" title="H/W Development Platforms" href="hw.html" /> 
+    <link rel="prev" title="Overview" href="overview.html" /> 
 
 <script>
 function setheight() {
@@ -52,7 +51,7 @@ document.getElementById('d1').style.height=h2 + "px";
         <div class="bodywrapper">
           <div class="body">
 <div style="float: right">
-<a href="hw.html"
+<a href="overview.html"
                         title="previous chapter"> &lt&lt </a>
 <a href="programming.html"
                         title="next chapter"> &gt&gt </a></p>
@@ -64,33 +63,36 @@ document.getElementById('d1').style.height=h2 + "px";
 <div class="section" id="software-architecture">
 <h2>Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this headline">¶</a></h2>
 <p>The following Figure shows the architecture of the TCP/IP stack when
-attaching to an independent Ethernet stack through XC channel:</p>
+attaching to an independent Ethernet MAC through an XC channel:</p>
 <div class="figure align-center">
 <img alt="_images/xtcp_arch-crop.png" src="_images/xtcp_arch-crop.png" />
 <p class="caption">XTCP software architecture</p>
 </div>
-<p>The server runs in a single thread and connects to the XMOS Ethernet
-MAC component (see <a class="reference internal" href="references.html#xeth10"><span>[XEth10]</span></a>). It can then connect to several client
-threads over XC channels.</p>
+<p>The server runs on a single logical core and connects to the XMOS Ethernet
+MAC component. It can then connect to several client
+tasks over XC channels. To enable this option the define
+<tt class="docutils literal"><span class="pre">XTCP_USE_SEPARATE_MAC</span></tt> needs to be set to <tt class="docutils literal"><span class="pre">1</span></tt> in the
+<tt class="docutils literal"><span class="pre">xtcp_conf.h</span></tt> file in your application and run the
+<a class="reference internal" href="api.html#xtcp_server" title="xtcp_server"><span>xtcp_server()</span></a> function.</p>
 <p>Alternatively, the TCP/IP server and Ethernet server can be run as
-an integrated system of two threads.  To enable this, the header
-file <tt class="docutils literal"><span class="pre">uip_single_server.h</span></tt> should be included, and the function
-<a class="reference internal" href="api.html#uipSingleServer" title="uipSingleServer"><span>uipSingleServer()</span></a> used in place of the <a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a> and
-<tt class="docutils literal"><span class="pre">ethernet_server</span></tt> function from the ethernet repository.  In addition,
-the <tt class="docutils literal"><span class="pre">module_mii_singlethread</span></tt> should be used instead of <tt class="docutils literal"><span class="pre">module_ethernet</span></tt>
-and <tt class="docutils literal"><span class="pre">module_locks</span></tt> in the Makefile. Finally, define the constant
-<tt class="docutils literal"><span class="pre">UIP_USE_SINGLE_THREADED_ETHERNET</span></tt> in your application&#8217;s <tt class="docutils literal"><span class="pre">xtcp_client_config.h</span></tt>
-file.</p>
+an integrated system on two logical cores. This can be started by
+running the <a class="reference internal" href="api.html#ethernet_xtcp_server" title="ethernet_xtcp_server"><span>ethernet_xtcp_server()</span></a> function.</p>
 </div>
 <div class="section" id="ip-configuration">
 <h2>IP Configuration<a class="headerlink" href="#ip-configuration" title="Permalink to this headline">¶</a></h2>
 <p>The server will determine its IP configuration based on the arguments
-passed into the <a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a> or <a class="reference internal" href="api.html#uipSingleServer" title="uipSingleServer"><span>uipSingleServer()</span></a> function.
+passed into the <a class="reference internal" href="api.html#xtcp_server" title="xtcp_server"><span>xtcp_server()</span></a> or <a class="reference internal" href="api.html#ethernet_xtcp_server" title="ethernet_xtcp_server"><span>ethernet_xtcp_server()</span></a>
+function.
 If an address is supplied then that address will be used (a static IP address
-configuration). If no address is supplied then the server will first
+configuration).</p>
+<p>If no address is supplied then the server will first
 try to find a DHCP server on the network to obtain an address
-automatically. If this fails it will determine a link local address
-(in the range 169.254/16) automatically using the Zeroconf IPV4LL protocol.</p>
+automatically. If it cannot obtain an address from DHCP, it will determine
+a link local address (in the range 169.254/16) automatically using the
+Zeroconf IPV4LL protocol.</p>
+<p>To use dynamic address, the <a class="reference internal" href="api.html#xtcp_server" title="xtcp_server"><span>xtcp_server()</span></a> or
+<a class="reference internal" href="api.html#ethernet_xtcp_server" title="ethernet_xtcp_server"><span>ethernet_xtcp_server()</span></a> function can be passed a <em>null</em> to
+the ip configuration parameter.</p>
 </div>
 <div class="section" id="events-and-connections">
 <h2>Events and Connections<a class="headerlink" href="#events-and-connections" title="Permalink to this headline">¶</a></h2>
@@ -102,11 +104,11 @@ application.</p>
 <img alt="_images/events-crop.png" src="_images/events-crop.png" />
 <p class="caption">Example event sequence</p>
 </div>
-<p>Each clients will receive <em>events</em> from the server. These events
+<p>Each client will receive <em>events</em> from the server. These events
 usually have an associated <em>connection</em>. In addition to receiving
 these events the client can send <em>commands</em> to the server to initiate
 new connections and so on.</p>
-<p>The preceding figure shows an example event/command sequence of a
+<p>The above Figure shows an example event/command sequence of a
 client making a connection, sending some data, receiving some data and
 then closing the connection. Note that sending and receiving may be
 split into several events/commands since the server itself performs no
@@ -133,6 +135,11 @@ used to listen on a port for other hosts to connect to the application
 . In either
 case once a connection is established then the
 <tt class="xref c c-member docutils literal"><span class="pre">XTCP_NEW_CONNECTION</span></tt> event is triggered.</p>
+<p>In the Berkley sockets API, a listening UDP connection merely reports
+data received on the socket, indepedent of the source IP address.  In
+XTCP, a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_NEW_CONNECTION</span></tt> event is sent each time data
+arrives from a new source.  The API function <a class="reference internal" href="api.html#xtcp_close" title="xtcp_close"><span>xtcp_close()</span></a>
+should be called after the connection is no longer needed.</p>
 </div>
 <div class="section" id="receiving-data">
 <h2>Receiving Data<a class="headerlink" href="#receiving-data" title="Permalink to this headline">¶</a></h2>
@@ -144,7 +151,7 @@ data.</p>
 in. There is no buffering in the server so it will wait for the client
 to handle the event before processing new incoming packets.</p>
 <p>As an alternative to the low level interface, a higher level buffered
-interface is available.  See the section below.</p>
+interface is available.  See section <a class="reference internal" href="#sec-buffered-api"><span>Buffered API</span></a>.</p>
 </div>
 <div class="section" id="sending-data">
 <h2>Sending Data<a class="headerlink" href="#sending-data" title="Permalink to this headline">¶</a></h2>
@@ -164,12 +171,6 @@ MAC address.</p>
 done but the server is notified of a wish to send. The client must
 then wait for a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_REQUEST_DATA</span></tt> event at which point it
 must respond with a call to <a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a>.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The maximum buffer size that can be sent in one call to
-<a class="reference internal" href="api.html#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> is contained in the <tt class="xref c c-member docutils literal"><span class="pre">mss</span></tt>
-field of the connection structure relating to the event.</p>
-</div>
 <p>After this data is sent to the server, two things can happen: Either
 the server will respond with an <tt class="xref c c-member docutils literal"><span class="pre">XTCP_SENT_DATA</span></tt> event, in
 which case the next chunk of data can be sent or with an
@@ -189,13 +190,13 @@ link status events to the client. The events <tt class="xref c c-member docutils
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>The server is configured via arguments passed to the
-<a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a> function and the defines described in Section
+<a class="reference internal" href="api.html#xtcp_server" title="xtcp_server"><span>xtcp_server()</span></a> function and the defines described in Section
 <a class="reference internal" href="api.html#sec-config-defines"><span>Configuration Defines</span></a>.</p>
 <p>Client connections are configured via the client API described in
 Section <a class="reference internal" href="api.html#sec-config-defines"><span>Configuration Defines</span></a>.</p>
 </div>
 <div class="section" id="buffered-api">
-<h2>Buffered API<a class="headerlink" href="#buffered-api" title="Permalink to this headline">¶</a></h2>
+<span id="sec-buffered-api"></span><h2>Buffered API<a class="headerlink" href="#buffered-api" title="Permalink to this headline">¶</a></h2>
 <p>As an alternative to the low level interface, a buffered interface is
 available as a utility layer.</p>
 <p>To set up the buffered interface, the application must receive or make
@@ -213,6 +214,10 @@ is returned, indicated by a non-zero return value, then the application
 should process the data, and call the receive function again.  Only when
 the function returns zero can the application stop trying to receive and
 process the data.</p>
+<p>Two example applications are provided. <em>app_buffered_protocol_demo</em> shows
+the use of the buffered API used with fixed length packets, and
+<em>app_buffered_protocol_demo_2</em> shows the use of the delimited token
+mechanism.</p>
 </div>
 </div>
 
@@ -223,11 +228,9 @@ process the data.</p>
       </div>
       <div class="sphinxsidebar" id='d2'>
         <div class="sphinxsidebarwrapper">
-<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
+<h3><a href="index.html">Ethernet TCP/IP Component Programming Guide</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">TCP/IP Stack System Description</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#software-architecture">Software Architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ip-configuration">IP Configuration</a></li>
@@ -243,7 +246,6 @@ process the data.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div id="searchbox" style="display: none;margin-bottom: 10px;">

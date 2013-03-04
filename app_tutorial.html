@@ -6,13 +6,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>An XTCP application (tutorial) &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <title>An XTCP application (tutorial) &mdash; Ethernet TCP/IP Component Programming Guide v documentation</title>
     <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2v0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -21,9 +21,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
     <script type="text/javascript" src="_static/xcomment.js"></script>
-    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
+    <link rel="top" title="Ethernet TCP/IP Component Programming Guide v documentation" href="index.html" />
     <link rel="up" title="Programming Guide" href="programming.html" />
     <link rel="next" title="API" href="api.html" />
     <link rel="prev" title="Source code structure" href="structure.html" /> 
@@ -62,47 +61,31 @@ document.getElementById('d1').style.height=h2 + "px";
             
   <div class="section" id="an-xtcp-application-tutorial">
 <h1>An XTCP application (tutorial)<a class="headerlink" href="#an-xtcp-application-tutorial" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial walks through the a simple webserver application that
+<p>This tutorial walks through a simple webserver application that
 uses the XMOS TCP/IP component. This can be found in the
 <tt class="docutils literal"><span class="pre">app_simple_webserver</span></tt> directory.</p>
 <div class="section" id="the-toplevel-main">
 <h2>The toplevel main<a class="headerlink" href="#the-toplevel-main" title="Permalink to this headline">¶</a></h2>
 <p>The toplevel main of the application sets up the different components
-running on different threads on the device. It can be found in the
+running on different logical cores on the device. It can be found in the
 file <tt class="docutils literal"><span class="pre">main.xc</span></tt>.</p>
-<p>First the ethernet MAC is run on core 2. Details of the ethernet
-component can be found in <a class="reference internal" href="references.html#xeth10"><span>[XEth10]</span></a>.</p>
-<div class="highlight-none"><div class="highlight"><pre>		on stdcore[2]:
-		{
-			int mac_address[2];
-
-			ethernet_getmac_otp(otp_data, otp_addr, otp_ctrl,
-					(mac_address, char[]));
-
-			phy_init(clk_smi,
-#ifdef PORT_ETH_RST_N
-					p_mii_resetn,
-#else
-					null,
-#endif
-					smi, mii);
-
-			ethernet_server(mii, mac_address,
-					mac_rx, 1, mac_tx, 1, smi,
-					connect_status);
-		}
+<p>First the TCP/IP server is run on the tile given by the define
+<tt class="docutils literal"><span class="pre">ETHERNET_DEFAULT_TILE</span></tt> (supplied by the
+<tt class="docutils literal"><span class="pre">ethernet_board_support.h</span></tt> header which gives defines for common
+XMOS development boards.). It is run via the function
+<a class="reference internal" href="api.html#ethernet_xtcp_server" title="ethernet_xtcp_server"><span>ethernet_xtcp_server()</span></a>. The server runs both the ethernet code to
+communicate with the ethernet phy and the tcp server on two logical cores.</p>
+<div class="highlight-none"><div class="highlight"><pre>on ETHERNET_DEFAULT_TILE:
+   ethernet_xtcp_server(xtcp_ports,
+                        ipconfig,
+                        c_xtcp,
+                        1);
 </pre></div>
 </div>
-<p>The TCP/IP server is run using the <a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a> function.</p>
-<div class="highlight-none"><div class="highlight"><pre>		on stdcore[3]: uip_server(mac_rx[0], mac_tx[0],
-				xtcp, 1, ipconfig,
-				connect_status);
-</pre></div>
-</div>
-<p>Finally, the client to the TCP/IP server is run on a separate thread
-and connected to the TCP/IP server via the first element <tt class="docutils literal"><span class="pre">xtcp</span></tt>
+<p>The client to the TCP/IP server is run as a separate task
+and connected to the TCP/IP server via the first element <tt class="docutils literal"><span class="pre">c_xtcp</span></tt>
 channel array. The function <tt class="docutils literal"><span class="pre">xhttpd</span></tt> implements the web server.</p>
-<div class="highlight-none"><div class="highlight"><pre>		on stdcore[0]: xhttpd(xtcp[0]);
+<div class="highlight-none"><div class="highlight"><pre>on tile[0]: xhttpd(c_xtcp[0]);
 </pre></div>
 </div>
 </div>
@@ -115,7 +98,7 @@ passed onto the <tt class="docutils literal"><span class="pre">httpd_handle_even
 <div class="highlight-none"><div class="highlight"><pre>void xhttpd(chanend tcp_svr)
 {
   xtcp_connection_t conn;
-  
+  printstrln(&quot;**WELCOME TO THE SIMPLE WEBSERVER DEMO**&quot;);
   // Initiate the HTTP state
   httpd_init(tcp_svr);
    
@@ -128,6 +111,7 @@ passed onto the <tt class="docutils literal"><span class="pre">httpd_handle_even
           httpd_handle_event(tcp_svr, conn);
           break;
         }
+
     }
 }
 </pre></div>
@@ -181,7 +165,16 @@ type. Firstly, link status events are ignored:</p>
   // Ignore events that are not directly relevant to http
   switch (conn-&gt;event) 
     {
-    case XTCP_IFUP:
+    case XTCP_IFUP: {
+      xtcp_ipconfig_t ipconfig;
+      xtcp_get_ipconfig(tcp_svr, &amp;ipconfig);
+      printstr(&quot;IP Address: &quot;);
+      printint(ipconfig.ipaddr[0]);printstr(&quot;.&quot;);
+      printint(ipconfig.ipaddr[1]);printstr(&quot;.&quot;);
+      printint(ipconfig.ipaddr[2]);printstr(&quot;.&quot;);
+      printint(ipconfig.ipaddr[3]);printstr(&quot;\n&quot;);
+      }
+      return;
     case XTCP_IFDOWN:
     case XTCP_ALREADY_HANDLED:
       return;
@@ -190,7 +183,7 @@ type. Firstly, link status events are ignored:</p>
     }
 </pre></div>
 </div>
-<p>For other events, we first check that the connection is definitely a
+<p>For other events, we first check that the connection is definitely an
 http connection (is directed at port 80) and then call one of several
 event handlers for each type of event. The is a separate function for
 new connections, receiving data, sending data and closing connections:</p>
@@ -249,7 +242,7 @@ array is searched for a free state structure.</p>
 </pre></div>
 </div>
 <p>If we can allocate the state structure then the elements of the
-structure are initalizes. The function
+structure are initialized. The function
 <a class="reference internal" href="api.html#xtcp_set_connection_appstate" title="xtcp_set_connection_appstate"><span>xtcp_set_connection_appstate()</span></a> is then called to associate the
 state with the connection. This means when a subsequent event is
 signalled on this connection the state can be recovered.</p>
@@ -285,7 +278,7 @@ with the connection can be freed up. This is done in the
 </div>
 <div class="section" id="receiving-data">
 <h3>Receiving Data<a class="headerlink" href="#receiving-data" title="Permalink to this headline">¶</a></h3>
-<p>When a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RECV_DATA</span></tt> event occurs the <tt class="docutils literal"><span class="pre">httpd_recv</span></tt>
+<p>When an <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RECV_DATA</span></tt> event occurs the <tt class="docutils literal"><span class="pre">httpd_recv</span></tt>
 function is called. The first thing this function does is call the
 <a class="reference internal" href="api.html#xtcp_recv" title="xtcp_recv"><span>xtcp_recv()</span></a> function to place the received data in the
 <tt class="docutils literal"><span class="pre">data</span></tt> array. (Note that all TCP/IP clients <em>must</em> call
@@ -313,7 +306,7 @@ set up and the <tt class="docutils literal"><span class="pre">hs</span></tt> var
   
 </pre></div>
 </div>
-<p>Now we are in a position where we have known connection state and the
+<p>Now the connection state is known and the
 incoming data buffer filled. To keep things simple, this server makes
 the assumption that a single tcp packet gives us enough information to
 parse the http request. However, many applications will need to
@@ -392,7 +385,7 @@ this connection. The actual sending of data is handled when an
 </table>
 <p>We keep the previous value of <tt class="docutils literal"><span class="pre">dptr</span></tt> in case the tcp/ip server asks
 for a resend.</p>
-<p>On receiving a <tt class="xref c c-member docutils literal"><span class="pre">XTCP_REQUEST_DATA</span></tt>,
+<p>On receiving an <tt class="xref c c-member docutils literal"><span class="pre">XTCP_REQUEST_DATA</span></tt>,
 <tt class="xref c c-member docutils literal"><span class="pre">XTCP_SENT_DATA</span></tt> or <tt class="xref c c-member docutils literal"><span class="pre">XTCP_RESEND_DATA</span></tt> event the
 function <tt class="docutils literal"><span class="pre">httpd_send</span></tt> is called.</p>
 <p>The first thing the function does is check whether we have been asked
@@ -450,11 +443,9 @@ function.</p>
       </div>
       <div class="sphinxsidebar" id='d2'>
         <div class="sphinxsidebarwrapper">
-<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
+<h3><a href="index.html">Ethernet TCP/IP Component Programming Guide</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="programming.html">Programming Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -473,7 +464,6 @@ function.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div id="searchbox" style="display: none;margin-bottom: 10px;">

@@ -1,7 +1,7 @@
 Source code structure
 ---------------------
 
-All the files for the stack are contains in the ``module_xtcp``
+All the files for the stack are contained in the ``module_xtcp``
 directory. The important header files that are used by applications
 are:
 
@@ -10,10 +10,5 @@ are:
   
   * - File
     - Description
-  * - ``uip_server.h`` 
-    - Header file containing prototype for :c:func:`uip_server`.
-  * - ``uip_single_server.h``
-    - Header file containing prototype for :c:func:`uipSingleServer`.
-  * - ``xtcp_client.h``
-    - Header file containing the client API described in :ref:`sec_client_api`.
-
+  * - ``xtcp.h``
+    - Header file containing prototypes for the functions found in :ref:`sec_client_api`. 

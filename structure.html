@@ -6,13 +6,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Source code structure &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <title>Source code structure &mdash; Ethernet TCP/IP Component Programming Guide v documentation</title>
     <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2v0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -21,9 +21,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
     <script type="text/javascript" src="_static/xcomment.js"></script>
-    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
+    <link rel="top" title="Ethernet TCP/IP Component Programming Guide v documentation" href="index.html" />
     <link rel="up" title="Programming Guide" href="programming.html" />
     <link rel="next" title="An XTCP application (tutorial)" href="app_tutorial.html" />
     <link rel="prev" title="Getting started" href="getting_started.html" /> 
@@ -62,7 +61,7 @@ document.getElementById('d1').style.height=h2 + "px";
             
   <div class="section" id="source-code-structure">
 <h1>Source code structure<a class="headerlink" href="#source-code-structure" title="Permalink to this headline">¶</a></h1>
-<p>All the files for the stack are contains in the <tt class="docutils literal"><span class="pre">module_xtcp</span></tt>
+<p>All the files for the stack are contained in the <tt class="docutils literal"><span class="pre">module_xtcp</span></tt>
 directory. The important header files that are used by applications
 are:</p>
 <table border="1" class="docutils">
@@ -76,14 +75,8 @@ are:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr><td><tt class="docutils literal"><span class="pre">uip_server.h</span></tt></td>
-<td>Header file containing prototype for <a class="reference internal" href="api.html#uip_server" title="uip_server"><span>uip_server()</span></a>.</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">uip_single_server.h</span></tt></td>
-<td>Header file containing prototype for <a class="reference internal" href="api.html#uipSingleServer" title="uipSingleServer"><span>uipSingleServer()</span></a>.</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">xtcp_client.h</span></tt></td>
-<td>Header file containing the client API described in <a class="reference internal" href="api.html#sec-client-api"><span>Client API</span></a>.</td>
+<tr><td><tt class="docutils literal"><span class="pre">xtcp.h</span></tt></td>
+<td>Header file containing prototypes for the functions found in <a class="reference internal" href="api.html#sec-client-api"><span>Client API</span></a>.</td>
 </tr>
 </tbody>
 </table>
@@ -96,11 +89,9 @@ are:</p>
       </div>
       <div class="sphinxsidebar" id='d2'>
         <div class="sphinxsidebarwrapper">
-<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
+<h3><a href="index.html">Ethernet TCP/IP Component Programming Guide</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="programming.html">Programming Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -109,7 +100,6 @@ are:</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div id="searchbox" style="display: none;margin-bottom: 10px;">

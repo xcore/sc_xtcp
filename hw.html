@@ -6,13 +6,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>H/W Development Platforms &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <title>H/W Development Platforms &mdash; Ethernet TCP/IP Component Programming Guide v documentation</title>
     <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2v0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -21,11 +21,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
     <script type="text/javascript" src="_static/xcomment.js"></script>
-    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
-    <link rel="next" title="TCP/IP Stack System Description" href="system.html" />
-    <link rel="prev" title="Overview" href="overview.html" /> 
+    <link rel="top" title="Ethernet TCP/IP Component Programming Guide v documentation" href="index.html" /> 
 
 <script>
 function setheight() {
@@ -52,10 +49,6 @@ document.getElementById('d1').style.height=h2 + "px";
         <div class="bodywrapper">
           <div class="body">
 <div style="float: right">
-<a href="overview.html"
-                        title="previous chapter"> &lt&lt </a>
-<a href="system.html"
-                        title="next chapter"> &gt&gt </a></p>
 </div>
 
             
@@ -75,6 +68,9 @@ development platforms can be used:</p>
 <p>For developing an application specific board with ethernet please
 refer to the hardware guides for the above boards with example
 schematics, BOMs, design guidelines etc.</p>
+<p>Note that the 2 thread version of the stack relies on the single thread MII ethernet
+component, which requires 62.5MIPS to run correctly.  Consequently, the 2-thread
+version of the stack will not run on a 400MHz device.</p>
 </div>
 
 
@@ -84,15 +80,12 @@ schematics, BOMs, design guidelines etc.</p>
       </div>
       <div class="sphinxsidebar" id='d2'>
         <div class="sphinxsidebarwrapper">
-<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
-<ul class="current">
+<h3><a href="index.html">Ethernet TCP/IP Component Programming Guide</a></h3>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div id="searchbox" style="display: none;margin-bottom: 10px;">

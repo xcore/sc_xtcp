@@ -6,13 +6,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Overview &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <title>Overview &mdash; Ethernet TCP/IP Component Programming Guide v documentation</title>
     <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2v0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -21,11 +21,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
     <script type="text/javascript" src="_static/xcomment.js"></script>
-    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
-    <link rel="next" title="H/W Development Platforms" href="hw.html" />
-    <link rel="prev" title="XMOS TCP/IP STACK" href="index.html" /> 
+    <link rel="top" title="Ethernet TCP/IP Component Programming Guide v documentation" href="index.html" />
+    <link rel="next" title="TCP/IP Stack System Description" href="system.html" />
+    <link rel="prev" title="Ethernet TCP/IP Component Programming Guide" href="index.html" /> 
 
 <script>
 function setheight() {
@@ -54,7 +53,7 @@ document.getElementById('d1').style.height=h2 + "px";
 <div style="float: right">
 <a href="index.html"
                         title="previous chapter"> &lt&lt </a>
-<a href="hw.html"
+<a href="system.html"
                         title="next chapter"> &gt&gt </a></p>
 </div>
 
@@ -69,11 +68,34 @@ embedded programming environment and despite its low memory footprint
 provides a complete stack including ARP, IP, UDP, TCP, DHCP, IPv4LL,
 ICMP and IGMP protocols.</p>
 <p>The stack is based on the open-source stack uIP with modifications to
-work efficiently on XMOS architecture and communicate between threads
+work efficiently on the XMOS architecture and communicate between tasks
 using XC channels.</p>
-<p>The TCP stack interfaces to the 5-thread XMOS ethernet stack via a pair
-of channels.  Alternatively, an integrated 2-thread Ethernet plus TCP/IP
-is available for use in resource limited applications.</p>
+<p>The TCP stack can either interface to a separate ethernet MAC or work
+with an integrated MAC taking only 2 logical cores.</p>
+<div class="section" id="seperate-mac-tcp-ip-stack-properties">
+<h2>Seperate MAC + TCP/IP stack properties<a class="headerlink" href="#seperate-mac-tcp-ip-stack-properties" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Layer 2 packets can be sent and received independently of layer 3</li>
+<li>Integrated support for high priority Qtagged packets</li>
+<li>Integrated support for 802.1 Qav rate control</li>
+<li>Packet filtering in an independent logical core</li>
+<li>Works on a 400 MHz part</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="two-core-ethernet-plus-integrated-tcp-ip-stack-properties">
+<h2>Two core ethernet plus integrated TCP/IP stack properties<a class="headerlink" href="#two-core-ethernet-plus-integrated-tcp-ip-stack-properties" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Uses only 2 logical cores</li>
+<li>High throughput</li>
+<li>Uses lower memory footprint</li>
+<li>Only TCP/IP sourced packets can be transmitted</li>
+<li>500 MHz parts only (MII core requires 62.5 MIPS)</li>
+</ul>
+</div></blockquote>
+</div>
 <div class="section" id="component-summary">
 <h2>Component Summary<a class="headerlink" href="#component-summary" title="Permalink to this headline">¶</a></h2>
 <blockquote>
@@ -107,68 +129,15 @@ is available for use in resource limited applications.</p>
 <tr><td colspan="2"><strong>Requirements</strong></td>
 </tr>
 <tr><td>XMOS Desktop Tools</td>
-<td>v10.4 or later</td>
+<td>v12.0 or later</td>
 </tr>
 <tr><td>XMOS Ethernet Component</td>
-<td>2v0</td>
-</tr>
-<tr><td colspan="2"><strong>Licensing and Support</strong></td>
-</tr>
-<tr><td colspan="2">Component code provided without charge from XMOS.
-Component code is maintained by XMOS.</td>
+<td>2.2.0 or later</td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
 </div>
-</div>
-<div class="section" id="resource-requirements">
-<h1>Resource requirements<a class="headerlink" href="#resource-requirements" title="Permalink to this headline">¶</a></h1>
-<p>The resource requirements for the XTCP stack alone are:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="29%" />
-<col width="71%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head" colspan="2">Resource     | Usage</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td colspan="2">Channels     | 1 per client</td>
-</tr>
-<tr><td colspan="2">Memory       | Between 20 and 45 KBytes</td>
-</tr>
-<tr><td colspan="2">Timers       | 2</td>
-</tr>
-<tr><td colspan="2">Clocks       | 0</td>
-</tr>
-</tbody>
-</table>
-<p>When used with the single thread ethernet MII module,
-the combined usage is:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="29%" />
-<col width="71%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head" colspan="2">Resource     | Usage</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td colspan="2">Channels     | 3 plus 1 per client</td>
-</tr>
-<tr><td colspan="2">Memory       | Between 26 and 50 KBytes</td>
-</tr>
-<tr><td colspan="2">Timers       | 4</td>
-</tr>
-<tr><td colspan="2">Clocks       | 1</td>
-</tr>
-</tbody>
-</table>
-<p>The memory usage depends on the selection of different options
-at compile time, and on the amount of buffering chosen.</p>
 </div>
 
 
@@ -178,18 +147,17 @@ at compile time, and on the amount of buffering chosen.</p>
       </div>
       <div class="sphinxsidebar" id='d2'>
         <div class="sphinxsidebarwrapper">
-<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
+<h3><a href="index.html">Ethernet TCP/IP Component Programming Guide</a></h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#seperate-mac-tcp-ip-stack-properties">Seperate MAC + TCP/IP stack properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#two-core-ethernet-plus-integrated-tcp-ip-stack-properties">Two core ethernet plus integrated TCP/IP stack properties</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#component-summary">Component Summary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#resource-requirements">Resource requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div id="searchbox" style="display: none;margin-bottom: 10px;">

@@ -6,13 +6,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>XMOS TCP/IP STACK &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <title>Ethernet TCP/IP Component Programming Guide &mdash; Ethernet TCP/IP Component Programming Guide v documentation</title>
     <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2v0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -21,9 +21,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
     <script type="text/javascript" src="_static/xcomment.js"></script>
-    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="#" />
+    <link rel="top" title="Ethernet TCP/IP Component Programming Guide v documentation" href="#" />
     <link rel="next" title="Overview" href="overview.html" /> 
 
 <script>
@@ -56,23 +55,16 @@ document.getElementById('d1').style.height=h2 + "px";
 </div>
 
             
-  <div class="section" id="xmos-tcp-ip-stack">
-<h1>XMOS TCP/IP STACK<a class="headerlink" href="#xmos-tcp-ip-stack" title="Permalink to this headline">¶</a></h1>
-<p>This documentation covers the xtcp component for XMOS Devices
-found at:</p>
-<blockquote>
-<div><a class="reference external" href="http://www.github.com/xcore/sc_xtcp"><span>http://www.github.com/xcore/sc_xtcp</span></a></div></blockquote>
-<div class="section" id="table-of-contents">
-<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
-</div>
+  <div class="section" id="ethernet-tcp-ip-component-programming-guide">
+<h1>Ethernet TCP/IP Component Programming Guide<a class="headerlink" href="#ethernet-tcp-ip-component-programming-guide" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#seperate-mac-tcp-ip-stack-properties">Seperate MAC + TCP/IP stack properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#two-core-ethernet-plus-integrated-tcp-ip-stack-properties">Two core ethernet plus integrated TCP/IP stack properties</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#component-summary">Component Summary</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="system.html#software-architecture">Software Architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="system.html#ip-configuration">IP Configuration</a></li>
@@ -89,7 +81,6 @@ found at:</p>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting started</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="getting_started.html#compilation-and-demo-applications">Compilation and Demo Applications</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="structure.html">Source code structure</a></li>
@@ -123,7 +114,6 @@ found at:</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 </div>
 </div>
@@ -135,15 +125,12 @@ found at:</p>
       </div>
       <div class="sphinxsidebar" id='d2'>
         <div class="sphinxsidebarwrapper">
-<h3><a href="#">XTCP TCP/IP Stack (2v0)</a></h3>
+<h3><a href="#">Ethernet TCP/IP Component Programming Guide</a></h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div id="searchbox" style="display: none;margin-bottom: 10px;">

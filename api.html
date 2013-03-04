@@ -6,13 +6,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>API &mdash; XTCP TCP/IP Stack v2v0 documentation</title>
+    <title>API &mdash; Ethernet TCP/IP Component Programming Guide v documentation</title>
     <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '2v0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -21,10 +21,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://mathjax.connectmv.com/MathJax.js"></script>
     <script type="text/javascript" src="_static/xcomment.js"></script>
-    <link rel="top" title="XTCP TCP/IP Stack v2v0 documentation" href="index.html" />
-    <link rel="next" title="References" href="references.html" />
+    <link rel="top" title="Ethernet TCP/IP Component Programming Guide v documentation" href="index.html" />
     <link rel="prev" title="An XTCP application (tutorial)" href="app_tutorial.html" /> 
 
 <script>
@@ -54,8 +52,6 @@ document.getElementById('d1').style.height=h2 + "px";
 <div style="float: right">
 <a href="app_tutorial.html"
                         title="previous chapter"> &lt&lt </a>
-<a href="references.html"
-                        title="next chapter"> &gt&gt </a></p>
 </div>
 
             
@@ -66,144 +62,158 @@ document.getElementById('d1').style.height=h2 + "px";
 <p>The following defines can be set by adding the file
 <tt class="docutils literal"><span class="pre">xtcp_client_conf.h</span></tt> into your application and setting the defines
 within that file.</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="50%" />
-<col width="33%" />
-<col width="17%" />
-</colgroup>
-<thead valign="bottom">
-<tr><th class="head">Define</th>
-<th class="head">Description</th>
-<th class="head">Default</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_CLIENT_BUF_SIZE</span></tt></td>
-<td>The buffer size used for incoming packets. This has a maximum
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">XTCP_CLIENT_BUF_SIZE</span></tt></dt>
+<dd>The buffer size used for incoming packets. This has a maximum
 value of 1472 which can handle any incoming packet. If it is
-set to less larger incoming packets will be truncated.</td>
-<td>1472</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">UIP_CONF_MAX_CONNECTIONS</span></tt></td>
-<td>The maximum number of UDP or TCP connections the server can
-handle simultaneously.</td>
-<td>20</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">UIP_CONF_MAX_LISTENPORTS</span></tt></td>
-<td>The maximum number of UDP or TCP ports the server can listen to
-simultaneously.</td>
-<td>20</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">UIP_USE_SINGLE_THREADED_ETHERNET</span></tt></td>
-<td>Defining this, and using the uipSingleServer function in the
-multithreaded main, will use the two thread TCP plus Ethernet.</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_LISTEN</span></tt></td>
-<td>Exclude support for the listen command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_UNLISTEN</span></tt></td>
-<td>Exclude support for the unlisten command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_CONNECT</span></tt></td>
-<td>Exclude support for the connect command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_BIND_REMOTE</span></tt></td>
-<td>Exclude support for the bind_remote command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_BIND_LOCAL</span></tt></td>
-<td>Exclude support for the bind_local command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_INIT_SEND</span></tt></td>
-<td>Exclude support for the init_send command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_SET_APPSTATE</span></tt></td>
-<td>Exclude support for the set_appstate command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ABORT</span></tt></td>
-<td>Exclude support for the abort command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_CLOSE</span></tt></td>
-<td>Exclude support for the close command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_SET_POLL_INTERVAL</span></tt></td>
-<td>Exclude support for the set_poll_interval command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_JOIN_GROUP</span></tt></td>
-<td>Exclude support for the join_group command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_LEAVE_GROUP</span></tt></td>
-<td>Exclude support for the leave_group command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_GET_MAC_ADDRESS</span></tt></td>
-<td>Exclude support for the get_mac_address command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_GET_IPCONFIG</span></tt></td>
-<td>Exclude support for the get_ipconfig command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ACK_RECV</span></tt></td>
-<td>Exclude support for the ack_recv command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ACK_RECV_MODE</span></tt></td>
-<td>Exclude support for the ack_recv_mode command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_PAUSE</span></tt></td>
-<td>Exclude support for the pause command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_UNPAUSE</span></tt></td>
-<td>Exclude support for the unpause command from the server,
-reducing memory footprint</td>
-<td>Not defined</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">UIP_USE_AUTOIP</span></tt></td>
-<td>1</td>
-<td>By defining this as 0, the auto IP application is removed from the code. Do this to save
+set to a smaller value, larger incoming packets will be truncated. Default
+is 1472.</dd>
+<dt><tt class="docutils literal"><span class="pre">UIP_CONF_MAX_CONNECTIONS</span></tt></dt>
+<dd><ul class="first last simple">
+<li>The maximum number of UDP or TCP connections the server can
+handle simultaneously. Default is 20.</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">UIP_CONF_MAX_LISTENPORTS</span></tt></dt>
+<dd><ul class="first last simple">
+<li>The maximum number of UDP or TCP ports the server can listen to
+simultaneously. Default is 20.</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_SEPARATE_MAC</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Defining this as 1 will cause the module to assume it will
+connect to a separate layer 2 MAC using <a class="reference internal" href="#xtcp_server" title="xtcp_server"><span>xtcp_server()</span></a>.
+By default this is not enabled.</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_LISTEN</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the listen command from the server,
+reducing memory footprint</li>
+<li>Not defined</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_UNLISTEN</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the unlisten command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_CONNECT</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the connect command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_BIND_REMOTE</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the bind_remote command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_BIND_LOCAL</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the bind_local command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_INIT_SEND</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the init_send command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_SET_APPSTATE</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the set_appstate command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ABORT</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the abort command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_CLOSE</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the close command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_SET_POLL_INTERVAL</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the set_poll_interval command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_JOIN_GROUP</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the join_group command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_LEAVE_GROUP</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the leave_group command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_GET_MAC_ADDRESS</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the get_mac_address command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_GET_IPCONFIG</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the get_ipconfig command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ACK_RECV</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the ack_recv command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_ACK_RECV_MODE</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the ack_recv_mode command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_PAUSE</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the pause command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">XTCP_EXCLUDE_UNPAUSE</span></tt></dt>
+<dd><ul class="first last simple">
+<li>Exclude support for the unpause command from the server,
+reducing memory footprint</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">UIP_USE_AUTOIP</span></tt></dt>
+<dd><ul class="first last simple">
+<li>By defining this as 0, the IPv4LL application is removed from the code. Do this to save
 approxmiately 1kB.  Auto IP is a stateless protocol that assigns an IP address to a
 device.  Typically, if a unit is trying to use DHCP to obtain an address, and a server
-cannot be found, then auto IP is used to assign an address of the form 169.254.x.y.</td>
-</tr>
-<tr><td><tt class="docutils literal"><span class="pre">UIP_USE_DHCP</span></tt></td>
-<td>1</td>
-<td>By defining this as 0, the DHCP client is removed from the code. This will save approximately
-2kB.  DHCP is a protocol for dynamically acquiring an IP address from a centralised DHCP server.</td>
-</tr>
-</tbody>
-</table>
+cannot be found, then auto IP is used to assign an address of
+the form 169.254.x.y. Auto IP is enabled by default</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">UIP_USE_DHCP</span></tt></dt>
+<dd><ul class="first last simple">
+<li>By defining this as 0, the DHCP client is removed from the
+code. This will save approximately 2kB.
+DHCP is a protocol for dynamically acquiring an IP address from
+a centralised DHCP server.  This option is enabled by default.</li>
+</ul>
+</dd>
+</dl>
 </div>
 <div class="section" id="data-structures-types">
 <h2>Data Structures/Types<a class="headerlink" href="#data-structures-types" title="Permalink to this headline">¶</a></h2>
@@ -281,28 +291,28 @@ cannot be found, then auto IP is used to assign an address of the form 169.254.x
 <dt id="xtcp_event_type_t.XTCP_RECV_DATA">
 <tt class="descname">XTCP_RECV_DATA</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_RECV_DATA" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event occurs when the connection has received some data.</p>
-<p>The client <em>must</em> follow receipt of this event with a call to <a class="reference internal" href="#xtcp_recv" title="xtcp_recv"><span>xtcp_recv()</span></a> before any other interaction with the server.</p>
+<p>The client <strong>must</strong> follow receipt of this event with a call to <a class="reference internal" href="#xtcp_recv" title="xtcp_recv"><span>xtcp_recv()</span></a> before any other interaction with the server.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_event_type_t.XTCP_REQUEST_DATA">
 <tt class="descname">XTCP_REQUEST_DATA</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_REQUEST_DATA" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event occurs when the server is ready to send data and is requesting that the client send data.</p>
-<p>This event happens after a call to <a class="reference internal" href="#xtcp_init_send" title="xtcp_init_send"><span>xtcp_init_send()</span></a> from the client. The client <em>must</em> follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
+<p>This event happens after a call to <a class="reference internal" href="#xtcp_init_send" title="xtcp_init_send"><span>xtcp_init_send()</span></a> from the client. The client <strong>must</strong> follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_event_type_t.XTCP_SENT_DATA">
 <tt class="descname">XTCP_SENT_DATA</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_SENT_DATA" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event occurs when the server has successfully sent the previous piece of data that was given to it via a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a>.</p>
-<p>The server is now requesting more data so the client must* follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
+<p>The server is now requesting more data so the client must** follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_event_type_t.XTCP_RESEND_DATA">
 <tt class="descname">XTCP_RESEND_DATA</tt><a class="headerlink" href="#xtcp_event_type_t.XTCP_RESEND_DATA" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event occurs when the server has failed to send the previous piece of data that was given to it via a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a>.</p>
-<p>The server is now requesting for the same data to be sent again. The client must* follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
+<p>The server is now requesting for the same data to be sent again. The client must** follow receipt of this event with a call to <a class="reference internal" href="#xtcp_send" title="xtcp_send"><span>xtcp_send()</span></a> before any other interaction with the server.</p>
 </dd></dl>
 
 <dl class="member">
@@ -392,13 +402,13 @@ int <tt class="descname">id</tt><a class="headerlink" href="#xtcp_connection_t.i
 <dl class="member">
 <dt id="xtcp_connection_t.protocol">
 <a class="reference internal" href="#xtcp_protocol_t" title="xtcp_protocol_t"><span>xtcp_protocol_t</span></a> <tt class="descname">protocol</tt><a class="headerlink" href="#xtcp_connection_t.protocol" title="Permalink to this definition">¶</a></dt>
-<dd><p>The protocol of the connection (TCP/UDP).</p>
+<dd><p>The protocol of the connection (TCP/UDP)</p>
 </dd></dl>
 
 <dl class="member">
 <dt id="xtcp_connection_t.connection_type">
 <a class="reference internal" href="#xtcp_connection_type_t" title="xtcp_connection_type_t"><span>xtcp_connection_type_t</span></a> <tt class="descname">connection_type</tt><a class="headerlink" href="#xtcp_connection_t.connection_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>The type of connection (client/sever).</p>
+<dd><p>The type of connection (client/sever)</p>
 </dd></dl>
 
 <dl class="member">
@@ -444,10 +454,10 @@ unsigned int <tt class="descname">mss</tt><a class="headerlink" href="#xtcp_conn
 <div class="section" id="server-api">
 <h2>Server API<a class="headerlink" href="#server-api" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="uip_server">
-void <tt class="descname">uip_server</tt><big>(</big>chanend<em>&nbsp;mac_rx</em>, chanend<em>&nbsp;mac_tx</em>, chanend<em>&nbsp;xtcp[]</em>, int<em>&nbsp;num_xtcp_clients</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t"><span>xtcp_ipconfig_t</span></a> &amp;<em>&nbsp;?ipconfig</em>, chanend<em>&nbsp;connect_status</em><big>)</big><a class="headerlink" href="#uip_server" title="Permalink to this definition">¶</a></dt>
-<dd><p>uIP based xtcp server.</p>
-<p>This function implements an xtcp tcp/ip server in a thread. It uses a port of the uIP stack which is then interfaces over the xtcp channel array.</p>
+<dt id="xtcp_server">
+void <tt class="descname">xtcp_server</tt><big>(</big>chanend<em>&nbsp;mac_rx</em>, chanend<em>&nbsp;mac_tx</em>, chanend<em>&nbsp;xtcp[]</em>, int<em>&nbsp;num_xtcp_clients</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t"><span>xtcp_ipconfig_t</span></a><em>&nbsp;&amp;?ipconfig</em><big>)</big><a class="headerlink" href="#xtcp_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>xtcp TCP/IP server.</p>
+<p>This function implements an xtcp tcp/ip server in a logical core. It uses a port of the uIP stack which is then interfaces over the xtcp channel array.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -469,30 +479,9 @@ void <tt class="descname">uip_server</tt><big>(</big>chanend<em>&nbsp;mac_rx</em
 </dd></dl>
 
 <dl class="function">
-<dt id="uipSingleServer">
-void <tt class="descname">uipSingleServer</tt><big>(</big>clock<em>&nbsp;clk_smi</em>, out port<em>&nbsp;?p_mii_resetn</em>, smi_interface_t<em>&nbsp;&amp;smi</em>, mii_interface_t<em>&nbsp;&amp;mii</em>, chanend<em>&nbsp;xtcp[]</em>, int<em>&nbsp;num_xtcp</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t"><span>xtcp_ipconfig_t</span></a><em>&nbsp;&amp;ipconfig</em>, char<em>&nbsp;mac_address[6]</em><big>)</big><a class="headerlink" href="#uipSingleServer" title="Permalink to this definition">¶</a></dt>
-<dd><p>The top level thread function for a single threaded XTCP server, interfacing to a single thread ethernet MII.</p>
-<p>The xtcp_client_conf.h file should define the compile time flag UIP_USE_SINGLE_THREADED_ETHERNET in order to use this function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>clk_smi</strong> &#8211; Clock block for controlling the SMI interface</li>
-<li><strong>p_mii_resetn</strong> &#8211; Optional port which resets the PHY</li>
-<li><strong>smi</strong> &#8211; Structure describing the SMI ports</li>
-<li><strong>mii</strong> &#8211; Structure describing the MII ports</li>
-<li><strong>xtcp</strong> &#8211; Array of client comms channels</li>
-<li><strong>num_xtcp</strong> &#8211; The number of TCP client channels</li>
-<li><strong>ipconfig</strong> &#8211; The configuration structure for the IP address</li>
-<li><strong>mac_address</strong> &#8211; The unicast MAC address for this device</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<p>This function should be used in a top level &#8216;par&#8217; in the main function. It will internally create the single MII thread.</p>
-</dd></dl>
+<dt id="ethernet_xtcp_server">
+void <tt class="descname">ethernet_xtcp_server</tt><big>(</big>ethernet_xtcp_ports_t<em>&nbsp;&amp;ports</em>, <a class="reference internal" href="#xtcp_ipconfig_t" title="xtcp_ipconfig_t"><span>xtcp_ipconfig_t</span></a><em>&nbsp;&amp;ipconfig</em>, chanend<em>&nbsp;xtcp[]</em>, int<em>&nbsp;n</em><big>)</big><a class="headerlink" href="#ethernet_xtcp_server" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="client-api">
@@ -744,7 +733,7 @@ void <tt class="descname">xtcp_init_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp
 
 <dl class="function">
 <dt id="xtcp_send">
-void <tt class="descname">xtcp_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char NULLABLE<em>&nbsp;data[]</em>, int<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#xtcp_send" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char ?<em>&nbsp;data[]</em>, int<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#xtcp_send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send data to the xtcp server.</p>
 <p>Send data to the server. This should be called after a XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event (alternatively xtcp_write_buf can be called). To finish sending this must be called with a length of zero or call the <a class="reference internal" href="#xtcp_complete_send" title="xtcp_complete_send"><span>xtcp_complete_send()</span></a> function.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -764,7 +753,7 @@ void <tt class="descname">xtcp_send</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>
 
 <dl class="function">
 <dt id="xtcp_sendi">
-void <tt class="descname">xtcp_sendi</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char NULLABLE<em>&nbsp;data[]</em>, int<em>&nbsp;i</em>, int<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#xtcp_sendi" title="Permalink to this definition">¶</a></dt>
+void <tt class="descname">xtcp_sendi</tt><big>(</big>chanend<em>&nbsp;c_xtcp</em>, char ?<em>&nbsp;data[]</em>, int<em>&nbsp;i</em>, int<em>&nbsp;len</em><big>)</big><a class="headerlink" href="#xtcp_sendi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send data to the xtcp server.</p>
 <p>Send data to the server. This should be called after a XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event (alternatively xtcp_write_buf can be called). The data is sent starting from index i i.e. data[i] is the first byte to be sent. To finish sending this must be called with a length of zero.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1220,11 +1209,9 @@ int <tt class="descname">xtcp_buffered_send_buffer_remaining</tt><big>(</big>xtc
       </div>
       <div class="sphinxsidebar" id='d2'>
         <div class="sphinxsidebarwrapper">
-<h3><a href="index.html">XTCP TCP/IP Stack (2v0)</a></h3>
+<h3><a href="index.html">Ethernet TCP/IP Component Programming Guide</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="overview.html#resource-requirements">Resource requirements</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hw.html">H/W Development Platforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="system.html">TCP/IP Stack System Description</a></li>
 <li class="toctree-l1"><a class="reference internal" href="programming.html">Programming Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">API</a><ul>
@@ -1244,7 +1231,6 @@ int <tt class="descname">xtcp_buffered_send_buffer_remaining</tt><big>(</big>xtc
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div id="searchbox" style="display: none;margin-bottom: 10px;">

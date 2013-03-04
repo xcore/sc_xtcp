@@ -1,7 +1,7 @@
 An XTCP application (tutorial)
 ----------------------------------
 
-This tutorial walks through the a simple webserver application that
+This tutorial walks through a simple webserver application that
 uses the XMOS TCP/IP component. This can be found in the
 ``app_simple_webserver`` directory.
 
@@ -9,29 +9,30 @@ The toplevel main
 +++++++++++++++++
 
 The toplevel main of the application sets up the different components
-running on different threads on the device. It can be found in the
+running on different logical cores on the device. It can be found in the
 file ``main.xc``.
 
-First the ethernet MAC is run on core 2. Details of the ethernet
-component can be found in [XEth10]_.
+First the TCP/IP server is run on the tile given by the define
+``ETHERNET_DEFAULT_TILE`` (supplied by the
+``ethernet_board_support.h`` header which gives defines for common
+XMOS development boards.). It is run via the function
+:c:func:`ethernet_xtcp_server`. The server runs both the ethernet code to
+communicate with the ethernet phy and the tcp server on two logical cores.
 
 .. literalinclude:: app_simple_webserver/src/main.xc
-   :start-after: // The ethernet server
-   :end-before: // The TCP/IP
-
-The TCP/IP server is run using the :c:func:`uip_server` function.
-
-.. literalinclude:: app_simple_webserver/src/main.xc
-   :start-after: // The TCP/IP
+   :start-after: // The main ethernet/tcp
    :end-before: // The webserver
+   :strip-leading-whitespace:
 
-Finally, the client to the TCP/IP server is run on a separate thread
-and connected to the TCP/IP server via the first element ``xtcp``
+
+The client to the TCP/IP server is run as a separate task
+and connected to the TCP/IP server via the first element ``c_xtcp``
 channel array. The function ``xhttpd`` implements the web server.
 
 .. literalinclude:: app_simple_webserver/src/main.xc
    :start-after: // The webserver
    :end-before: }
+   :strip-leading-whitespace:
 
 
 The webserver mainloop
@@ -75,7 +76,7 @@ type. Firstly, link status events are ignored:
    :start-after: // HTTP event handler
    :end-before: // Check if the connection
 
-For other events, we first check that the connection is definitely a
+For other events, we first check that the connection is definitely an
 http connection (is directed at port 80) and then call one of several
 event handlers for each type of event. The is a separate function for
 new connections, receiving data, sending data and closing connections:
@@ -105,7 +106,7 @@ If we don't find a free state we cannot handle the connection so
    :end-before: // Otherwise,
 
 If we can allocate the state structure then the elements of the
-structure are initalizes. The function
+structure are initialized. The function
 :c:func:`xtcp_set_connection_appstate` is then called to associate the 
 state with the connection. This means when a subsequent event is
 signalled on this connection the state can be recovered.
@@ -127,7 +128,7 @@ Receiving Data
 ~~~~~~~~~~~~~~
 
 
-When a :c:member:`XTCP_RECV_DATA` event occurs the ``httpd_recv``
+When an :c:member:`XTCP_RECV_DATA` event occurs the ``httpd_recv``
 function is called. The first thing this function does is call the
 :c:func:`xtcp_recv` function to place the received data in the
 ``data`` array. (Note that all TCP/IP clients *must* call
@@ -147,7 +148,7 @@ set up and the ``hs`` variable is non-null.
    :start-after: // If we 
    :end-before: // Otherwise
 
-Now we are in a position where we have known connection state and the
+Now the connection state is known and the
 incoming data buffer filled. To keep things simple, this server makes
 the assumption that a single tcp packet gives us enough information to
 parse the http request. However, many applications will need to
@@ -199,7 +200,7 @@ To send data the connection state keeps track of three variables:
 We keep the previous value of ``dptr`` in case the tcp/ip server asks
 for a resend.
 
-On receiving a :c:member:`XTCP_REQUEST_DATA`,
+On receiving an :c:member:`XTCP_REQUEST_DATA`,
 :c:member:`XTCP_SENT_DATA` or :c:member:`XTCP_RESEND_DATA` event the 
 function ``httpd_send`` is called.
 
