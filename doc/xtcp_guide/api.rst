@@ -26,7 +26,7 @@ within that file.
      - The maximum number of UDP or TCP ports the server can listen to
        simultaneously. Default is 20.
 
-``XTCP_USE_SEPARATE_MAC``
+``XTCP_SEPARATE_MAC``
      - Defining this as 1 will cause the module to assume it will
        connect to a separate layer 2 MAC using :c:func:`xtcp_server`.
        By default this is not enabled.
