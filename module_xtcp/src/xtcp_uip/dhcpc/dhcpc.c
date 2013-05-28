@@ -68,7 +68,6 @@ struct dhcp_msg {
   u8_t sname[64];
   u8_t file[128];
 #endif
-
   u8_t options[312];
 };
 
@@ -164,7 +163,14 @@ create_msg(register struct dhcp_msg *m)
   m->secs = 0;
   m->flags = HTONS(BOOTP_BROADCAST); /*  Broadcast bit. */
 
-  memcpy(m->ciaddr, uip_hostaddr, sizeof(m->ciaddr));
+  if (s.state != STATE_CONFIG_RECEIVED)
+  {
+    memset(m->ciaddr, 0, sizeof(m->ciaddr));
+  }
+  else
+  {
+    memcpy(m->ciaddr, uip_hostaddr, sizeof(m->ciaddr));
+  }
 
 #ifndef UIP_CONF_DHCP_LIGHT
   memset(m->yiaddr, 0, sizeof(m->yiaddr)+sizeof(m->siaddr)+sizeof(m->giaddr)+sizeof(m->chaddr)+sizeof(m->sname)+sizeof(m->file));
@@ -203,7 +209,7 @@ send_request(void)
   end = add_server_id(end);
   end = add_req_ipaddr(end);
   end = add_end(end);
-
+  
   uip_send(uip_appdata, end - (u8_t *)uip_appdata);
 }
 /*---------------------------------------------------------------------------*/
@@ -232,6 +238,14 @@ parse_options(u8_t *optptr, int len)
       break;
     case DHCP_OPTION_LEASE_TIME:
       memcpy(s.lease_time, optptr + 2, 4);
+      // Swap the bytes to correct the network ordering.
+      unsigned char val;
+      val = (s.lease_time[1] >> 8);
+      s.lease_time[1] <<= 8;
+      s.lease_time[1] |= val;
+      val = (s.lease_time[0] >> 8);
+      s.lease_time[0] <<= 8;
+      s.lease_time[0] |= val;
       break;
     case DHCP_OPTION_END:
       return type;
@@ -291,6 +305,7 @@ static
 PT_THREAD(handle_dhcp(void))
 {
     unsigned int ticks;
+    int msg;
     
     PT_BEGIN(&s.pt);
     
@@ -298,6 +313,8 @@ PT_THREAD(handle_dhcp(void))
         PT_RESTART(&s.pt);
         
     // Random startup delay as described in spec
+  initwait:
+    rand_startup = rand() % 8192; // 0 - 8 seconds
     s.ticks = rand_startup;
     timer_set(&s.timer, s.ticks);
     
@@ -318,11 +335,15 @@ PT_THREAD(handle_dhcp(void))
         do
         {
             PT_YIELD(&s.pt);
-            if (uip_newdata() && msg_for_me() == DHCPOFFER)
+            if (uip_newdata())
             {
+              msg = msg_for_me();
+              if (msg == DHCPOFFER)
+              {
                 parse_msg();
                 s.state = STATE_OFFER_RECEIVED;
                 goto selecting;
+              }
             }
         
         } while (!timer_expired(&s.timer));
@@ -350,13 +371,20 @@ PT_THREAD(handle_dhcp(void))
         do
         {
             PT_YIELD(&s.pt);
-            if (uip_newdata() && msg_for_me() == DHCPACK)
+            if (uip_newdata())
             {
+              msg = msg_for_me();
+              if (msg == DHCPACK)
+              {
                 parse_msg();
                 s.state = STATE_CONFIG_RECEIVED;
                 goto bound;
+              }
+              else if (msg == DHCPNAK)
+              {
+                goto initwait;
+              }
             }
-        
         } while (!timer_expired(&s.timer));
         
         if (s.ticks <= CLOCK_SECOND * 10)
@@ -412,10 +440,18 @@ PT_THREAD(handle_dhcp(void))
         {
             PT_YIELD(&s.pt);
             
-            if (uip_newdata() && msg_for_me() == DHCPACK)
+            if (uip_newdata())
             {
+              msg = msg_for_me();
+              if (msg == DHCPACK)
+              {
                 parse_msg();
                 goto bound;
+              }
+              else if (msg == DHCPNAK)
+              {
+                goto init;
+              }
             }
         } while (!timer_expired(&s.timer));
     
@@ -447,7 +483,6 @@ dhcpc_init(const void *mac_addr, int mac_len)
   
   srand(rand_seed);
   rand();
-  rand_startup = rand() % 8192; // 0 - 8 seconds
 
   uip_ipaddr(addr, 255,255,255,255);
   s.conn = uip_udp_new(&addr, HTONS(DHCPC_SERVER_PORT));
