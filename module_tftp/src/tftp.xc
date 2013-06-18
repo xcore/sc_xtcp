@@ -1,26 +1,10 @@
-// Copyright (c) 2011, XMOS Ltd, All rights reserved
-// This software is freely distributable under a derivative of the
-// University of Illinois/NCSA Open Source License posted in
-// LICENSE.txt and at <http://github.xcore.com/>
-
-/*************************************************************************
- *
- *  Basic TFTP (RFC 1350) Implementation
- *
- *  This implements a basic TFTP server that accepts a single Write Request
- *  connection only. It does not support any of the Option Extensions.
- *
- *  It may be extended to cover a more general use-case.
- *
- *************************************************************************/
-
+#include "tftp.h"
+#include "tftp_app.h"
 #include <platform.h>
 #include "print.h"
 #include "uip_server.h"
 #include "getmac.h"
 #include "ethernet_server.h"
-#include "tftp.h"
-#include "tftp_app.h"
 
 static enum
 {

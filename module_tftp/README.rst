@@ -6,4 +6,9 @@
 :keywords: <Add comma separated list of keywords>
 :boards: <Add comma separated list of supported boards>
 
-<Add description of software block>
+Basic TFTP (RFC 1350) Implementation
+ 
+This module implements a basic TFTP server that accepts a single Write Request
+connection only. It does not support any of the Option Extensions.
+
+It may be extended to cover a more general (non firmware upgrade) use-case.

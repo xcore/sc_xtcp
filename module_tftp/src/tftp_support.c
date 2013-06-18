@@ -1,15 +1,10 @@
-// Copyright (c) 2011, XMOS Ltd, All rights reserved
-// This software is freely distributable under a derivative of the
-// University of Illinois/NCSA Open Source License posted in
-// LICENSE.txt and at <http://github.xcore.com/>
-
-#include <platform.h>
-#include <string.h>
-#include <assert.h>
-#include "print.h"
-#include "ethernet_server.h"
 #include "tftp.h"
 #include "tftp_app.h"
+#include <platform.h>
+#include <string.h>
+#include "xassert.h"
+#include "print.h"
+#include "ethernet_server.h"
 
 static unsigned short prev_block_num = 0;
 
