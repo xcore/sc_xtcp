@@ -1,10 +1,13 @@
 TCP/IP Component Changelog
 ==========================
 
+3.1.3
+~~~~~
+  * Updated ethernet dependency to version 2.2.4
+
 3.1.2
 ~~~~~
   * Fixed auto-ip bug for 2-core xtcp server
-
 
 3.1.1
 ~~~~~
