@@ -1,5 +1,5 @@
-TCP/IP Component Changelog
-==========================
+sc_xtcp Change Log
+==================
 
 3.1.3
 ~~~~~
