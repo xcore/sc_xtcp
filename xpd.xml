@@ -16,11 +16,11 @@
             <keyword>UDP</keyword>
         </component>
         <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple HTTP Demo">
-            <componentDependency>module_otp_board_info</componentDependency>
-            <componentDependency>module_locks</componentDependency>
+            <componentDependency>module_ethernet_smi</componentDependency>
             <componentDependency>module_xtcp</componentDependency>
             <componentDependency>module_ethernet_board_support</componentDependency>
-            <componentDependency>module_ethernet_smi</componentDependency>
+            <componentDependency>module_otp_board_info</componentDependency>
+            <componentDependency>module_locks</componentDependency>
             <componentDependency>module_ethernet</componentDependency>
             <keyword>ethernet</keyword>
             <keyword>tcp/ip</keyword>
@@ -75,6 +75,7 @@
     <release parenthash = "34b3bfe41b9be8c21f8d786543ad7cf30cc0f55d" version = "3.1.1rc3" githash = "dd577c606e5760abc2e3a44d81a1837d3d421987"></release>
     <release parenthash = "60d32f9cfa4461b811113f4afd39f580cd7a16e8" version = "3.1.2rc0" githash = "33336c4194eef2c72d0828c7aacc51caa46f9d76"></release>
     <release parenthash = "8ce08457bcd2d0cdeb7c629dd737be8a4073b144" version = "3.1.2rc1" githash = "5e87ae983af2cf444efdd792c70f823d03aef7c9"></release>
+    <release parenthash = "ffe7ed0f43fc29532e84070124cc57521e1c13df" version = "3.1.3rc0"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
