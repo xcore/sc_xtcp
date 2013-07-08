@@ -4,6 +4,7 @@ sc_xtcp Change Log
 3.1.3
 ~~~~~
   * Updated ethernet dependency to version 2.2.4
+  * Fixed corner case errors/improved robustness in DHCP protocol handling
 
 3.1.2
 ~~~~~
