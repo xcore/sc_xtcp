@@ -1,6 +1,10 @@
 sc_xtcp Change Log
 ==================
 
+3.1.4
+~~~~~
+  * Updated ethernet dependency to version 2.2.5
+
 3.1.3
 ~~~~~
   * Updated ethernet dependency to version 2.2.4
