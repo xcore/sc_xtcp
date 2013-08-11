@@ -140,9 +140,10 @@ void xtcpd_check_connection_poll(chanend mac_tx)
 	}
 }
 
-void xtcp_process_incoming_packet(chanend mac_tx)
+void xtcp_process_incoming_packet(chanend mac_tx, int length)
 {
 	if (BUF->type == htons(UIP_ETHTYPE_IP)) {
+		uip_len = length;
 		uip_arp_ipin();
 		uip_input();
 		if (uip_len > 0) {
@@ -155,6 +156,7 @@ void xtcp_process_incoming_packet(chanend mac_tx)
 			xtcp_tx_buffer(mac_tx);
 		}
 	} else if (BUF->type == htons(UIP_ETHTYPE_ARP)) {
+		uip_len = length;
 		uip_arp_arpin();
 
 		if (uip_len > 0) {

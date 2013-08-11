@@ -28,7 +28,7 @@ extern void uip_printip4(const uip_ipaddr_t ip4);
 extern void uip_server_init(chanend xtcp[], int num_xtcp, xtcp_ipconfig_t* ipconfig, unsigned char mac_address[6]);
 extern void xtcpd_check_connection_poll(chanend mac_tx);
 extern void xtcp_tx_buffer(chanend mac_tx);
-extern void xtcp_process_incoming_packet(chanend mac_tx);
+extern void xtcp_process_incoming_packet(chanend mac_tx, int length);
 extern void xtcp_process_udp_acks(chanend mac_tx);
 extern void xtcp_process_periodic_timer(chanend mac_tx);
 
