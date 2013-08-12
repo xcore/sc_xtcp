@@ -16,11 +16,11 @@
             <keyword>UDP</keyword>
         </component>
         <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple HTTP Demo">
-            <componentDependency>module_otp_board_info</componentDependency>
-            <componentDependency>module_locks</componentDependency>
+            <componentDependency>module_ethernet_smi</componentDependency>
             <componentDependency>module_xtcp</componentDependency>
             <componentDependency>module_ethernet_board_support</componentDependency>
-            <componentDependency>module_ethernet_smi</componentDependency>
+            <componentDependency>module_otp_board_info</componentDependency>
+            <componentDependency>module_locks</componentDependency>
             <componentDependency>module_ethernet</componentDependency>
             <keyword>ethernet</keyword>
             <keyword>tcp/ip</keyword>
@@ -29,25 +29,25 @@
         </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>3db65a9cd09d968d0f8e59550f900cc8b6b77401</githash>
+        <githash>d4288863b8258d525d0ee421cab4f8c177080855</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.2.2rc0</version>
+        <version>2.2.5rc2</version>
     </dependency>
     <dependency repo = "sc_otp">
         <githash>062aa923a78bc603b254b2a99b78593ab3a816ec</githash>
         <uri>git@github.com:xcore/sc_otp</uri>
         <version>1.0.0rc0</version>
     </dependency>
+    <dependency repo = "sc_util">
+        <githash>d0531d7c68ab67334582c324828e36d617baf8b3</githash>
+        <uri>git@github.com:xcore/sc_util</uri>
+        <version>1.0.3rc0</version>
+    </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>doc/xtcp_guide</docdir>
     <docdir>doc/slicekit_quickstart</docdir>
-    <exclude_dir>test_3_thread_example</exclude_dir>
     <exclude_dir>tests</exclude_dir>
     <exclude_dir>experimental</exclude_dir>
-    <exclude_dir>doc_pip</exclude_dir>
-    <exclude_dir>app_pip_bootloader</exclude_dir>
-    <exclude_dir>app_pip_test</exclude_dir>
-    <exclude_dir>module_pip</exclude_dir>
     <location>ssh://git@github.com/davelxmos/sc_xtcp</location>
     <name>sc_xtcp</name>
     <maintainer>davidn@xmos.com</maintainer>
@@ -74,7 +74,9 @@
     <release parenthash = "de29e033408ae3bcbeb1a515d9346a91be2e87fd" version = "3.1.1rc2" githash = "6d4caf30161924bee1ecab698a6e4b204d8d9f73"></release>
     <release parenthash = "34b3bfe41b9be8c21f8d786543ad7cf30cc0f55d" version = "3.1.1rc3" githash = "dd577c606e5760abc2e3a44d81a1837d3d421987"></release>
     <release parenthash = "60d32f9cfa4461b811113f4afd39f580cd7a16e8" version = "3.1.2rc0" githash = "33336c4194eef2c72d0828c7aacc51caa46f9d76"></release>
-    <release parenthash = "8ce08457bcd2d0cdeb7c629dd737be8a4073b144" version = "3.1.2rc1"></release>
+    <release parenthash = "8ce08457bcd2d0cdeb7c629dd737be8a4073b144" version = "3.1.2rc1" githash = "5e87ae983af2cf444efdd792c70f823d03aef7c9"></release>
+    <release parenthash = "ffe7ed0f43fc29532e84070124cc57521e1c13df" version = "3.1.3rc0" githash = "fcc26ffd1d8e27ba7742ea089f846dcb102728a6"></release>
+    <release parenthash = "64779261dba118ad20fad2888c660ce4244b95e1" version = "3.1.4rc0"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <xcore_repo>sc_xtcp</xcore_repo>
