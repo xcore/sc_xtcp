@@ -100,7 +100,7 @@ void udp_reflect(chanend c_xtcp)
           }
           if (broadcast_connection.id != -1) {
             xtcp_close(c_xtcp, broadcast_connection);
-            responding_connection.id = -1;
+            broadcast_connection.id = -1;
           }
           break;
         case XTCP_NEW_CONNECTION:
