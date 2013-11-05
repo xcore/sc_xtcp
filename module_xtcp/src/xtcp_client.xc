@@ -189,7 +189,7 @@ void xtcp_ignore_recv(chanend c_xtcp)
 
 
 void xtcp_sendi(chanend c_xtcp,
-                unsigned char ?data[],
+                NULLABLE_ARRAY_OF(unsigned char, data),
                 int index,
                 int len)
 {
@@ -201,7 +201,7 @@ void xtcp_sendi(chanend c_xtcp,
 }
 
 void xtcp_send(chanend c_xtcp,
-               unsigned char ?data[],
+               NULLABLE_ARRAY_OF(unsigned char, data),
                int len)
 {
   xtcp_sendi(c_xtcp, data, 0, len);

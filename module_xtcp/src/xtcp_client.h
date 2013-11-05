@@ -6,11 +6,6 @@
 #ifndef   _xtcp_client_h_
 #define   _xtcp_client_h_
 #include <xccompat.h>
-#ifdef __XC__
-#define NULLABLE ?
-#else
-#define NULLABLE
-#endif
 
 #include "xtcp_conf_derived.h"
 #ifndef XTCP_CLIENT_BUF_SIZE
@@ -429,7 +424,7 @@ void xtcp_ack_recv(chanend c_xtcp,
  *                    be sent and a XTCP_SENT_DATA event will not occur.
  */
 void xtcp_send(chanend c_xtcp,
-               char NULLABLE data[],
+               NULLABLE_ARRAY_OF(char, data),
                int len);
 
 /** \brief Complete a send transaction with the server.
@@ -467,7 +462,7 @@ inline void xtcp_complete_send(chanend c_xtcp) {
  *                    be sent and a XTCP_SENT_DATA event will not occur.
  */
 void xtcp_sendi(chanend c_xtcp,
-                char NULLABLE data[],
+                NULLABLE_ARRAY_OF(char, data),
                 int i,
                 int len);
 

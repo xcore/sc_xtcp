@@ -301,6 +301,17 @@ void xtcpd_send_event(chanend c,
   send_conn_and_complete(c, s.conn);
 }
 
+static transaction do_recv(chanend xtcp, int &client_ready,
+                           int datalen, unsigned char data[])
+{
+  xtcp :> client_ready;
+  if (client_ready) {
+    xtcp <: datalen;
+    for (int i=0;i<datalen;i++)
+      xtcp <: data[i];
+  }
+}
+
 #pragma unsafe arrays
 void xtcpd_recv(chanend xtcp[],
                 int linknum,
@@ -317,14 +328,7 @@ void xtcpd_recv(chanend xtcp[],
   do {
     s.conn.event = XTCP_RECV_DATA;
     send_conn_and_complete(xtcp[linknum], s.conn);
-    master {
-      xtcp[linknum] :> client_ready;
-      if (client_ready) {
-        xtcp[linknum] <: datalen;
-        for (int i=0;i<datalen;i++)
-          xtcp[linknum] <: data[i];
-      }
-    }
+    master do_recv(xtcp[linknum], client_ready, datalen, data);
     if (!client_ready) {
       xtcpd_service_clients_until_ready(linknum, xtcp, num_xtcp);      
     }
