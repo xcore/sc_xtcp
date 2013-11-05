@@ -334,6 +334,8 @@ void xtcpd_recv(chanend xtcp[],
     }
   } while (!client_ready);
 
+  outct(xtcp[linknum], XS1_CT_END);
+
   return;
 }
 
