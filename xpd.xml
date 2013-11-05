@@ -44,7 +44,7 @@
         <version>1.0.3rc0</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
-    <docdir>doc/xtcp_guide</docdir>
+    <docdir>module_xtcp/doc</docdir>
     <docdir>doc/slicekit_quickstart</docdir>
     <exclude_dir>tests</exclude_dir>
     <exclude_dir>experimental</exclude_dir>
