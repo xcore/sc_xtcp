@@ -5,7 +5,7 @@ Software Architecture
 ---------------------
 
 The following Figure shows the architecture of the TCP/IP stack when
-attaching to an independent Ethernet MAC through an XC channel:
+attaching to an independent Ethernet MAC through an xC channel:
 
 .. only:: html
 
@@ -24,7 +24,7 @@ attaching to an independent Ethernet MAC through an XC channel:
 
 The server runs on a single logical core and connects to the XMOS Ethernet
 MAC component. It can then connect to several client
-tasks over XC channels. To enable this option the define
+tasks over xC channels. To enable this option the define
 ``XTCP_USE_SEPARATE_MAC`` needs to be set to ``1`` in the
 ``xtcp_conf.h`` file in your application and run the
 :c:func:`xtcp_server` function.

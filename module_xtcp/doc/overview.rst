@@ -11,7 +11,7 @@ ICMP and IGMP protocols.
 
 The stack is based on the open-source stack uIP with modifications to
 work efficiently on the XMOS architecture and communicate between tasks
-using XC channels.
+using xC channels.
 
 The TCP stack can either interface to a separate ethernet MAC or work
 with an integrated MAC taking only 2 logical cores.
