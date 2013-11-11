@@ -1,9 +1,9 @@
-Ethernet TCP/IP Component Programming Guide
+Ethernet TCP/IP component programming guide
 ===========================================
 
 .. toctree::
 
    overview
    system
-   programming
    api
+   programming
