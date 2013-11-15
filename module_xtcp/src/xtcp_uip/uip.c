@@ -585,7 +585,12 @@ void uip_udp_listen(u16_t port) {
 }
 
 /*---------------------------------------------------------------------------*/
-/* XXX: IP fragment reassembly: not well-tested. */
+/* XXX: IP fragment reassembly
+   This feature is **disabled**, not supported and not known to work if
+   enabled. Any guarantees of the robustness of the component made by
+   XMOS do not hold if this feature is enabled.
+*/
+
 
 #if UIP_REASSEMBLY && !UIP_CONF_IPV6
 #define UIP_REASS_BUFSIZE (UIP_BUFSIZE - UIP_LLH_LEN)

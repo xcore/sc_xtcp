@@ -99,7 +99,11 @@
  * uip_setdraddr() and uip_setnetmask() should be used instead.
  *
  * \hideinitializer
- */
+ *
+ * This feature is **disabled**, not supported and not known to work if
+ * enabled. Any guarantees of the robustness of the component made by
+ * XMOS do not hold if this feature is enabled.
+*/
 #define UIP_FIXEDADDR    0
 
 /**
@@ -155,9 +159,12 @@
  * reassembly buffer is of the same size as the uip_buf buffer
  * (configured by UIP_BUFSIZE).
  *
- * \note IP packet reassembly is not heavily tested.
- *
  * \hideinitializer
+ *
+ * This feature is **disabled**, not supported and not known to work if
+ * enabled. Any guarantees of the robustness of the component made by
+ * XMOS do not hold if this feature is enabled.
+ *
  */
 #define UIP_REASSEMBLY 0
 

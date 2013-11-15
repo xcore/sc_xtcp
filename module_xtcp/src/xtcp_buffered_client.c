@@ -3,6 +3,12 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
+/* Experimental features.
+   The features in this file are **experimental**,
+   not supported and not known to work if enabled. Any guarantees of
+   the robustness of the component made by XMOS do not hold if these features
+   are used.
+ */
 #include "xtcp_client.h"
 #include "xtcp_bufinfo.h"
 #include "string.h"
