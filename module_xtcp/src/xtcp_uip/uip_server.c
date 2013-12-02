@@ -65,7 +65,7 @@ void xtcp_server_uip(chanend mac_rx, chanend mac_tx, chanend xtcp[], int num_xtc
 		uip_xtcp_checkstate();
 		uip_len = xcoredev_read(mac_rx, UIP_CONF_BUFFER_SIZE);
 		if (uip_len > 0) {
-			xtcp_process_incoming_packet(mac_tx);
+                  xtcp_process_incoming_packet(mac_tx, uip_len);
 		}
 
 		xtcp_process_udp_acks(mac_tx);

@@ -84,5 +84,6 @@
     <xsoftip_exclude>module_zeroconf</xsoftip_exclude>
     <xsoftip_exclude>module_tftp</xsoftip_exclude>
     <xsoftip_exclude>app_udp_demo</xsoftip_exclude>
+    <xsoftip_exclude>app_webserver_separate_mac</xsoftip_exclude>
     <scope>product</scope>
 </xpd>
