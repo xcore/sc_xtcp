@@ -1,6 +1,14 @@
 sc_xtcp Change Log
 ==================
 
+3.1.5
+~~~~~
+  * Fixed channel protocol bug that caused crash when xCONNECT is
+    heavily loaded
+  * Various documentation updates
+  * Fixes to avoid warning in xTIMEcomposer studio version 13.0.0
+    or later
+
 3.1.4
 ~~~~~
   * Updated ethernet dependency to version 2.2.5
