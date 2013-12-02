@@ -11,7 +11,7 @@
 #define NUM_MII_RX_BUF 6
 #define NUM_MII_TX_BUF 4
 
-#define MAX_ETHERNET_CLIENTS   (1)    
+#define MAX_ETHERNET_CLIENTS   (1)
 
 
 

@@ -25,7 +25,7 @@ xtcp_connection_t xtcp_wait_for_connection(chanend tcp_svr)
   return conn;
 }
 
-int xtcp_write(chanend tcp_svr, 
+int xtcp_write(chanend tcp_svr,
                xtcp_connection_t &conn,
                unsigned char buf[],
                int len)
@@ -37,7 +37,7 @@ int xtcp_write(chanend tcp_svr,
   xtcp_init_send(tcp_svr, conn);
   while (!finished) {
     slave xtcp_event(tcp_svr, conn);
-    switch (conn.event) 
+    switch (conn.event)
       {
       case XTCP_NEW_CONNECTION:
         xtcp_close(tcp_svr, conn);
@@ -47,10 +47,10 @@ int xtcp_write(chanend tcp_svr,
         { int sendlen = (len - index);
           if (sendlen > conn.mss)
             sendlen = conn.mss;
-          
+
           xtcp_sendi(tcp_svr, buf, index, sendlen);
           prev = index;
-          index += sendlen;        
+          index += sendlen;
           if (sendlen == 0)
             finished = 1;
         }
@@ -60,7 +60,7 @@ int xtcp_write(chanend tcp_svr,
         break;
       case XTCP_RECV_DATA:
         slave { tcp_svr <: 0; } // delay packet receive
-        if (prev != len) 
+        if (prev != len)
           success = 0;
         finished = 1;
         break;
@@ -70,7 +70,7 @@ int xtcp_write(chanend tcp_svr,
         if (conn.id == id) {
           finished = 1;
           success = 0;
-        }       
+        }
         break;
       case XTCP_IFDOWN:
         finished = 1;
@@ -80,9 +80,9 @@ int xtcp_write(chanend tcp_svr,
   }
   return success;
 }
-                
 
-int xtcp_read(chanend tcp_svr, 
+
+int xtcp_read(chanend tcp_svr,
               xtcp_connection_t &conn,
               unsigned char buf[],
               int minlen)
@@ -91,12 +91,12 @@ int xtcp_read(chanend tcp_svr,
   int id = conn.id;
   while (rlen < minlen) {
     slave xtcp_event(tcp_svr, conn);
-    switch (conn.event) 
+    switch (conn.event)
       {
       case XTCP_NEW_CONNECTION:
         xtcp_close(tcp_svr, conn);
         break;
-      case XTCP_RECV_DATA: 
+      case XTCP_RECV_DATA:
         {
           int n;
           n = xtcp_recvi(tcp_svr, buf, rlen);
@@ -111,7 +111,7 @@ int xtcp_read(chanend tcp_svr,
       case XTCP_TIMED_OUT:
       case XTCP_ABORTED:
       case XTCP_CLOSED:
-        if (conn.id == id) 
+        if (conn.id == id)
           return -1;
         break;
       case XTCP_IFDOWN:

@@ -24,7 +24,7 @@ char page[] = 	"HTTP/1.0 200 OK\nServer: xc2/pre-1.0 (http://xmos.com)\nContent-
 typedef struct httpd_state_t {
   int active;      //< Whether this state structure is being used
                    //  for a connection
-  int conn_id;     //< The connection id 
+  int conn_id;     //< The connection id
   char *dptr;      //< Pointer to the remaining data to send
   int dlen;        //< The length of remaining data to send
   char *prev_dptr; //< Pointer to the previously sent item of data
@@ -39,7 +39,7 @@ void httpd_init(chanend tcp_svr)
   int i;
   // Listen on the http port
   xtcp_listen(tcp_svr, 80, XTCP_PROTOCOL_TCP);
-  
+
   for ( i = 0; i < NUM_HTTPD_CONNECTIONS; i++ )
     {
       connection_states[i].active = 0;
@@ -56,7 +56,7 @@ void parse_http_request(httpd_state_t *hs, char *data, int len)
     {
       return;
     }
-  
+
   // Test if we received a HTTP GET request
   if (strncmp(data, "GET ", 4) == 0)
     {
@@ -77,24 +77,24 @@ void httpd_recv(chanend tcp_svr, xtcp_connection_t *conn)
   struct httpd_state_t *hs = (struct httpd_state_t *) conn->appstate;
   char data[XTCP_CLIENT_BUF_SIZE];
   int len;
-  
+
   // Receive the data from the TCP stack
   len = xtcp_recv(tcp_svr, data);
-  
+
   // If we already have data to send, return
   if ( hs == NULL || hs->dptr != NULL)
     {
       return;
     }
-  
+
   // Otherwise we have data, so parse it
   parse_http_request(hs, &data[0], len);
-  
+
   // If we are required to send data
   if (hs->dptr != NULL)
     {
       // Initate a send request with the TCP stack.
-      // It will then reply with event XTCP_REQUEST_DATA 
+      // It will then reply with event XTCP_REQUEST_DATA
       // when it's ready to send
       xtcp_init_send(tcp_svr, conn);
     }
@@ -124,15 +124,15 @@ void httpd_send(chanend tcp_svr, xtcp_connection_t *conn)
   // We need to send some new data
   else {
     int len = hs->dlen;
-    
+
     if (len > conn->mss)
       len = conn->mss;
 
     xtcp_send(tcp_svr, hs->dptr, len);
-    
+
     hs->prev_dptr = hs->dptr;
     hs->dptr += len;
-    hs->dlen -= len;    
+    hs->dlen -= len;
   }
   ////
 
@@ -143,14 +143,14 @@ void httpd_send(chanend tcp_svr, xtcp_connection_t *conn)
 void httpd_init_state(chanend tcp_svr, xtcp_connection_t *conn)
 {
   int i;
-  
+
   // Try and find an empty connection slot
   for (i=0;i<NUM_HTTPD_CONNECTIONS;i++)
     {
       if (!connection_states[i].active)
         break;
     }
-  
+
   // If no free connection slots were found, abort the connection
   if ( i == NUM_HTTPD_CONNECTIONS )
     {
@@ -163,8 +163,8 @@ void httpd_init_state(chanend tcp_svr, xtcp_connection_t *conn)
       connection_states[i].conn_id = conn->id;
       connection_states[i].dptr = NULL;
       xtcp_set_connection_appstate(
-           tcp_svr, 
-           conn, 
+           tcp_svr,
+           conn,
            (xtcp_appstate_t) &connection_states[i]);
     }
 }
@@ -174,7 +174,7 @@ void httpd_init_state(chanend tcp_svr, xtcp_connection_t *conn)
 void httpd_free_state(xtcp_connection_t *conn)
 {
   int i;
-  
+
   for ( i = 0; i < NUM_HTTPD_CONNECTIONS; i++ )
     {
       if (connection_states[i].conn_id == conn->id)
@@ -189,11 +189,11 @@ void httpd_free_state(xtcp_connection_t *conn)
 // HTTP event handler
 void httpd_handle_event(chanend tcp_svr, xtcp_connection_t *conn)
 {
-  // We have received an event from the TCP stack, so respond 
+  // We have received an event from the TCP stack, so respond
   // appropriately
 
   // Ignore events that are not directly relevant to http
-  switch (conn->event) 
+  switch (conn->event)
     {
     case XTCP_IFUP: {
       xtcp_ipconfig_t ipconfig;
@@ -218,15 +218,15 @@ void httpd_handle_event(chanend tcp_svr, xtcp_connection_t *conn)
       {
       case XTCP_NEW_CONNECTION:
         httpd_init_state(tcp_svr, conn);
-        break;          
+        break;
       case XTCP_RECV_DATA:
         httpd_recv(tcp_svr, conn);
-        break;        
-      case XTCP_SENT_DATA:        
+        break;
+      case XTCP_SENT_DATA:
       case XTCP_REQUEST_DATA:
       case XTCP_RESEND_DATA:
           httpd_send(tcp_svr, conn);
-          break;         
+          break;
       case XTCP_TIMED_OUT:
       case XTCP_ABORTED:
       case XTCP_CLOSED:

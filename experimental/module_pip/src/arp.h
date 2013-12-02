@@ -21,7 +21,7 @@ void pipInitARP();
 /** Function that deals with an incoming ARP packet.
  *
  * \param packet contains the packet data.
- * 
+ *
  * \param offset points to the ARP header in the packet.
  */
 void pipIncomingARP(unsigned short packet[], unsigned offset);
@@ -33,7 +33,7 @@ void pipIncomingARP(unsigned short packet[], unsigned offset);
 void pipTimeOutARP();
 
 /** Function that creates an ARP packet.
- * 
+ *
  * \param reply      whether to generate a reply or request message.
  *                   Set to 0 for generating an ARP request.
  *

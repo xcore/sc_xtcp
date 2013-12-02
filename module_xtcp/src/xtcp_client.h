@@ -31,19 +31,19 @@ typedef unsigned int xtcp_appstate_t;
 typedef unsigned char xtcp_ipaddr_t[4];
 
 /** IP configuration information structure.
- * 
+ *
  *  This structure describes IP configuration for an ip node.
- *  
+ *
  **/
 typedef struct xtcp_ipconfig_t {
   xtcp_ipaddr_t ipaddr;    /**< The IP Address of the node */
-  xtcp_ipaddr_t netmask;   /**< The netmask of the node. The mask used 
+  xtcp_ipaddr_t netmask;   /**< The netmask of the node. The mask used
                                 to determine which address are routed locally.*/
   xtcp_ipaddr_t gateway;   /**< The gateway of the node */
 } xtcp_ipconfig_t;
 
 /** XTCP protocol type.
- *  
+ *
  * This determines what type a connection is: either UDP or TCP.
  *
  **/
@@ -56,22 +56,22 @@ typedef enum xtcp_protocol_t {
 /** XTCP event type.
  *
  *  The event type represents what event is occuring on a particualr connection.
- *  It is instantiated when an event is received by the client using the 
+ *  It is instantiated when an event is received by the client using the
  *  xtcp_event() function.
  *
  **/
 typedef enum xtcp_event_type_t {
-  XTCP_NEW_CONNECTION,  /**<  This event represents a new connection has been 
+  XTCP_NEW_CONNECTION,  /**<  This event represents a new connection has been
                               made. In the case of a TCP server connections it
                               occurs when a remote host firsts makes contact
-                              with the local host. For TCP client connections  
+                              with the local host. For TCP client connections
                               it occurs when a stream is setup with the remote
                               host.
-                              For UDP connections it occurs as soon as the 
-                              connection is created.        **/ 
+                              For UDP connections it occurs as soon as the
+                              connection is created.        **/
 
   XTCP_RECV_DATA,       /**<  This event occurs when the connection has received
-                              some data. The client **must** follow receipt of 
+                              some data. The client **must** follow receipt of
                               this event with a call to xtcp_recv() before
                               any other interaction with the server. **/
 
@@ -84,17 +84,17 @@ typedef enum xtcp_event_type_t {
 
   XTCP_REQUEST_DATA,    /**<  This event occurs when the server is ready to send
                               data and is requesting that the client send data.
-                              This event happens after a call to 
+                              This event happens after a call to
                               xtcp_init_send() from the client.
-                              The client **must** follow receipt of this event 
+                              The client **must** follow receipt of this event
                               with a call to xtcp_send() before any other
                               interaction with the server. */
-                                                    
+
   XTCP_SENT_DATA,       /**<  This event occurs when the server has successfully
                               sent the previous piece of data that was given
                               to it via a call to xtcp_send(). The server
-                              is now requesting more data so the client 
-                              **must** follow receipt of this event 
+                              is now requesting more data so the client
+                              **must** follow receipt of this event
                               with a call to xtcp_send() before any other
                               interaction with the server. */
 
@@ -102,20 +102,20 @@ typedef enum xtcp_event_type_t {
                               send the previous piece of data that was given
                               to it via a call to xtcp_send(). The server
                               is now requesting for the same data to be sent
-                              again. The client 
-                              **must** follow receipt of this event 
+                              again. The client
+                              **must** follow receipt of this event
                               with a call to xtcp_send() before any other
                               interaction with the server. */
 
-  XTCP_TIMED_OUT,      /**<   This event occurs when the connection has 
-                              timed out with the remote host (TCP only). 
+  XTCP_TIMED_OUT,      /**<   This event occurs when the connection has
+                              timed out with the remote host (TCP only).
                               This event represents the closing of a connection
                               and is the last event that will occur on
                               an active connection. */
 
-  XTCP_ABORTED,        /**<   This event occurs when the connection has 
+  XTCP_ABORTED,        /**<   This event occurs when the connection has
                               been aborted by the local or remote host
-                              (TCP only). 
+                              (TCP only).
                               This event represents the closing of a connection
                               and is the last event that will occur on
                               an active connection. */
@@ -127,18 +127,18 @@ typedef enum xtcp_event_type_t {
                               an active connection. */
 
   XTCP_POLL,           /**<   This event occurs at regular intervals per
-                              connection. Polling can be initiated and 
-                              the interval can be set with 
+                              connection. Polling can be initiated and
+                              the interval can be set with
                               xtcp_set_poll_interval() */
 
   XTCP_IFUP,           /**<   This event occurs when the link goes up (with
-                              valid new ip address). This event has no 
+                              valid new ip address). This event has no
                               associated connection. */
-                              
-  XTCP_IFDOWN,         /**<   This event occurs when the link goes down. 
+
+  XTCP_IFDOWN,         /**<   This event occurs when the link goes down.
                               This event has no associated connection. */
 
-  XTCP_ALREADY_HANDLED /**<   This event type does not get set by the server 
+  XTCP_ALREADY_HANDLED /**<   This event type does not get set by the server
                               but can be set by the client to show an event
                               has been handled */
 } xtcp_event_type_t;
@@ -154,8 +154,8 @@ typedef enum xtcp_connection_type_t {
 
 /** This type represents a TCP or UDP connection.
  *
- *  This is the main type containing connection information for the client 
- *  to handle. Elements of this type are instantiated by the xtcp_event() 
+ *  This is the main type containing connection information for the client
+ *  to handle. Elements of this type are instantiated by the xtcp_event()
  *  function which informs the client about an event and the connection
  *  the event is on.
  *
@@ -166,7 +166,7 @@ typedef struct xtcp_connection_t {
   xtcp_connection_type_t connection_type; /**< The type of connection (client/sever) */
   xtcp_event_type_t event; /**< The last reported event on this connection. */
   xtcp_appstate_t appstate; /**< The application state associated with the
-                                 connection.  This is set using the 
+                                 connection.  This is set using the
                                  xtcp_set_connection_appstate() function. */
   xtcp_ipaddr_t remote_addr; /**< The remote ip address of the connection. */
   unsigned int remote_port;  /**< The remote port of the connection. */
@@ -198,7 +198,7 @@ typedef struct xtcp_connection_t {
 
 /** \brief Convert a unsigned integer representation of an ip address into
  *         the xtcp_ipaddr_t type.
- * 
+ *
  * \param ipaddr The result ipaddr
  * \param i      An 32-bit integer containing the ip address (network order)
  */
@@ -224,14 +224,14 @@ void xtcp_listen(chanend c_xtcp, int port_number, xtcp_protocol_t proto);
 void xtcp_unlisten(chanend c_xtcp, int port_number);
 
 /** \brief Try to connect to a remote port.
- * 
+ *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param port_number the remote port to try to connect to
  * \param ipaddr      the ip addr of the remote host
  * \param proto       the protocol to connect with (TCP or UDP)
  */
-void xtcp_connect(chanend c_xtcp, 
-                  int port_number, 
+void xtcp_connect(chanend c_xtcp,
+                  int port_number,
                   xtcp_ipaddr_t ipaddr,
                   xtcp_protocol_t proto);
 
@@ -242,7 +242,7 @@ void xtcp_connect(chanend c_xtcp,
  * \param conn        the connection
  * \param port_number the local port to set the connection to
  */
-void xtcp_bind_local(chanend c_xtcp, 
+void xtcp_bind_local(chanend c_xtcp,
                      REFERENCE_PARAM(xtcp_connection_t,  conn),
                      int port_number);
 
@@ -250,16 +250,16 @@ void xtcp_bind_local(chanend c_xtcp,
  *         ip address.
  *
  * This is only valid for XTCP_PROTOCOL_UDP connections.
- * After this call, packets sent to this connection will go to 
+ * After this call, packets sent to this connection will go to
  * the specified address and port
  *
  * \param c_xtcp      chanend connected to the xtcp server
  * \param conn        the connection
- * \param addr        the intended remote address of the connection 
+ * \param addr        the intended remote address of the connection
  * \param port_number the intended remote port of the connection
  */
-void xtcp_bind_remote(chanend c_xtcp, 
-                      REFERENCE_PARAM(xtcp_connection_t, conn), 
+void xtcp_bind_remote(chanend c_xtcp,
+                      REFERENCE_PARAM(xtcp_connection_t, conn),
                       xtcp_ipaddr_t addr, int port_number);
 
 
@@ -291,7 +291,7 @@ void do_xtcp_event(chanend c_xtcp,  xtcp_connection_t *conn);
  * \param c_xtcp      chanend connected to the xtcp server
  * \param conn        the connection
  */
-void xtcp_init_send(chanend c_xtcp, 
+void xtcp_init_send(chanend c_xtcp,
                     REFERENCE_PARAM(xtcp_connection_t, conn));
 
 
@@ -308,8 +308,8 @@ void xtcp_init_send(chanend c_xtcp,
  *                    this is usually a pointer to some connection dependent
  *                    information.
  */
-void xtcp_set_connection_appstate(chanend c_xtcp, 
-                                  REFERENCE_PARAM(xtcp_connection_t, conn), 
+void xtcp_set_connection_appstate(chanend c_xtcp,
+                                  REFERENCE_PARAM(xtcp_connection_t, conn),
                                   xtcp_appstate_t appstate);
 
 /** \brief Close a connection.
@@ -398,8 +398,8 @@ void xtcp_ack_recv_mode(chanend c_xtcp,
 
 
 /** \brief Ack a receive event
- *  
- * In ack-receive mode this command will acknowledge the last receive and 
+ *
+ * In ack-receive mode this command will acknowledge the last receive and
  * therefore
  * open the receive window again so new receive events can occur.
  *
@@ -413,8 +413,8 @@ void xtcp_ack_recv(chanend c_xtcp,
 /** \brief Send data to the xtcp server
  *
  *  Send data to the server. This should be called after a
- *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event 
- *  (alternatively xtcp_write_buf can be called). 
+ *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event
+ *  (alternatively xtcp_write_buf can be called).
  *  To finish sending this must be called with a length  of zero or
  *  call the xtcp_complete_send() function.
  *
@@ -430,10 +430,10 @@ void xtcp_send(chanend c_xtcp,
 /** \brief Complete a send transaction with the server.
  *
  *  This function can be called after a
- *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event 
+ *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event
  *  to finish any sending on the connection that the event
  *  related to.
- *  
+ *
  *  \param c_xtcp   chanend connected to the tcp server
  */
 inline void xtcp_complete_send(chanend c_xtcp) {
@@ -449,8 +449,8 @@ inline void xtcp_complete_send(chanend c_xtcp) {
 /** \brief Send data to the xtcp server
  *
  *  Send data to the server. This should be called after a
- *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event 
- *  (alternatively xtcp_write_buf can be called). 
+ *  XTCP_REQUEST_DATA, XTCP_SENT_DATA or XTCP_RESEND_DATA event
+ *  (alternatively xtcp_write_buf can be called).
  *  The data is sent starting from index i i.e. data[i] is the first
  *  byte to be sent.
  *  To finish sending this must be called with a length  of zero.
@@ -514,7 +514,7 @@ void xtcp_get_mac_address(chanend c_xtcp, unsigned char mac_addr[]);
  * \param ipconfig    the structure to be filled with the IP configuration
  *                    information
  **/
-void xtcp_get_ipconfig(chanend c_xtcp, 
+void xtcp_get_ipconfig(chanend c_xtcp,
                        REFERENCE_PARAM(xtcp_ipconfig_t, ipconfig));
 
 

@@ -32,8 +32,8 @@
  *  \param buf       	a pointer to the buffer to use for received data
  *  \param buflen    	the length of the receive buffer in bytes
  */
-void xtcp_buffered_set_rx_buffer(chanend tcp_svr, 
-                                 xtcp_connection_t *conn, 
+void xtcp_buffered_set_rx_buffer(chanend tcp_svr,
+                                 xtcp_connection_t *conn,
                                  xtcp_bufinfo_t *bufinfo,
                                  char *buf,
                                  int buflen);
@@ -51,8 +51,8 @@ void xtcp_buffered_set_rx_buffer(chanend tcp_svr,
  *  \param buflen    	the length of the receive buffer in bytes
  *  \param lowmark		if the number of spare bytes in the buffer falls below this, TCP pauses the stream
  */
-void xtcp_buffered_set_tx_buffer(chanend tcp_svr, 
-                                 xtcp_connection_t *conn, 
+void xtcp_buffered_set_tx_buffer(chanend tcp_svr,
+                                 xtcp_connection_t *conn,
                                  xtcp_bufinfo_t *bufinfo,
                                  char *buf,
                                  int buflen,
@@ -101,7 +101,7 @@ void xtcp_buffered_set_tx_buffer(chanend tcp_svr,
  *        the allocated buffer
  */
 int xtcp_buffered_recv(chanend tcp_svr,
-                       xtcp_connection_t *conn, 
+                       xtcp_connection_t *conn,
                        xtcp_bufinfo_t *bufinfo,
                        char **buf,
                        int len,
@@ -153,10 +153,10 @@ int xtcp_buffered_recv_upto(chanend tcp_svr,
  *  \param len			the length of the data in the buffer
  *
  */
-int xtcp_buffered_send(chanend tcp_svr, 
-                       xtcp_connection_t *conn, 
+int xtcp_buffered_send(chanend tcp_svr,
+                       xtcp_connection_t *conn,
                        xtcp_bufinfo_t *bufinfo,
-                       char *buf, 
+                       char *buf,
                        int len);
 
 /** \brief The handler function for transmission requests from the xtcp stack

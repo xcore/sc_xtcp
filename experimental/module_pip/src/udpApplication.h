@@ -10,7 +10,7 @@
  * \param stack channel to the UDP stack
  *
  * \param buffer array to store the packet in
- * 
+ *
  * \param start  first location in the buffer to write into
  *
  * \param maxBytes maximum number of bytes to write into the buffer
@@ -22,7 +22,7 @@
  * \param localPort the localPort to listen on.
  */
 int pipApplicationReadUDP(streaming chanend stack,
-                          unsigned char buffer[], unsigned start, 
+                          unsigned char buffer[], unsigned start,
                           unsigned maxBytes,
                           unsigned int &remoteIP, unsigned int &remotePort,
                           unsigned int localPort);
@@ -33,7 +33,7 @@ int pipApplicationReadUDP(streaming chanend stack,
  * \param stack channel to the UDP stack
  *
  * \param buffer array to read the packet from
- * 
+ *
  * \param start  first location in the buffer to read from
  *
  * \param maxBytes number of bytes to write into the packet. Note that this parameter must be less than the maximum outgoing packet size minus 42.
@@ -45,7 +45,7 @@ int pipApplicationReadUDP(streaming chanend stack,
  * \param localPort the localPort to supply to the other end
  */
 void pipApplicationWriteUDP(streaming chanend stack,
-                            unsigned char buffer[], unsigned start, 
+                            unsigned char buffer[], unsigned start,
                             unsigned maxBytes,
                             unsigned int remoteIP, unsigned int remotePort,
                             unsigned int localPort);

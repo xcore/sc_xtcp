@@ -142,7 +142,7 @@ typedef unsigned short uip_stats_t;
  *
  * \hideinitializer
  */
-#ifndef UIP_CONF_LOGGING 
+#ifndef UIP_CONF_LOGGING
 #define UIP_CONF_LOGGING         0
 #endif
 

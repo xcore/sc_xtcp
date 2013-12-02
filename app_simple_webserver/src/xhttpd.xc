@@ -15,7 +15,7 @@ void xhttpd(chanend tcp_svr)
   printstrln("**WELCOME TO THE SIMPLE WEBSERVER DEMO**");
   // Initiate the HTTP state
   httpd_init(tcp_svr);
-   
+
   // Loop forever processing TCP events
   while(1)
     {

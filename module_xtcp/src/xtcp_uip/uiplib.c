@@ -53,7 +53,7 @@ uiplib_ipaddrconv(char *addrstr, unsigned char *ipaddr)
   unsigned char i, j;
 
   tmp = 0;
-  
+
   for(i = 0; i < 4; ++i) {
     j = 0;
     do {

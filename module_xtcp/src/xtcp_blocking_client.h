@@ -34,7 +34,7 @@ xtcp_connection_t xtcp_wait_for_connection(chanend tcp_svr);
  *  \param buf		The buffer to write
  *  \param len		The length of data to send
  */
-int xtcp_write(chanend tcp_svr, 
+int xtcp_write(chanend tcp_svr,
                REFERENCE_PARAM(xtcp_connection_t, conn),
                unsigned char buf[],
                int len);
@@ -49,7 +49,7 @@ int xtcp_write(chanend tcp_svr,
  *  \param buf		The buffer to read into
  *  \param minlen	The minimim length of data to receive
  */
-int xtcp_read(chanend tcp_svr, 
+int xtcp_read(chanend tcp_svr,
               REFERENCE_PARAM(xtcp_connection_t, conn),
               unsigned char buf[],
               int minlen);

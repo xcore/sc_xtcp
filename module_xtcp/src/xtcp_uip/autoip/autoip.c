@@ -110,26 +110,26 @@ void autoip_init(int seed)
 static void random_timer_set(struct uip_timer *t,
                       int a,
                       int b)
-{ 
+{
   long long x;
   rand(autoip_state);
   x = autoip_state->rand * (b-a);
   x = x >> 32;
   timer_set(t, a + x);
-}                     
+}
 
 __attribute__ ((noinline))
-static void create_arp_packet() 
+static void create_arp_packet()
 {
 	memcpy(BUF, &autoip_arp_pkt, sizeof(autoip_arp_pkt));
 	memcpy(BUF->ethhdr.src.addr, uip_ethaddr.addr, 6);
 	memcpy(BUF->shwaddr.addr, uip_ethaddr.addr, 6);
-  
+
 	uip_appdata = &uip_buf[UIP_TCPIP_HLEN + UIP_LLH_LEN];
 	uip_len = sizeof(struct arp_hdr);
 }
 
-static void send_probe() 
+static void send_probe()
 {
   create_arp_packet();
   uip_ipaddr_copy(BUF->dipaddr, autoip_state->ipaddr);
@@ -140,7 +140,7 @@ static void send_probe()
                    PROBE_MAX * CLOCK_SECOND);
 }
 
-static void send_announce() 
+static void send_announce()
 {
   create_arp_packet();
   uip_ipaddr_copy(BUF->dipaddr, autoip_state->ipaddr);
@@ -150,13 +150,13 @@ static void send_announce()
   timer_set(&autoip_state->timer, ANNOUNCE_INTERVAL * CLOCK_SECOND);
 }
 
-void autoip_periodic() 
+void autoip_periodic()
 {
-  switch (autoip_state->state) 
+  switch (autoip_state->state)
     {
     case DISABLED:
       break;
-    case NO_ADDRESS: 
+    case NO_ADDRESS:
       {
         int r1,r2;
         if (!autoip_state->limit_rate || timer_expired(&autoip_state->timer)) {
@@ -176,16 +176,16 @@ void autoip_periodic()
       }
       break;
     case PROBING:
-      if (timer_expired(&autoip_state->timer)) 
+      if (timer_expired(&autoip_state->timer))
         {
           if (autoip_state->probes_sent == PROBE_NUM) {
             // configured
             autoip_state->state = WAIT_FOR_ANNOUNCE;
             timer_set(&autoip_state->timer, ANNOUNCE_WAIT * CLOCK_SECOND);
           }
-          else 
+          else
             send_probe();
-        }      
+        }
       break;
     case WAIT_FOR_ANNOUNCE:
       if (timer_expired(&autoip_state->timer)) {
@@ -198,7 +198,7 @@ void autoip_periodic()
           autoip_state->probes_sent = 0;
           autoip_state->announces_sent = 0;
           autoip_state->num_conflicts = 0;
-          autoip_state->limit_rate = 
+          autoip_state->limit_rate =
             autoip_state->limit_rate ||
             (autoip_state->num_conflicts > MAX_CONFLICTS);
           timer_set(&autoip_state->timer, RATE_LIMIT_INTERVAL * CLOCK_SECOND);
@@ -227,7 +227,7 @@ void autoip_arp_in()
       case WAIT_FOR_ANNOUNCE:
         if (uip_ipaddr_cmp(BUF->sipaddr, autoip_state->ipaddr)) {
           autoip_state->num_conflicts++;
-        }       
+        }
         break;
     default:
       break;
@@ -235,7 +235,7 @@ void autoip_arp_in()
   return;
 }
 
-void autoip_start() 
+void autoip_start()
 {
   if (autoip_state->state == DISABLED) {
 	autoip_init(autoip_state->seed);
@@ -244,7 +244,7 @@ void autoip_start()
   }
 }
 
-void autoip_stop() 
+void autoip_stop()
 {
   autoip_state->state = DISABLED;
 }

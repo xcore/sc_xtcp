@@ -25,11 +25,11 @@ void pipInitDHCP();
 void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, int offset, int length);
 
 /** Function that creates a DHCP message.
- * 
+ *
  * \param firstMessage flag to indicate that this is the first DHCP message
  *                     (DHCP-DISCOVER), set to 0 to indicate that it is a
  *                     DHCP-REQUEST.
- * 
+ *
  * \param proposedIP   The suggested IP address - set to 0 if no IP address
  *                     is suggested.
  *

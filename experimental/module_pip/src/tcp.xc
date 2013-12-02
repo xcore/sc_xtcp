@@ -338,7 +338,7 @@ void pipTimeOutTCPTimewait() {
             tcpConnections[i].state = CLOSED;
             if (tcpConnections[i].appStatus != APP_NOT_WAITING) {
                 appSendError(tcpConnections[i]);
-            }            
+            }
 #endif
         }
         notAcknowledged = PIP_TCP_BUFSIZE_TX - (tcpConnections[i].tx.length + tcpConnections[i].tx.free);
@@ -493,12 +493,12 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
             appSendAcknowledge(tcpConnections[opened]);
             if(tcpConnections[opened].sndUNA == segACK) { // TODO: ISS not segACK
                 pipOutgoingTCP(tcpConnections[opened], 0, ACK);
-                tcpConnections[opened].state = ESTAB;                
+                tcpConnections[opened].state = ESTAB;
                 return;
             }
             pipOutgoingTCP(tcpConnections[opened], 0, SYN|ACK);
-            tcpConnections[opened].state = SYNRCVD;                
-            
+            tcpConnections[opened].state = SYNRCVD;
+
         }
 
         break;
@@ -580,7 +580,7 @@ void pipIncomingTCP(unsigned short packet[], unsigned offset, unsigned srcIP, un
         if (tcpConnections[opened].state == LASTACK) {
 //            printintln(tcpConnections[opened].tx.free);
 //            if (tcpConnections[opened].tx.free == PIP_TCP_BUFSIZE_TX + 1) {
-            
+
             if (tcpConnections[opened].sndNXT+1 == segACK) {
                 tcpConnections[opened].state  = CLOSED;
                 if (tcpConnections[opened].appStatus == APP_CLOSING) {
@@ -743,12 +743,12 @@ static void doConnect(struct tcpConnection &conn, streaming chanend app) {
 static void doClose(struct tcpConnection &conn, streaming chanend app) {
     switch(conn.state) {
     case CLOSED:
-        soutct(app, PIP_TCP_ACK_CT); 
+        soutct(app, PIP_TCP_ACK_CT);
         return;
     case SYNSENT:
     case LISTEN:
         conn.state = CLOSED;
-        soutct(app, PIP_TCP_ACK_CT); 
+        soutct(app, PIP_TCP_ACK_CT);
         return;
     case SYNRCVD:
     case ESTAB:

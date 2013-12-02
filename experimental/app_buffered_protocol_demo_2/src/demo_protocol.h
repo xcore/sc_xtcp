@@ -27,7 +27,7 @@ typedef struct demo_protocol_state_t
   int conn_id;
   xtcp_bufinfo_t bufinfo;
   char inbuf[DEMO_PROTOCOL_RXBUF_LEN];
-  char outbuf[DEMO_PROTOCOL_TXBUF_LEN]; 
+  char outbuf[DEMO_PROTOCOL_TXBUF_LEN];
 } demo_protocol_state_t;
 
 #endif

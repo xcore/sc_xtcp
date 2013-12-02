@@ -87,7 +87,7 @@ struct tcpip_hdr {
   u16_t ipchksum;
   u16_t srcipaddr[2],
     destipaddr[2];
-  
+
   /* TCP header. */
   u16_t srcport,
     destport;
@@ -142,7 +142,7 @@ struct icmpip_hdr {
  */
 struct fwcache_entry {
   u16_t timer;
-  
+
   u16_t srcipaddr[2];
   u16_t destipaddr[2];
   u16_t ipid;
@@ -270,7 +270,7 @@ time_exceeded(void)
   ICMPBUF->ipoffset[0] = ICMPBUF->ipoffset[1] = 0;
   ICMPBUF->ttl  = UIP_TTL;
   ICMPBUF->proto = UIP_PROTO_ICMP;
-  
+
   /* Calculate IP checksum. */
   ICMPBUF->ipchksum = 0;
   ICMPBUF->ipchksum = ~(uip_ipchksum());
@@ -292,7 +292,7 @@ fwcache_register(void)
 
   oldest = FW_TIME;
   fw = NULL;
-  
+
   /* Find the oldest entry in the cache. */
   for(i = 0; i < FWCACHE_SIZE; ++i) {
     if(fwcache[i].timer == 0) {
@@ -330,7 +330,7 @@ static struct uip_fw_netif *
 find_netif(void)
 {
   struct uip_fw_netif *netif;
-  
+
   /* Walk through every network interface to check for a match. */
   for(netif = netifs; netif != NULL; netif = netif->next) {
     if(ipaddr_maskcmp(BUF->destipaddr, netif->ipaddr,
@@ -339,7 +339,7 @@ find_netif(void)
       return netif;
     }
   }
-  
+
   /* If no matching netif was found, we use default netif. */
   return defaultnetif;
 }
@@ -385,7 +385,7 @@ uip_fw_output(void)
     return UIP_FW_OK;
   }
 #endif /* UIP_BROADCAST */
-  
+
   netif = find_netif();
   /*  printf("uip_fw_output: netif %p ->output %p len %d\n", netif,
 	 netif->output,
@@ -464,10 +464,10 @@ uip_fw_forward(void)
     }
     time_exceeded();
   }
-  
+
   /* Decrement the TTL (time-to-live) value in the IP header */
   BUF->ttl = BUF->ttl - 1;
-  
+
   /* Update the IP checksum. */
   if(BUF->ipchksum >= HTONS(0xffff - 0x0100)) {
     BUF->ipchksum = BUF->ipchksum + HTONS(0x0100) + 1;

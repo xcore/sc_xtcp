@@ -3,7 +3,7 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
-// These functions need to be supplied by the IP stack to 
+// These functions need to be supplied by the IP stack to
 // implement an xtcp server
 
 #ifndef _xtcp_server_impl_h_
@@ -13,11 +13,11 @@
 void xtcpd_ask(int linknum);
 void xtcpd_listen(int linknum, int port_number, xtcp_protocol_t p);
 void xtcpd_unlisten(int linknum, int port_number);
-void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr, 
+void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr,
                    xtcp_protocol_t p);
 void xtcpd_bind_local(int linknum, int conn_id, int port_number);
-void xtcpd_bind_remote(int linknum, 
-                       int conn_id, 
+void xtcpd_bind_remote(int linknum,
+                       int conn_id,
                        xtcp_ipaddr_t addr,
                        int port_number);
 
@@ -45,4 +45,4 @@ void xtcpd_pause(int conn_id);
 void xtcpd_unpause(int conn_id);
 void xtcpd_accept_partial_ack(int conn_id);
 
-#endif 
+#endif

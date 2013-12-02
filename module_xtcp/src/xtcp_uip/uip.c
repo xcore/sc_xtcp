@@ -1169,7 +1169,7 @@ void uip_process(u8_t flag) {
 	 UDP/IP headers, but let the UDP application do all the hard
 	 work. If the application sets uip_slen, it has a packet to
 	 send. */
-     
+
 #if UIP_UDP_CHECKSUMS
 	uip_len = uip_len - UIP_IPUDPH_LEN;
 	uip_appdata = &uip_buf[UIP_LLH_LEN + UIP_IPUDPH_LEN];
@@ -1195,7 +1195,7 @@ void uip_process(u8_t flag) {
 		 connection is bound to a remote IP address, the source IP
 		 address of the packet is checked. */
 
-#if 0	  	  
+#if 0
 		if(uip_udp_conn->lport != 0 &&
 				UDPBUF->destport == uip_udp_conn->lport &&
 				(uip_udp_conn->rport == 0 ||
@@ -1283,7 +1283,7 @@ void uip_process(u8_t flag) {
 
 	uip_ipaddr_copy(BUF->srcipaddr, uip_hostaddr);
 	uip_ipaddr_copy(BUF->destipaddr, uip_udp_conn->ripaddr);
-    
+
 	uip_appdata = &uip_buf[UIP_LLH_LEN + UIP_IPTCPH_LEN];
 
 #if UIP_UDP_CHECKSUMS

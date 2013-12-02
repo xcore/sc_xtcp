@@ -118,7 +118,7 @@ void pipIncomingDHCP(unsigned short packet[], unsigned srcIP, unsigned dstIP, in
         }
 #ifdef PIP_LINK_LOCAL
         pipDisableLinkLocal();
-#endif        
+#endif
         pipSetTimeOut(PIP_DHCP_TIMER_T1, renewalTime, 0, PIP_FUZZ_1S);
         pipSetTimeOut(PIP_DHCP_TIMER_T2, rebindTime, 0, PIP_FUZZ_1S);
         state = STATE_ALLOCATED;

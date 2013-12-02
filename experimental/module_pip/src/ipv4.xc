@@ -32,13 +32,13 @@ void pipIncomingIPv4(unsigned short packet[], int offset) {
     unsigned int dstIP = getIntUnaligned(packet, 2*offset + 16);
 
     int chkSum = onesChecksum(0, packet, offset, headerLength * 4);
-    
+
     if (chkSum != 0) {
         return;        // Bad checksum; drop.
     }
 
     if ((dstIP | mySubnetIP) != 0xFFFFFFFF &&
-        (dstIP >> 24) != 224 && 
+        (dstIP >> 24) != 224 &&
         dstIP != 0 &&
         dstIP != myIP) {
         return;        // dest ip address is not us; drop.

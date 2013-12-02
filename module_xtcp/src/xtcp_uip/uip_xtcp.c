@@ -58,7 +58,7 @@ static struct xtcpd_state_t  *lookup_xtcpd_state(int conn_id) {
         xtcpd_state_t *s = (xtcpd_state_t *) &(uip_udp_conns[i].appstate);
         if (s->conn.id == conn_id) return s;
     }
-  } 
+  }
   return NULL;
 }
 
@@ -81,14 +81,14 @@ static int get_listener_linknum(struct listener_info_t listeners[],
 {
   int i, linknum = -1;
   for (i=0;i<n;i++)
-    if (listeners[i].active && 
+    if (listeners[i].active &&
         local_port == listeners[i].port_number) {
       linknum = listeners[i].linknum;
       break;
     }
   return linknum;
 }
-                          
+
 
 void xtcpd_init_state(xtcpd_state_t *s,
                       xtcp_protocol_t protocol,
@@ -120,13 +120,13 @@ void xtcpd_init_state(xtcpd_state_t *s,
   while (lookup_xtcpd_state(guid) != NULL)
   {
     guid++;
-    if (guid > MAX_GUID) 
+    if (guid > MAX_GUID)
       guid = 1;
   }
 
   s->conn.connection_type = connection_type;
   s->linknum = linknum;
-  s->conn.id = guid;  
+  s->conn.id = guid;
   s->conn.local_port = HTONS(local_port);
   s->conn.remote_port = HTONS(remote_port);
   s->conn.protocol = protocol;
@@ -152,7 +152,7 @@ static void unregister_listener(struct listener_info_t listeners[],
                                 int linknum,
                                 int port_number,
                                 int n){
-  
+
   int i;
   for (i=0;i<n;i++){
     if (listeners[i].port_number == HTONS(port_number) &&
@@ -173,7 +173,7 @@ static void register_listener(struct listener_info_t listeners[],
     for (i=0;i<n;i++)
       if (!listeners[i].active)
         break;
-    
+
     if (i==n) {
       // Error: max number of listeners reached
     }
@@ -194,7 +194,7 @@ void xtcpd_listen(int linknum, int port_number, xtcp_protocol_t p)
 
   if (p == XTCP_PROTOCOL_TCP) {
     register_listener(tcp_listeners, linknum, port_number, NUM_TCP_LISTENERS);
-    uip_listen(HTONS(port_number));    
+    uip_listen(HTONS(port_number));
   }
   else {
     register_listener(udp_listeners, linknum, port_number, NUM_UDP_LISTENERS);
@@ -208,14 +208,14 @@ void xtcpd_bind_local(int linknum, int conn_id, int port_number)
 {
   xtcpd_state_t *s = lookup_xtcpd_state(conn_id);
   s->conn.local_port = port_number;
-  if (s->conn.protocol == XTCP_PROTOCOL_UDP) 
-    ((struct uip_udp_conn *) s->s.uip_conn)->lport = HTONS(port_number);    
-  else 
-    ((struct uip_conn *) s->s.uip_conn)->lport = HTONS(port_number);    
+  if (s->conn.protocol == XTCP_PROTOCOL_UDP)
+    ((struct uip_udp_conn *) s->s.uip_conn)->lport = HTONS(port_number);
+  else
+    ((struct uip_conn *) s->s.uip_conn)->lport = HTONS(port_number);
 }
 
-void xtcpd_bind_remote(int linknum, 
-                       int conn_id, 
+void xtcpd_bind_remote(int linknum,
+                       int conn_id,
                        xtcp_ipaddr_t addr,
                        int port_number)
 {
@@ -223,23 +223,23 @@ void xtcpd_bind_remote(int linknum,
   if (s->conn.protocol == XTCP_PROTOCOL_UDP) {
     struct uip_udp_conn *conn = (struct uip_udp_conn *) s->s.uip_conn;
     s->conn.remote_port = port_number;
-    conn->rport = HTONS(port_number);    
+    conn->rport = HTONS(port_number);
     XTCP_IPADDR_CPY(s->conn.remote_addr, addr);
     conn->ripaddr[0] = (addr[1] << 8) | addr[0];
     conn->ripaddr[1] = (addr[3] << 8) | addr[2];
-  }            
+  }
 }
 
-void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr, 
+void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr,
                    xtcp_protocol_t p) {
   uip_ipaddr_t uipaddr;
   uip_ipaddr(uipaddr, addr[0], addr[1], addr[2], addr[3]);
   if (p == XTCP_PROTOCOL_TCP) {
-    struct uip_conn *conn = uip_connect(&uipaddr, HTONS(port_number)); 
+    struct uip_conn *conn = uip_connect(&uipaddr, HTONS(port_number));
     if (conn != NULL) {
          xtcpd_state_t *s = (xtcpd_state_t *) &(conn->appstate);
          s->linknum = linknum;
-         s->s.connect_request = 1;      
+         s->s.connect_request = 1;
          s->conn.connection_type = XTCP_CLIENT_CONNECTION;
        }
   }
@@ -249,7 +249,7 @@ void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr,
     if (conn != NULL) {
       xtcpd_state_t *s = (xtcpd_state_t *) &(conn->appstate);
       s->linknum = linknum;
-      s->s.connect_request = 1;      
+      s->s.connect_request = 1;
       s->conn.connection_type = XTCP_CLIENT_CONNECTION;
     }
   }
@@ -399,7 +399,7 @@ void uip_xtcpd_handle_poll(xtcpd_state_t *s)
  if (s->s.abort_request) {
     if (uip_udpconnection()) {
       uip_udp_conn->lport = 0;
-      xtcpd_event(XTCP_CLOSED, s);    
+      xtcpd_event(XTCP_CLOSED, s);
     }
     else
       uip_abort();
@@ -408,21 +408,21 @@ void uip_xtcpd_handle_poll(xtcpd_state_t *s)
   else if (s->s.close_request) {
     if (uip_udpconnection()) {
       uip_udp_conn->lport = 0;
-      xtcpd_event(XTCP_CLOSED, s);    
+      xtcpd_event(XTCP_CLOSED, s);
     }
     else
       uip_close();
     s->s.close_request = 0;
   }
   else
-  if (s->s.connect_request) {    
-    if (uip_udpconnection()) {   
+  if (s->s.connect_request) {
+    if (uip_udpconnection()) {
       xtcpd_init_state(s,
                        XTCP_PROTOCOL_UDP,
                        (unsigned char *) uip_udp_conn->ripaddr,
                        uip_udp_conn->lport,
                        uip_udp_conn->rport,
-                       uip_udp_conn);   
+                       uip_udp_conn);
       xtcpd_event(XTCP_NEW_CONNECTION, s);
       s->s.connect_request = 0;
     }
@@ -432,13 +432,13 @@ void uip_xtcpd_handle_poll(xtcpd_state_t *s)
     if (s->linknum != -1) {
       len = do_xtcpd_send(xtcp_links[s->linknum],
                        XTCP_REQUEST_DATA,
-                       s, 
+                       s,
                        uip_appdata,
                        uip_udpconnection() ? XTCP_CLIENT_BUF_SIZE : uip_mss());
       uip_send(uip_appdata, len);
     }
     s->s.send_request--;
-  }      
+  }
   else if (s->s.poll_interval != 0 &&
            timer_expired(&(s->s.tmr)))
     {
@@ -454,11 +454,11 @@ void uip_xtcpd_handle_poll(xtcpd_state_t *s)
 #define ICMPBUF ((struct uip_icmpip_hdr *)&uip_buf[UIP_LLH_LEN])
 #define UDPBUF ((struct uip_udpip_hdr *)&uip_buf[UIP_LLH_LEN])
 
-void 
+void
 xtcpd_appcall(void)
 {
   xtcpd_state_t *s;
-  
+
   if (uip_udpconnection() &&
       (uip_udp_conn->lport == HTONS(DHCPC_CLIENT_PORT) ||
        uip_udp_conn->lport == HTONS(DHCPC_SERVER_PORT))) {
@@ -483,8 +483,8 @@ xtcpd_appcall(void)
     else
       s = (xtcpd_state_t *) &(uip_conn->appstate);
 
-  
-  
+
+
 
   //  if (!uip_udpconnection() && uip_connected()) {
   if (uip_connected()) {
@@ -503,7 +503,7 @@ xtcpd_appcall(void)
                        (unsigned char *) uip_udp_conn->ripaddr,
                        uip_udp_conn->lport,
                        uip_udp_conn->rport,
-                       uip_udp_conn);   
+                       uip_udp_conn);
       xtcpd_event(XTCP_NEW_CONNECTION, s);
 
     }
@@ -514,10 +514,10 @@ xtcpd_appcall(void)
     if (s->linknum != -1) {
 
       xtcpd_service_clients_until_ready(s->linknum, xtcp_links, xtcp_num);
-      
+
       xtcpd_recv(xtcp_links, s->linknum, xtcp_num,
-                 s, 
-                 uip_appdata, 
+                 s,
+                 uip_appdata,
                  uip_datalen());
 
       if (!uip_udpconnection() && s->s.ack_recv_mode) {
@@ -526,11 +526,11 @@ xtcpd_appcall(void)
     }
 
   }
-  
+
   else if (uip_aborted()) {
     xtcpd_event(XTCP_ABORTED, s);
     return;
-  } 
+  }
   else if (uip_timedout()) {
     xtcpd_event(XTCP_TIMED_OUT, s);
     return;
@@ -549,7 +549,7 @@ xtcpd_appcall(void)
 
       uip_send(uip_appdata, len);
     }
-  }  
+  }
 
 
   if (uip_rexmit()) {
@@ -559,19 +559,19 @@ xtcpd_appcall(void)
 #ifdef XTCP_ENABLE_PARTIAL_PACKET_ACK
       s->conn.outstanding = 0;
 #endif
-      len = xtcpd_send(xtcp_links[s->linknum], 
-                       XTCP_RESEND_DATA, 
-                       s, 
+      len = xtcpd_send(xtcp_links[s->linknum],
+                       XTCP_RESEND_DATA,
+                       s,
                        uip_appdata,
                        uip_udpconnection() ? XTCP_CLIENT_BUF_SIZE : uip_mss());
       if (len != 0)
         uip_send(uip_appdata, len);
-    }    
+    }
   }
 
   if (uip_poll()) {
     uip_xtcpd_handle_poll(s);
-  }  
+  }
 
 #if XTCP_ENABLE_PUSH_FLAG_NOTIFICATION
   if (uip_tcp_push()) {
@@ -593,7 +593,7 @@ xtcpd_appcall(void)
 static int uip_ifstate = 0;
 
 
-void xtcpd_get_ipconfig(xtcp_ipconfig_t *ipconfig) 
+void xtcpd_get_ipconfig(xtcp_ipconfig_t *ipconfig)
 {
   ipconfig->ipaddr[0] = uip_ipaddr1(uip_hostaddr);
   ipconfig->ipaddr[1] = uip_ipaddr2(uip_hostaddr);
@@ -606,7 +606,7 @@ void xtcpd_get_ipconfig(xtcp_ipconfig_t *ipconfig)
   ipconfig->gateway[0] = uip_ipaddr1(uip_draddr);
   ipconfig->gateway[1] = uip_ipaddr2(uip_draddr);
   ipconfig->gateway[2] = uip_ipaddr3(uip_draddr);
-  ipconfig->gateway[3] = uip_ipaddr4(uip_draddr);  
+  ipconfig->gateway[3] = uip_ipaddr4(uip_draddr);
 }
 
 void uip_xtcpd_send_config(int linknum)
@@ -620,7 +620,7 @@ void uip_xtcpd_send_config(int linknum)
 }
 
 
-void uip_xtcp_checkstate() 
+void uip_xtcp_checkstate()
 {
   int i;
 
@@ -630,7 +630,7 @@ void uip_xtcp_checkstate()
       prev_ifstate[i] = uip_ifstate;
     }
   }
-  
+
 }
 
 
@@ -642,8 +642,8 @@ void uip_xtcp_down() {
   uip_ifstate = 0;
 }
 
-                         
-int get_uip_xtcp_ifstate() 
+
+int get_uip_xtcp_ifstate()
 {
   return uip_ifstate;
 }

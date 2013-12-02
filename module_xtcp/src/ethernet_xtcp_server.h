@@ -7,7 +7,7 @@
 
 typedef struct ethernet_xtcp_ports_s {
   otp_ports_t otp_ports;
-  smi_interface_t smi;    
+  smi_interface_t smi;
   mii_interface_lite_t mii;
   ethernet_reset_interface_t eth_rst;
 } ethernet_xtcp_ports_t;

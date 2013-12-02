@@ -236,7 +236,7 @@ int echo_server(chanend xtcp, xtcp_protocol_t protocol){
 	xtcp_connection_t conn;
 	int len = 1024;
 	int i = 0;
-	
+
 	do{
 		int lport = src_port + ++i;
 		zero_data(buf, 1024);
@@ -268,7 +268,7 @@ int echo_server(chanend xtcp, xtcp_protocol_t protocol){
 			return 0;
 	    }
 	}while ((len /= 2));
-	
+
 	return 1;
 }
 

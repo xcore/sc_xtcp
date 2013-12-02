@@ -20,7 +20,7 @@ static void handle_xtcp_cmd(chanend c,
                             xtcp_cmd_t cmd,
                             int conn_id)
 {
-  switch (cmd) 
+  switch (cmd)
     {
 #ifndef XTCP_EXCLUDE_LISTEN
     case XTCP_CMD_LISTEN: {
@@ -49,7 +49,7 @@ static void handle_xtcp_cmd(chanend c,
       int port_number;
       xtcp_ipaddr_t ipaddr;
       xtcp_protocol_t protocol;
-      slave {        
+      slave {
         c :> port_number;
         for (int j=0;j<4;j++)
           c :> ipaddr[j];
@@ -105,7 +105,7 @@ static void handle_xtcp_cmd(chanend c,
     }
 #endif
 #ifndef XTCP_EXCLUDE_CLOSE
-    case XTCP_CMD_CLOSE: 
+    case XTCP_CMD_CLOSE:
       xtcpd_close(i, conn_id);
       break;
 #endif
@@ -143,7 +143,7 @@ static void handle_xtcp_cmd(chanend c,
       }
       xtcpd_leave_group(ipaddr);
       }
-      break;    
+      break;
 #endif
 #ifndef XTCP_EXCLUDE_GET_MAC_ADDRESS
     case XTCP_CMD_GET_MAC_ADDRESS: {
@@ -160,13 +160,13 @@ static void handle_xtcp_cmd(chanend c,
 #endif
 #ifndef XTCP_EXCLUDE_GET_IPCONFIG
     case XTCP_CMD_GET_IPCONFIG: {
-      {        
+      {
         xtcp_ipconfig_t ipconfig;
         xtcpd_get_ipconfig(ipconfig);
         master {
-          for (int i=0;i<4;i++) 
+          for (int i=0;i<4;i++)
             c <: ipconfig.ipaddr[i];
-          
+
           for (int i=0;i<4;i++)
             c <: ipconfig.netmask[i];
 
@@ -179,25 +179,25 @@ static void handle_xtcp_cmd(chanend c,
 #endif
 #ifndef XTCP_EXCLUDE_ACK_RECV
     case XTCP_CMD_ACK_RECV: {
-      xtcpd_ack_recv(conn_id);      
+      xtcpd_ack_recv(conn_id);
       break;
     }
 #endif
 #ifndef XTCP_EXCLUDE_ACK_RECV_MODE
     case XTCP_CMD_ACK_RECV_MODE: {
-      xtcpd_ack_recv_mode(conn_id);      
+      xtcpd_ack_recv_mode(conn_id);
       break;
     }
 #endif
 #ifndef XTCP_EXCLUDE_PAUSE
     case XTCP_CMD_PAUSE: {
-      xtcpd_pause(conn_id);      
+      xtcpd_pause(conn_id);
       break;
     }
 #endif
 #ifndef XTCP_EXCLUDE_UNPAUSE
     case XTCP_CMD_UNPAUSE: {
-      xtcpd_unpause(conn_id);      
+      xtcpd_unpause(conn_id);
       break;
     }
 #endif
@@ -210,7 +210,7 @@ static void handle_xtcp_cmd(chanend c,
     }
 }
 
-static void send_conn_and_complete(chanend c, 
+static void send_conn_and_complete(chanend c,
                                    xtcp_connection_t &conn)
 {
   #pragma unsafe arrays
@@ -228,7 +228,7 @@ int xtcpd_service_client0(chanend xtcp, int i, int waiting_link)
   unsigned char tok;
   unsigned int cmd;
   unsigned int conn_id;
-  select 
+  select
       {
       case inct_byref(xtcp, tok):
         if (tok == XS1_CT_END) {
@@ -236,14 +236,14 @@ int xtcpd_service_client0(chanend xtcp, int i, int waiting_link)
           notified[i] = 0;
           if (pending_event[i] != -1) {
             dummy_conn.event = pending_event[i];
-            
+
             send_conn_and_complete(xtcp, dummy_conn);
             pending_event[i] = -1;
             if (i==waiting_link) {
               outct(xtcp, XS1_CT_END);
               notified[i] = 1;
             }
-          }          
+          }
         }
         else {
           outct(xtcp, XS1_CT_END);
@@ -254,7 +254,7 @@ int xtcpd_service_client0(chanend xtcp, int i, int waiting_link)
           chkct(xtcp, XS1_CT_END);
           outct(xtcp, XS1_CT_END);
           handle_xtcp_cmd(xtcp, i, cmd, conn_id);
-          if (notified[i]) 
+          if (notified[i])
             outct(xtcp, XS1_CT_END);
         }
         break;
@@ -272,13 +272,13 @@ void xtcpd_service_clients(chanend xtcp[], int num_xtcp){
       activity = 0;
       for (int i=0;i<num_xtcp;i++)
         activity |= xtcpd_service_client0(xtcp[i], i, -1);
-      
-  }	
+
+  }
 }
 
 #pragma unsafe arrays
 void xtcpd_service_clients_until_ready(int waiting_link,
-                                       chanend xtcp[], 
+                                       chanend xtcp[],
                                        int num_xtcp)
 {
   if (!notified[waiting_link]) {
@@ -287,8 +287,8 @@ void xtcpd_service_clients_until_ready(int waiting_link,
   }
   while (notified[waiting_link]) {
     for (int i=0;i<num_xtcp;i++)
-      xtcpd_service_client0(xtcp[i], i, waiting_link);	 	
-  }	
+      xtcpd_service_client0(xtcp[i], i, waiting_link);
+  }
 }
 
 
@@ -330,7 +330,7 @@ void xtcpd_recv(chanend xtcp[],
     send_conn_and_complete(xtcp[linknum], s.conn);
     master do_recv(xtcp[linknum], client_ready, datalen, data);
     if (!client_ready) {
-      xtcpd_service_clients_until_ready(linknum, xtcp, num_xtcp);      
+      xtcpd_service_clients_until_ready(linknum, xtcp, num_xtcp);
     }
   } while (!client_ready);
 
@@ -340,7 +340,7 @@ void xtcpd_recv(chanend xtcp[],
 }
 
 #pragma unsafe arrays
-int xtcpd_send(chanend c,        
+int xtcpd_send(chanend c,
                xtcp_event_type_t event,
                xtcpd_state_t &s,
                unsigned char data[],
@@ -359,7 +359,7 @@ int xtcpd_send(chanend c,
 }
 
 #if XTCP_SUPPORT_DEPRECATED_1V3_FEATURES
-void xtcpd_send_config_event(chanend c, 
+void xtcpd_send_config_event(chanend c,
                              xtcp_config_event_t event,
                              xtcp_ipconfig_t &ipconfig)
 {

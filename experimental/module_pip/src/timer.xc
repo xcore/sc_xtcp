@@ -14,11 +14,11 @@
 #include "tcp.h"
 #include "linklocal.h"
 
-/* 
+/*
  * Times are represented by a pair of numbers, an epoch and a time value.
  * The time value ticks in 100 MHz reference clocks, the epoch value in
  * 2^30 reference clocks (approx 10.73 seconds). The epochs run out after
- * 1400 years; sufficient for our ethernet stack. 
+ * 1400 years; sufficient for our ethernet stack.
  *
  * Note that there is a * 2-bit overlap between the epoch and the timer;
  * this makes it easier to * deal with "timerafter" semantics.

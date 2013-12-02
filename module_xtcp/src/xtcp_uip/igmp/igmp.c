@@ -74,7 +74,7 @@ static u16_t ipid;
 static uip_ipaddr_t allgroups_ipaddr;
 static uip_ipaddr_t leavegroup_ipaddr;
 
-void igmp_init() 
+void igmp_init()
 {
   int i;
   for (i=0;i<MAX_IGMP_GROUPS;i++)
@@ -89,16 +89,16 @@ static void create_igmp_msg(int msgtype,
 {
   u16_t checksum;
   unsigned char dest_hwaddr[6];
-  uip_len = sizeof(struct ethip_hdr) + 
-    sizeof(ip_options_t) + 
+  uip_len = sizeof(struct ethip_hdr) +
+    sizeof(ip_options_t) +
     sizeof(igmp_msg_t);
-  
+
   dest_hwaddr[0] = 0x01;
   dest_hwaddr[1] = 0x00;
   dest_hwaddr[2] = 0x5e;
-  dest_hwaddr[3] = dest_addr[0] >> 8; 
+  dest_hwaddr[3] = dest_addr[0] >> 8;
   dest_hwaddr[4] = dest_addr[1] & 0xf;
-  dest_hwaddr[5] = dest_addr[1] >> 8; 
+  dest_hwaddr[5] = dest_addr[1] >> 8;
   memcpy(IPBUF->ethhdr.dest.addr, dest_hwaddr, 6);
   memcpy(IPBUF->ethhdr.src.addr, uip_ethaddr.addr, 6);
 
@@ -110,7 +110,7 @@ static void create_igmp_msg(int msgtype,
   IPBUF->len[0] = (32 >> 8);
   IPBUF->len[1] = (32 & 0xff);
   IPBUF->ipid[0] = ipid >> 8 ;
-  IPBUF->ipid[1] = ipid & 0xff; 
+  IPBUF->ipid[1] = ipid & 0xff;
   ipid++;
   IPBUF->ipoffset[0] = IPBUF->ipoffset[1] = 0;
   IPBUF->ttl = 1;//UIP_TTL;
@@ -123,8 +123,8 @@ static void create_igmp_msg(int msgtype,
   checksum = uip_chksum((u16_t *) &uip_buf[UIP_LLH_LEN], UIP_IPH_LEN+sizeof(ip_options_t));
   if (checksum == 0)
     checksum = 0xffff;
-  //  checksum = uip_ipchksum();  
-  IPBUF->ipchksum = ~checksum;  
+  //  checksum = uip_ipchksum();
+  IPBUF->ipchksum = ~checksum;
   IGMPBUF->msgtype = msgtype;
   IGMPBUF->max_response = 0x0;
   checksum = (IGMPBUF->msgtype);
@@ -154,7 +154,7 @@ static void igmp_group_periodic(igmp_group_state_t *s)
     case NON_MEMBER:
     case IDLE_MEMBER:
       break;
-    case PENDING_JOIN:      
+    case PENDING_JOIN:
       send_membership_report(s);
       s->flag = 1;
       s->state = DELAYED_MEMBER;
@@ -172,11 +172,11 @@ static void igmp_group_periodic(igmp_group_state_t *s)
         send_leave_group(s);
       s->state = NON_MEMBER;
       break;
-    }  
+    }
   return;
 }
 
-void igmp_periodic() 
+void igmp_periodic()
 {
   int i;
   for (i=0;i<MAX_IGMP_GROUPS;i++) {
@@ -187,7 +187,7 @@ void igmp_periodic()
   return;
 }
 
-static int igmp_checksum_valid() 
+static int igmp_checksum_valid()
 {
   u16_t chksum;
   chksum = (IGMPBUF->max_response << 8) | IGMPBUF->msgtype;
@@ -198,7 +198,7 @@ static int igmp_checksum_valid()
 
 void igmp_in()
 {
-  switch (IGMPBUF->msgtype) 
+  switch (IGMPBUF->msgtype)
     {
     case IGMP_MEMBERSHIP_QUERY: {
       int to_all_groups = uip_ipaddr_cmp(IGMPBUF->addr, allgroups_ipaddr);
@@ -216,7 +216,7 @@ void igmp_in()
                         (IGMPBUF->max_response >> 5) * CLOCK_SECOND);
             }
         }
-      }     
+      }
       break;
     case IGMP_MEMBERSHIP_REPORT: {
       int i=0;
@@ -231,7 +231,7 @@ void igmp_in()
             }
         }
       }
-      break;    
+      break;
     }
   // nothing to send
   uip_len = 0;
@@ -266,7 +266,7 @@ void igmp_leave_group(uip_ipaddr_t addr)
   return;
 }
 
-int igmp_check_addr(uip_ipaddr_t addr) 
+int igmp_check_addr(uip_ipaddr_t addr)
 {
   int i;
   for (i=0;i<MAX_IGMP_GROUPS;i++)

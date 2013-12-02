@@ -18,7 +18,7 @@ static void send_cmd(chanend c, xtcp_cmd_t cmd, int conn_id)
   outuint(c, cmd);
   outuint(c, conn_id);
   outct(c, XS1_CT_END);
-  chkct(c, XS1_CT_END);  
+  chkct(c, XS1_CT_END);
 }
 
 void xtcp_listen(chanend tcp_svr, int port_number, xtcp_protocol_t p) {
@@ -37,14 +37,14 @@ void xtcp_unlisten(chanend c_xtcp, int port_number) {
 }
 
 void xtcp_connect(chanend c_xtcp,
-                  int port_number, 
+                  int port_number,
                   xtcp_ipaddr_t ipaddr,
                   xtcp_protocol_t p)
 {
   send_cmd(c_xtcp, XTCP_CMD_CONNECT, 0);
   master {
 	  c_xtcp <: port_number;
-    for(int i=0;i<4;i++) 
+    for(int i=0;i<4;i++)
     	c_xtcp <: ipaddr[i];
     c_xtcp <: p;
   }
@@ -89,7 +89,7 @@ void xtcp_init_send(chanend c_xtcp,
 }
 
 void xtcp_set_connection_appstate(chanend c_xtcp,
-                                  REFERENCE_PARAM(xtcp_connection_t, conn), 
+                                  REFERENCE_PARAM(xtcp_connection_t, conn),
                                   xtcp_appstate_t appstate)
 {
   send_cmd(c_xtcp, XTCP_CMD_SET_APPSTATE, conn.id);
@@ -99,19 +99,19 @@ void xtcp_set_connection_appstate(chanend c_xtcp,
 }
 
 void xtcp_close(chanend c_xtcp,
-                REFERENCE_PARAM(xtcp_connection_t,conn)) 
+                REFERENCE_PARAM(xtcp_connection_t,conn))
 {
   send_cmd(c_xtcp, XTCP_CMD_CLOSE, conn.id);
 }
 
 void xtcp_ack_recv(chanend c_xtcp,
-                   REFERENCE_PARAM(xtcp_connection_t,conn)) 
+                   REFERENCE_PARAM(xtcp_connection_t,conn))
 {
   send_cmd(c_xtcp, XTCP_CMD_ACK_RECV, conn.id);
 }
 
 void xtcp_ack_recv_mode(chanend c_xtcp,
-                        REFERENCE_PARAM(xtcp_connection_t,conn)) 
+                        REFERENCE_PARAM(xtcp_connection_t,conn))
 {
   send_cmd(c_xtcp, XTCP_CMD_ACK_RECV_MODE, conn.id);
 }

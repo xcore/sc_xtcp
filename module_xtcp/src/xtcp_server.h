@@ -3,8 +3,8 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
-#ifndef __xtcp_server_h__ 
-#define __xtcp_server_h__ 
+#ifndef __xtcp_server_h__
+#define __xtcp_server_h__
 #include <xccompat.h>
 #include "xtcp_client.h"
 #include "xtcp_server_conf.h"
@@ -20,14 +20,14 @@ typedef struct xtcpd_state_t {
 
 void xtcpd_init(chanend xtcp[], int num_xtcp);
 
-void xtcpd_send_event(chanend c, xtcp_event_type_t event, 
+void xtcpd_send_event(chanend c, xtcp_event_type_t event,
                       REFERENCE_PARAM(xtcpd_state_t, s));
 
 void xtcpd_send_null_event(chanend c);
 
 void xtcpd_service_clients(chanend xtcp[], int num_xtcp);
 void xtcpd_service_clients_until_ready(int waiting_link,
-                                       chanend xtcp[], 
+                                       chanend xtcp[],
                                        int num_xtcp);
 
 void xtcpd_recv(chanend xtcp[],
@@ -37,7 +37,7 @@ void xtcpd_recv(chanend xtcp[],
                 unsigned char data[],
                 int datalen);
 
-int xtcpd_send(chanend c, 
+int xtcpd_send(chanend c,
                xtcp_event_type_t event,
                REFERENCE_PARAM(xtcpd_state_t, s),
                unsigned char data[],

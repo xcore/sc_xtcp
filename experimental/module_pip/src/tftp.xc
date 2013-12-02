@@ -45,7 +45,7 @@ void pipAcknowledgeTFTP() {
 
 void pipReadTFTP() {
     int fileNameLength = 2;
-    txData(22, "/x\000octet\000", 0, fileNameLength + 7); 
+    txData(22, "/x\000octet\000", 0, fileNameLength + 7);
     doSend(RRQ, fileNameLength + 9);
 }
 
@@ -72,7 +72,7 @@ void pipTimeOutTFTP() {
     }
 }
 
-void pipIncomingTFTP(unsigned short packet[], unsigned srcIP, unsigned dstIP, 
+void pipIncomingTFTP(unsigned short packet[], unsigned srcIP, unsigned dstIP,
                      unsigned srcPort, int offset, int length) {
     int opcode = byterev(packet[offset])>>16;
     int start;

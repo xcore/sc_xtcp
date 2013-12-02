@@ -60,13 +60,13 @@ void pipIncomingUDP(unsigned short packet[], unsigned offset, unsigned remoteIP,
     int localPort =   byterev(packet[offset+1]) >> 16;
     int totalLength = byterev(packet[offset+2]) >> 16;
     int chkSum;
-    
+
     chkSum = onesChecksum(0x0011 + totalLength + onesAdd(remoteIP, localIP),
                           packet, offset, totalLength);
     if (chkSum != 0) {
         return; /* ignore packet with bad chksum */
     }
-    
+
     // Check destination port, set packet ready for appropriate packet handler.
 
 #if defined(PIP_DHCP)
@@ -163,7 +163,7 @@ int pipApplicationReadUDP(streaming chanend stack,
 }
 
 void pipApplicationWriteUDP(streaming chanend stack,
-                            unsigned char buffer[], unsigned start, 
+                            unsigned char buffer[], unsigned start,
                             unsigned maxBytes,
                             unsigned int remoteIP, unsigned int remotePort,
                             unsigned int localPort) {

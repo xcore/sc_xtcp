@@ -6,7 +6,7 @@
 #ifndef _mdns_protocol_h_
 #define _mdns_protocol_h_
 
-#define MDNS_SERVER_PORT 5353 
+#define MDNS_SERVER_PORT 5353
 
 #if MDNS_NETBIOS
 #define NETBIOS_PORT     137

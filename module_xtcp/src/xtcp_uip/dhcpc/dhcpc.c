@@ -194,7 +194,7 @@ send_discover(void)
   end = add_end(end);
 
   uip_send(uip_appdata, end - (u8_t *)uip_appdata);
-  
+
 }
 /*---------------------------------------------------------------------------*/
 void
@@ -204,12 +204,12 @@ send_request(void)
   struct dhcp_msg *m = (struct dhcp_msg *)uip_appdata;
 
   create_msg(m);
-  
+
   end = add_msg_type(&m->options[4], DHCPREQUEST);
   end = add_server_id(end);
   end = add_req_ipaddr(end);
   end = add_end(end);
-  
+
   uip_send(uip_appdata, end - (u8_t *)uip_appdata);
 }
 /*---------------------------------------------------------------------------*/
@@ -261,14 +261,14 @@ static u8_t
 parse_msg(void)
 {
   struct dhcp_msg *m = (struct dhcp_msg *)uip_appdata;
-  
+
   if(m->op == DHCP_REPLY &&
      memcmp(m->xid, xid, sizeof(xid)) == 0 &&
      memcmp(m->chaddr, s.mac_addr, s.mac_len) == 0) {
     u8_t type = 0;
     memcpy(s.ipaddr, m->yiaddr, 4);
     type = parse_options(&m->options[4], uip_datalen());
-    
+
     return type;
   }
   return 0;
@@ -306,32 +306,32 @@ PT_THREAD(handle_dhcp(void))
 {
     unsigned int ticks;
     int msg;
-    
+
     PT_BEGIN(&s.pt);
-    
+
     if (s.state == STATE_DISABLED)
         PT_RESTART(&s.pt);
-        
+
     // Random startup delay as described in spec
   initwait:
     rand_startup = rand() % 8192; // 0 - 8 seconds
     s.ticks = rand_startup;
     timer_set(&s.timer, s.ticks);
-    
+
     do
     {
         PT_YIELD(&s.pt);
     } while (!timer_expired(&s.timer));
-    
+
   init:
     s.state = STATE_SENDING;
     s.ticks = CLOCK_SECOND;
-    
+
     while (1)
     {
         send_discover();
         timer_set(&s.timer, s.ticks);
-        
+
         do
         {
             PT_YIELD(&s.pt);
@@ -345,29 +345,29 @@ PT_THREAD(handle_dhcp(void))
                 goto selecting;
               }
             }
-        
+
         } while (!timer_expired(&s.timer));
-        
+
 #if UIP_USE_AUTOIP
         if (s.ticks == CLOCK_SECOND * 4)
         {
             autoip_start();
         }
 #endif
-        
+
         if (s.ticks < CLOCK_SECOND * 60)
         {
             s.ticks *= 2;
         }
     }
-    
+
   selecting:
     s.ticks = CLOCK_SECOND;
     do
     {
         send_request();
         timer_set(&s.timer, s.ticks);
-        
+
         do
         {
             PT_YIELD(&s.pt);
@@ -386,22 +386,22 @@ PT_THREAD(handle_dhcp(void))
               }
             }
         } while (!timer_expired(&s.timer));
-        
+
         if (s.ticks <= CLOCK_SECOND * 10)
         {
             s.ticks += CLOCK_SECOND;
         }
         else goto init;
-        
+
     } while (s.state != STATE_CONFIG_RECEIVED);
-    
+
   bound:
     dhcpc_configured(&s);
-    
+
     #define MAX_TICKS ((unsigned int)(~(0))/2)
     #define MAX_TICKS32 (~((unsigned int)0))
     #define IMIN(a, b) ((a) < (b) ? (a) : (b))
-    
+
     if((s.lease_time[0]*65536ul + s.lease_time[1])*CLOCK_SECOND/2 <= MAX_TICKS32)
     {
         s.ticks = (s.lease_time[0]*65536ul +s.lease_time[1])*CLOCK_SECOND/2;
@@ -410,7 +410,7 @@ PT_THREAD(handle_dhcp(void))
     {
         s.ticks = MAX_TICKS32;
     }
-    
+
     while(s.ticks > 0)
     {
         ticks = IMIN(s.ticks, MAX_TICKS);
@@ -418,7 +418,7 @@ PT_THREAD(handle_dhcp(void))
         timer_set(&s.timer, ticks);
         PT_YIELD_UNTIL(&s.pt, timer_expired(&s.timer));
     }
-    
+
     if((s.lease_time[0]*65536ul + s.lease_time[1])*CLOCK_SECOND/2 <= MAX_TICKS32)
     {
         s.ticks = (s.lease_time[0]*65536ul +s.lease_time[1])*CLOCK_SECOND/2;
@@ -427,7 +427,7 @@ PT_THREAD(handle_dhcp(void))
     {
         s.ticks = MAX_TICKS32;
     }
-    
+
     // Renew
     do
     {
@@ -435,11 +435,11 @@ PT_THREAD(handle_dhcp(void))
         ticks = IMIN(s.ticks / 2, MAX_TICKS);
         s.ticks -= ticks;
         timer_set(&s.timer, ticks);
-        
+
         do
         {
             PT_YIELD(&s.pt);
-            
+
             if (uip_newdata())
             {
               msg = msg_for_me();
@@ -454,14 +454,14 @@ PT_THREAD(handle_dhcp(void))
               }
             }
         } while (!timer_expired(&s.timer));
-    
+
     } while (s.ticks >= CLOCK_SECOND*3);
 
     // Lease expired
     goto init;
 
     PT_END(&s.pt);
-    
+
 }
 /*---------------------------------------------------------------------------*/
 void
@@ -473,14 +473,14 @@ dhcpc_init(const void *mac_addr, int mac_len)
   s.mac_len  = mac_len;
 
   s.state = STATE_DISABLED;
-  
+
   xid[0] = ((unsigned char *)mac_addr)[2];
   xid[1] = ((unsigned char *)mac_addr)[3];
   xid[2] = ((unsigned char *)mac_addr)[4];
   xid[3] = ((unsigned char *)mac_addr)[5];
-  
+
   memcpy(&rand_seed, xid, (size_t)4);
-  
+
   srand(rand_seed);
   rand();
 
@@ -518,7 +518,7 @@ void
 dhcpc_request(void)
 {
   u16_t ipaddr[2];
-  
+
   if(s.state == STATE_INITIAL)
   {
     uip_ipaddr(ipaddr, 0,0,0,0);

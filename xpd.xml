@@ -1,11 +1,23 @@
 <?xml version="1.0" ?>
 <xpd>
     <components>
+        <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple HTTP Demo">
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.2.7">module_ethernet_board_support</componentDependency>
+            <componentDependency repo = "git://github.com/davelxmos/sc_xtcp" version = "3.1.4">module_xtcp</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_otp" version = "1.0.0">module_otp_board_info</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.2.7">module_ethernet</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.2.7">module_ethernet_smi</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_util" version = "1.0.3">module_locks</componentDependency>
+            <keyword>ethernet</keyword>
+            <keyword>tcp/ip</keyword>
+            <keyword>webserver</keyword>
+            <keyword>http</keyword>
+        </component>
         <component name = "Ethernet/TCP Module" type = "component" buildresults_path = "module_xtcp/.module_xtcp.buildinfo" scope = "General Use" path = "module_xtcp" metainfo_path = "module_xtcp/module_xtcp.metainfo" local = "false" id = "module_xtcp" description = "An ethernet stack with TCP/IP">
-            <componentDependency>module_locks</componentDependency>
-            <componentDependency>module_ethernet_smi</componentDependency>
-            <componentDependency>module_ethernet</componentDependency>
-            <componentDependency>module_otp_board_info</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_util" version = "1.0.3">module_locks</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_otp" version = "1.0.0">module_otp_board_info</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.2.7">module_ethernet</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.2.7">module_ethernet_smi</componentDependency>
             <keyword>ethernet</keyword>
             <keyword>TCP/IP</keyword>
             <keyword>mac</keyword>
@@ -15,33 +27,16 @@
             <keyword>ICMP</keyword>
             <keyword>UDP</keyword>
         </component>
-        <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple HTTP Demo">
-            <componentDependency>module_ethernet_smi</componentDependency>
-            <componentDependency>module_xtcp</componentDependency>
-            <componentDependency>module_ethernet_board_support</componentDependency>
-            <componentDependency>module_otp_board_info</componentDependency>
-            <componentDependency>module_locks</componentDependency>
-            <componentDependency>module_ethernet</componentDependency>
-            <keyword>ethernet</keyword>
-            <keyword>tcp/ip</keyword>
-            <keyword>webserver</keyword>
-            <keyword>http</keyword>
-        </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>d4288863b8258d525d0ee421cab4f8c177080855</githash>
+        <githash>5bdae446ff270dd9a8db34ce5c5164fd37bb43d0</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.2.5rc2</version>
+        <version>2.2.7rc1</version>
     </dependency>
     <dependency repo = "sc_otp">
         <githash>062aa923a78bc603b254b2a99b78593ab3a816ec</githash>
         <uri>git@github.com:xcore/sc_otp</uri>
         <version>1.0.0rc0</version>
-    </dependency>
-    <dependency repo = "sc_util">
-        <githash>d0531d7c68ab67334582c324828e36d617baf8b3</githash>
-        <uri>git@github.com:xcore/sc_util</uri>
-        <version>1.0.3rc0</version>
     </dependency>
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>module_xtcp/doc</docdir>
@@ -76,14 +71,15 @@
     <release parenthash = "60d32f9cfa4461b811113f4afd39f580cd7a16e8" version = "3.1.2rc0" githash = "33336c4194eef2c72d0828c7aacc51caa46f9d76"></release>
     <release parenthash = "8ce08457bcd2d0cdeb7c629dd737be8a4073b144" version = "3.1.2rc1" githash = "5e87ae983af2cf444efdd792c70f823d03aef7c9"></release>
     <release parenthash = "ffe7ed0f43fc29532e84070124cc57521e1c13df" version = "3.1.3rc0" githash = "fcc26ffd1d8e27ba7742ea089f846dcb102728a6"></release>
-    <release parenthash = "64779261dba118ad20fad2888c660ce4244b95e1" version = "3.1.4rc0"></release>
+    <release parenthash = "64779261dba118ad20fad2888c660ce4244b95e1" version = "3.1.4rc0" githash = "b57f63aa0bf64834b17bd695fdc78c6c4b8f0fbf"></release>
+    <release parenthash = "47e6fd38de88a2100e9b97a59c6a271a1430e662" version = "3.1.5rc0"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
+    <version_defines></version_defines>
     <xcore_repo>sc_xtcp</xcore_repo>
     <xpd_version>1.0</xpd_version>
     <xsoftip_exclude>module_zeroconf</xsoftip_exclude>
     <xsoftip_exclude>module_tftp</xsoftip_exclude>
     <xsoftip_exclude>app_udp_demo</xsoftip_exclude>
     <xsoftip_exclude>app_webserver_separate_mac</xsoftip_exclude>
-    <scope>product</scope>
 </xpd>

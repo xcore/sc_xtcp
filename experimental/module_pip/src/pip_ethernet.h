@@ -19,7 +19,7 @@
  */
 void pipIncomingEthernet(unsigned short packet[]);
 void pipIncomingEthernetC(int a);
- 
+
 
 
 /** Function that completes the outgoing packet ready to go onto the Ethernet cable.

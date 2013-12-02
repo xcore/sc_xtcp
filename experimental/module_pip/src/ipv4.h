@@ -11,7 +11,7 @@
 /** Function that deals with an incoming IPv4 packet. Normally called from the Ethernet layer.
  *
  * \param packet contains the packet data.
- * 
+ *
  * \param offset points to the IPv4 header in the packet.
  */
 
@@ -38,7 +38,7 @@ void pipOutgoingIPv4(int ipType, unsigned ipDst, int length);
  * no router is available.
  *
  * \param proposedIP new IP address
- * 
+ *
  * \param subnet     new subnet mask
  *
  * \param router     new gateway IP for traffic outside our subnet.

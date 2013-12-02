@@ -14,8 +14,8 @@
 #include "string.h"
 #include "print.h"
 
-void xtcp_buffered_set_rx_buffer(chanend tcp_svr, 
-                                 xtcp_connection_t *conn, 
+void xtcp_buffered_set_rx_buffer(chanend tcp_svr,
+                                 xtcp_connection_t *conn,
                                  xtcp_bufinfo_t *bufinfo,
                                  char *buf,
                                  int buflen)
@@ -27,8 +27,8 @@ void xtcp_buffered_set_rx_buffer(chanend tcp_svr,
   bufinfo->rx_rdptr = buf;
 }
 
-void xtcp_buffered_set_tx_buffer(chanend tcp_svr, 
-                                 xtcp_connection_t *conn, 
+void xtcp_buffered_set_tx_buffer(chanend tcp_svr,
+                                 xtcp_connection_t *conn,
                                  xtcp_bufinfo_t *bufinfo,
                                  char *buf,
                                  int buflen,
@@ -37,15 +37,15 @@ void xtcp_buffered_set_tx_buffer(chanend tcp_svr,
   bufinfo->tx_buf = buf;
   bufinfo->tx_end = buf + buflen;
   bufinfo->tx_rdptr = buf;
-  bufinfo->tx_prev_rdptr = buf;  
+  bufinfo->tx_prev_rdptr = buf;
   bufinfo->tx_wrptr = buf;
   bufinfo->tx_lowmark = lowmark;
 }
 
 
 
-int xtcp_buffered_recv_upto(chanend tcp_svr, 
-                            xtcp_connection_t *conn, 
+int xtcp_buffered_recv_upto(chanend tcp_svr,
+                            xtcp_connection_t *conn,
                             xtcp_bufinfo_t *bufinfo,
                             char **buf,
                             char delim,
@@ -104,8 +104,8 @@ int xtcp_buffered_recv_upto(chanend tcp_svr,
 
 
 
-int xtcp_buffered_recv(chanend tcp_svr, 
-                       xtcp_connection_t *conn, 
+int xtcp_buffered_recv(chanend tcp_svr,
+                       xtcp_connection_t *conn,
                        xtcp_bufinfo_t *bufinfo,
                        char **buf,
                        int len,
@@ -155,8 +155,8 @@ int xtcp_buffered_recv(chanend tcp_svr,
 
 
 
-int xtcp_buffered_send(chanend tcp_svr, 
-                       xtcp_connection_t *conn, 
+int xtcp_buffered_send(chanend tcp_svr,
+                       xtcp_connection_t *conn,
                        xtcp_bufinfo_t *bufinfo,
                        char *buf,
                        int len)
@@ -165,7 +165,7 @@ int xtcp_buffered_send(chanend tcp_svr,
 
   space_left = bufinfo->tx_end - bufinfo->tx_wrptr;
 
-  
+
   if (space_left < len) {
     int remaining = bufinfo->tx_wrptr - bufinfo->tx_prev_rdptr;
     int shift = bufinfo->tx_prev_rdptr - bufinfo->tx_buf;
@@ -193,7 +193,7 @@ int xtcp_buffered_send(chanend tcp_svr,
   space_left -= len;
 
   space_left += (bufinfo->tx_prev_rdptr - bufinfo->tx_buf);
-  
+
 
   if (space_left < bufinfo->tx_lowmark) {
     xtcp_pause(tcp_svr, conn);
@@ -209,25 +209,25 @@ void xtcp_buffered_send_handler(chanend tcp_svr, xtcp_connection_t *conn,
   int space_left, len;
 
   if (conn->event == XTCP_RESEND_DATA) {
-    xtcp_send(tcp_svr, 
-              bufinfo->tx_prev_rdptr, 
+    xtcp_send(tcp_svr,
+              bufinfo->tx_prev_rdptr,
               bufinfo->tx_rdptr - bufinfo->tx_prev_rdptr);
     return;
   }
 
-  space_left = 
+  space_left =
     (bufinfo->tx_end - bufinfo->tx_wrptr) +
     (bufinfo->tx_prev_rdptr - bufinfo->tx_buf);
-  
+
 
   len = bufinfo->tx_wrptr - bufinfo->tx_rdptr;
   if (len > conn->mss)
-    len = conn->mss;  
+    len = conn->mss;
 
   xtcp_send(tcp_svr, bufinfo->tx_rdptr, len);
 
   if (space_left < bufinfo->tx_lowmark &&
-      space_left + len >= bufinfo->tx_lowmark) 
+      space_left + len >= bufinfo->tx_lowmark)
     xtcp_unpause(tcp_svr, conn);
 
 
@@ -240,7 +240,7 @@ int xtcp_buffered_send_buffer_remaining(xtcp_bufinfo_t *bufinfo)
 {
   int space_left;
 
-  space_left = 
+  space_left =
     (bufinfo->tx_end - bufinfo->tx_wrptr) +
     (bufinfo->tx_prev_rdptr - bufinfo->tx_buf);
 
