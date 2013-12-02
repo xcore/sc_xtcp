@@ -152,7 +152,7 @@ then wait for a :c:member:`XTCP_REQUEST_DATA` event at which point it
 must respond with a call to :c:func:`xtcp_send`. 
 
 .. note:: The maximum buffer size that can be sent in one call to 
-          :c:func:`xtcp_send` is contained in the :c:member:`mss`
+          `xtcp_send` is contained in the `mss`
           field of the connection structure relating to the event.
 
 After this data is sent to the server, two things can happen: Either
