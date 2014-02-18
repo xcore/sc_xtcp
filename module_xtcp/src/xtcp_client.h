@@ -21,7 +21,28 @@
 
 #include "xtcp_bufinfo.h"
 
+#if IPV6
+#define UIP_CONF_IPV6 1
+#else
+#define UIP_CONF_IPV6 0
+#endif
+
 typedef unsigned int xtcp_appstate_t;
+
+#if UIP_CONF_IPV6
+/** XTCP IP address.
+ *
+ *  This data type represents a single ipv6 address in the XTCP
+ *  stack.
+ */
+typedef union xtcp_ip6addr_t {
+  unsigned char  u8[16];			/* Initialiser, must come first. */
+  unsigned short u16[8];
+} xtcp_ip6addr_t;
+
+typedef xtcp_ip6addr_t xtcp_ipaddr_t;
+
+#else /* UIP_CONF_IPV6 -> UIP_CONF_IPV4 */
 
 /** XTCP IP address.
  *
@@ -30,17 +51,26 @@ typedef unsigned int xtcp_appstate_t;
  */
 typedef unsigned char xtcp_ipaddr_t[4];
 
+#endif /* UIP_CONF_IPV6 */
+
 /** IP configuration information structure.
  *
  *  This structure describes IP configuration for an ip node.
  *
  **/
+#if UIP_CONF_IPV6
+typedef struct xtcp_ipconfig_t {
+  int v;		           /**< used ip protocol version */
+  xtcp_ipaddr_t ipaddr;    /**< The IP Address of the node */
+} xtcp_ipconfig_t;
+#else
 typedef struct xtcp_ipconfig_t {
   xtcp_ipaddr_t ipaddr;    /**< The IP Address of the node */
-  xtcp_ipaddr_t netmask;   /**< The netmask of the node. The mask used
+  xtcp_ipaddr_t netmask;   /**< The netmask of the node. The mask used 
                                 to determine which address are routed locally.*/
   xtcp_ipaddr_t gateway;   /**< The gateway of the node */
 } xtcp_ipconfig_t;
+#endif
 
 /** XTCP protocol type.
  *
@@ -179,6 +209,42 @@ typedef struct xtcp_connection_t {
 } xtcp_connection_t;
 
 
+#if UIP_CONF_IPV6
+#define XTCP_IPADDR_CPY(dest, src) do { dest[0]  = src[0]; \
+								dest[1]  = src[1]; \
+								dest[2]  = src[2]; \
+								dest[3]  = src[3]; \
+								dest[4]  = src[4]; \
+								dest[5]  = src[5]; \
+								dest[6]  = src[6]; \
+								dest[7]  = src[7]; \
+								dest[8]  = src[8]; \
+								dest[9]  = src[9]; \
+								dest[10] = src[10]; \
+								dest[11] = src[11]; \
+								dest[12] = src[12]; \
+								dest[13] = src[13]; \
+								dest[14] = src[14]; \
+								dest[15] = src[15]; \
+							  } while (0)
+
+#define XTCP_IPADDR_CMP(a, b) (a[0]  == b[0] && \
+                               a[1]  == b[1] && \
+                               a[2]  == b[2] && \
+                               a[3]  == b[3] && \
+                               a[4]  == b[4] && \
+                               a[5]  == b[5] && \
+                               a[6]  == b[6] && \
+                               a[7]  == b[7] && \
+                               a[8]  == b[8] && \
+                               a[9]  == b[9] && \
+                               a[10] == b[10] && \
+                               a[11] == b[11] && \
+                               a[12] == b[12] && \
+                               a[13] == b[13] && \
+                               a[14] == b[14] && \
+                               a[15] == b[15])
+#else
 #define XTCP_IPADDR_CPY(dest, src) do { dest[0] = src[0]; \
                                         dest[1] = src[1]; \
                                         dest[2] = src[2]; \
@@ -190,6 +256,7 @@ typedef struct xtcp_connection_t {
                                a[1] == b[1] && \
                                a[2] == b[2] && \
                                a[3] == b[3])
+#endif
 
 #include "xtcp_blocking_client.h"
 

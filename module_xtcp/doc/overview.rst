@@ -7,7 +7,10 @@ clients to connect to it and send and receive on multiple TCP or UDP
 connections. The stack has been designed for a low memory 
 embedded programming environment and despite its low memory footprint
 provides a complete stack including ARP, IP, UDP, TCP, DHCP, IPv4LL,
-ICMP and IGMP protocols.
+ICMP, IGMP and IPV6 protocols.
+
+.. note:: For IPV6 support, please contact XMOS support for further 
+          information.
 
 The stack is based on the open-source stack uIP with modifications to
 work efficiently on the XMOS architecture and communicate between tasks
@@ -44,7 +47,7 @@ Component Summary
  +-------------------------------------------------------------------+
  |                       **Supported Standards**                     |
  +-------------------------------------------------------------------+
- | IP, UDP, TCP, DHCP, IPv4LL, ICMP, IGMP                            |
+ | IP, UDP, TCP, DHCP, IPv4LL, ICMP, IGMP, IPV6                      |
  +-------------------------------------------------------------------+
  |                       **Supported Devices**                       |
  +------------------------------+------------------------------------+

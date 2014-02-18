@@ -51,8 +51,13 @@ static void handle_xtcp_cmd(chanend c,
       xtcp_protocol_t protocol;
       slave {
         c :> port_number;
+#if UIP_CONF_IPV6
+        for (int j=0;j<sizeof(xtcp_ipaddr_t);j++)
+          c :> ipaddr.u8[j];
+#else
         for (int j=0;j<4;j++)
           c :> ipaddr[j];
+#endif
         c :> protocol;
         xtcpd_connect(i, port_number, ipaddr, protocol);
       }
@@ -64,8 +69,13 @@ static void handle_xtcp_cmd(chanend c,
       xtcp_ipaddr_t ipaddr;
       int port_number;
       slave {
+#if UIP_CONF_IPV6
+        for (int j=0;j<sizeof(xtcp_ipaddr_t);j++)
+          c :> ipaddr.u8[j];
+#else
         for (int j=0;j<4;j++)
           c :> ipaddr[j];
+#endif
         c :> port_number;
       }
       xtcpd_bind_remote(i, conn_id, ipaddr, port_number);
@@ -123,10 +133,16 @@ static void handle_xtcp_cmd(chanend c,
     case XTCP_CMD_JOIN_GROUP: {
       xtcp_ipaddr_t ipaddr;
       slave {
+#if UIP_CONF_IPV6
+    	  for(int i = 0; i<sizeof(xtcp_ipaddr_t); i++){
+    		  c:> ipaddr.u8[i];
+    	  }
+#else
         c :> ipaddr[0];
         c :> ipaddr[1];
         c :> ipaddr[2];
         c :> ipaddr[3];
+#endif
       }
       xtcpd_join_group(ipaddr);
       }
@@ -136,10 +152,16 @@ static void handle_xtcp_cmd(chanend c,
     case XTCP_CMD_LEAVE_GROUP: {
       xtcp_ipaddr_t ipaddr;
       slave {
+#if UIP_CONF_IPV6
+    	  for(int i = 0; i<sizeof(xtcp_ipaddr_t); i++){
+    		  c:> ipaddr.u8[i];
+    	  }
+#else
         c :> ipaddr[0];
         c :> ipaddr[1];
         c :> ipaddr[2];
         c :> ipaddr[3];
+#endif
       }
       xtcpd_leave_group(ipaddr);
       }
@@ -161,9 +183,19 @@ static void handle_xtcp_cmd(chanend c,
 #ifndef XTCP_EXCLUDE_GET_IPCONFIG
     case XTCP_CMD_GET_IPCONFIG: {
       {
+#if UIP_CONF_IPV6
+    	char *c_ptr;
+#endif
         xtcp_ipconfig_t ipconfig;
         xtcpd_get_ipconfig(ipconfig);
+#if UIP_CONF_IPV6
+        c_ptr = (char *)&ipconfig;
+#endif
         master {
+#if UIP_CONF_IPV6
+          for (int i=0;i<sizeof(xtcp_ipconfig_t);i++)
+            c <: c_ptr[i];
+#else
           for (int i=0;i<4;i++)
             c <: ipconfig.ipaddr[i];
 
@@ -172,6 +204,7 @@ static void handle_xtcp_cmd(chanend c,
 
           for (int i=0;i<4;i++)
             c <: ipconfig.gateway[i];
+#endif
         }
       }
       break;

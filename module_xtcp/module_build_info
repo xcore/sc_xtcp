@@ -1,14 +1,18 @@
 DEPENDENT_MODULES = module_ethernet module_otp_board_info
 
+ifeq ($(XTCP_IPV6),1)
+XTCP_SOURCE_DIRS = src src/xtcp_uip6/*
+EXCLUDE_FILES += uip_arp.c autoip.c dhcp.c igmp.c rpl.c rpl-dag.c rpl-ext-header.c \
+                 rpl-icmp6.c rpl-mrhof.c rpl-of0.c rpl-timers.c
+else
 XTCP_SOURCE_DIRS = src src/xtcp_uip/*
+EXCLUDE_FILES += uip-fw.c uip-neighbor.c
+endif
 
 SOURCE_DIRS += $(XTCP_SOURCE_DIRS)
-
 INCLUDE_DIRS += $(XTCP_SOURCE_DIRS)
-
-EXCLUDE_FILES += uip-fw.c uip-neighbor.c
-
 OPTIONAL_HEADERS += xtcp_client_conf.h xtcp_conf.h
+MODULE_XCC_FLAGS = $(XCC_FLAGS)
 
 ifeq ($(USE_XTCP_MAC_CUSTOM_FILTER),1)
 INCLUDE_DIRS += src/mac_custom_filter
@@ -28,4 +32,3 @@ XCC_FLAGS_uip_single_server.xc = $(XCC_FLAGS) -fsubword-select
 #  $(warning ****Building parts of xtcp at -O0 to help debugging****** )
 #  XCC_FLAGS_uip_xtcp.c = $(XCC_FLAGS) -O0 -g
 #  XCC_FLAGS_uip.c = $(XCC_FLAGS) -O0 -g
-
