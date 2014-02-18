@@ -15,6 +15,7 @@ Key Features
    * mDNS
    * Example of HTTP server and Telnet
    * TFTP server
+   * IPV6 support (contact XMOS support for further information)
 
 Firmware Overview
 =================

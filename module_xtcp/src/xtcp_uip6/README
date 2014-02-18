@@ -1,0 +1,5 @@
+This implementation of an XTCP server is based on uIP v1.0.
+
+uIP is a very small implementation of the TCP/IP stack that is written
+by Adam Dunkels <adam@sics.se>. More information can be obtained 
+at the uIP homepage at http://www.sics.se/~adam/uip/.
