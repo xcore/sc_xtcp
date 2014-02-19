@@ -44,8 +44,13 @@ void xtcp_connect(chanend c_xtcp,
   send_cmd(c_xtcp, XTCP_CMD_CONNECT, 0);
   master {
 	  c_xtcp <: port_number;
+#if UIP_CONF_IPV6
+    for(int i=0;i<sizeof(xtcp_ipaddr_t);i++)
+      c_xtcp <: ipaddr.u8[i];
+#else
     for(int i=0;i<4;i++)
     	c_xtcp <: ipaddr[i];
+#endif
     c_xtcp <: p;
   }
 }
@@ -64,8 +69,13 @@ void xtcp_bind_remote(chanend c_xtcp, xtcp_connection_t &conn,
 {
   send_cmd(c_xtcp, XTCP_CMD_BIND_REMOTE, conn.id);
   master {
+#if UIP_CONF_IPV6
+    for (int i=0;i<sizeof(xtcp_ipaddr_t);i++)
+    	c_xtcp <: addr.u8[i];
+#else
     for (int i=0;i<4;i++)
     	c_xtcp <: addr[i];
+#endif
     c_xtcp <: port_number;
   }
 }
@@ -213,6 +223,7 @@ void xtcp_send(chanend c_xtcp,
   xtcp_sendi(c_xtcp, data, 0, len);
 }
 
+#if !UIP_CONF_IPV6
 void xtcp_uint_to_ipaddr(xtcp_ipaddr_t ipaddr, unsigned int i) {
   ipaddr[0] = i & 0xff;
   i >>= 8;
@@ -222,6 +233,7 @@ void xtcp_uint_to_ipaddr(xtcp_ipaddr_t ipaddr, unsigned int i) {
   i >>= 8;
   ipaddr[3] = i & 0xff;
 }
+#endif
 
 void xtcp_set_poll_interval(chanend c_xtcp,
                             REFERENCE_PARAM(xtcp_connection_t, conn),
@@ -233,6 +245,7 @@ void xtcp_set_poll_interval(chanend c_xtcp,
   }
 }
 
+#if !UIP_CONF_IPV6
 void xtcp_join_multicast_group(chanend c_xtcp,
                                xtcp_ipaddr_t addr)
 {
@@ -256,6 +269,7 @@ void xtcp_leave_multicast_group(chanend c_xtcp,
     c_xtcp <: addr[3];
   }
 }
+#endif
 
 void xtcp_get_mac_address(chanend c_xtcp, unsigned char mac_addr[])
 {
@@ -271,8 +285,18 @@ void xtcp_get_mac_address(chanend c_xtcp, unsigned char mac_addr[])
 void xtcp_get_ipconfig(chanend c_xtcp,
                        xtcp_ipconfig_t &ipconfig)
 {
+#if UIP_CONF_IPV6
+  char *c_ptr;
+#endif
   send_cmd(c_xtcp, XTCP_CMD_GET_IPCONFIG, 0);
+#if UIP_CONF_IPV6
+  c_ptr = (char *)&ipconfig;
+#endif
   slave {
+#if UIP_CONF_IPV6
+	  for(int i=0; i<sizeof(xtcp_ipconfig_t); i++)
+		  c_xtcp :> c_ptr[i];
+#else
     c_xtcp :> ipconfig.ipaddr[0];
     c_xtcp :> ipconfig.ipaddr[1];
     c_xtcp :> ipconfig.ipaddr[2];
@@ -285,6 +309,7 @@ void xtcp_get_ipconfig(chanend c_xtcp,
     c_xtcp :> ipconfig.gateway[1];
     c_xtcp :> ipconfig.gateway[2];
     c_xtcp :> ipconfig.gateway[3];
+#endif
   }
 }
 

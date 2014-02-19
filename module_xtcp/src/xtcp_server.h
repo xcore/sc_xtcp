@@ -9,6 +9,11 @@
 #include "xtcp_client.h"
 #include "xtcp_server_conf.h"
 
+#if UIP_CONF_IPV6
+#include "process.h"
+#include "uip-conf.h"
+#endif
+
 #define MAX_XTCP_CLIENTS 10
 
 typedef struct xtcpd_state_t {
