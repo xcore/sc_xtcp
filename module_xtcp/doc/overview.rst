@@ -6,8 +6,10 @@ the XMOS ethernet component. It enables several
 clients to connect to it and send and receive on multiple TCP or UDP
 connections. The stack has been designed for a low memory 
 embedded programming environment and despite its low memory footprint
-provides a complete stack including ARP, IP, UDP, TCP, DHCP, IPv4LL,
+provides a complete stack including ARP, IPv4, IPv6, UDP, TCP, DHCP, IPv4LL,
 ICMP and IGMP protocols.
+
+.. note:: Please contact XMOS support for IPv6.
 
 The stack is based on the open-source stack uIP with modifications to
 work efficiently on the XMOS architecture and communicate between tasks
@@ -44,7 +46,7 @@ Component Summary
  +-------------------------------------------------------------------+
  |                       **Supported Standards**                     |
  +-------------------------------------------------------------------+
- | IP, UDP, TCP, DHCP, IPv4LL, ICMP, IGMP                            |
+ | IPv4, IPv6, UDP, TCP, DHCP, IPv4LL, ICMP, IGMP                    |
  +-------------------------------------------------------------------+
  |                       **Supported Devices**                       |
  +------------------------------+------------------------------------+
