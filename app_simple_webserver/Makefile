@@ -18,7 +18,13 @@ APP_NAME =
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to 
 # xcc for the final link (mapping) stage.
 
-XCC_FLAGS = -O2 -save-temps -g -report -Xmapper --map -Xmapper MAPFILE
+XTCP_IPV6 = 1
+
+ifeq ($(XTCP_IPV6),1)
+XCC_FLAGS = -O2 -save-temps -g -report -Xmapper --map -Xmapper MAPFILE -DIPV6=1
+else
+XCC_FLAGS = -O2 -save-temps -g -report -Xmapper --map -Xmapper MAPFILE -DIPV6=0
+endif
 
 # The USED_MODULES variable lists other module used by the application. 
 USED_MODULES = module_xtcp module_ethernet_board_support
