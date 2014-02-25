@@ -41,6 +41,7 @@
     <description>Implementation of uIP TCP/IP stack for XMOS devices. Runs in a single thread.</description>
     <docdir>module_xtcp/doc</docdir>
     <docdir>doc/slicekit_quickstart</docdir>
+    <docdir>app_simple_webserver/doc_quickstart</docdir>
     <exclude_dir>tests</exclude_dir>
     <exclude_dir>experimental</exclude_dir>
     <location>ssh://git@github.com/davelxmos/sc_xtcp</location>
