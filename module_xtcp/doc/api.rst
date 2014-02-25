@@ -189,7 +189,13 @@ Other General Client Functions
 ++++++++++++++++++++++++++++++
 
 .. doxygenfunction:: xtcp_join_multicast_group
+
+.. note:: Not available for IPv6
+
 .. doxygenfunction:: xtcp_leave_multicast_group
+
+.. note:: Not available for IPv6
+
 .. doxygenfunction:: xtcp_get_mac_address
 .. doxygenfunction:: xtcp_get_ipconfig
 
