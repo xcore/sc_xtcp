@@ -593,7 +593,7 @@ void xtcp_get_ipconfig(chanend c_xtcp,
  *  No further reads and writes will occur on the network.
  *  \param c_xtcp	chanend connected to the xtcp server
  *  \param conn		tcp connection structure
- *
+ *  \note         This functionality is considered experimental for when using IPv6.
  */
 void xtcp_pause(chanend c_xtcp,
                 REFERENCE_PARAM(xtcp_connection_t,conn));
@@ -605,6 +605,7 @@ void xtcp_pause(chanend c_xtcp,
  *
  *  \param c_xtcp	chanend connected to the xtcp server
  *  \param conn		tcp connection structure
+ *  \note         This functionality is considered experimental for when using IPv6. 
  */
 void xtcp_unpause(chanend c_xtcp,
                   REFERENCE_PARAM(xtcp_connection_t,conn));
@@ -614,6 +615,7 @@ void xtcp_unpause(chanend c_xtcp,
  *
  *  \param c_xtcp	chanend connected to the xtcp server
  *  \param conn		tcp connection structure
+ *  \note         This functionality is considered experimental for when using IPv6.
  */
 void xtcp_accept_partial_ack(chanend c_xtcp,
                              REFERENCE_PARAM(xtcp_connection_t,conn));
