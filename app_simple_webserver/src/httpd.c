@@ -198,11 +198,36 @@ void httpd_handle_event(chanend tcp_svr, xtcp_connection_t *conn)
     case XTCP_IFUP: {
       xtcp_ipconfig_t ipconfig;
       xtcp_get_ipconfig(tcp_svr, &ipconfig);
+
+#if IPV6
+      unsigned short a;
+      unsigned int i;
+      int f;
+      xtcp_ipaddr_t *addr = &ipconfig.ipaddr;
+      printstr("IPV6 Address = [");
+      for(i = 0, f = 0; i < sizeof(xtcp_ipaddr_t); i += 2) {
+        a = (addr->u8[i] << 8) + addr->u8[i + 1];
+        if(a == 0 && f >= 0) {
+          if(f++ == 0) {
+            printstr("::");
+           }
+        } else {
+            if(f > 0) {
+              f = -1;
+            } else if(i > 0) {
+                printstr(":");
+            }
+          printhex(a);
+        }
+      }
+      printstrln("]");
+#else
       printstr("IP Address: ");
       printint(ipconfig.ipaddr[0]);printstr(".");
       printint(ipconfig.ipaddr[1]);printstr(".");
       printint(ipconfig.ipaddr[2]);printstr(".");
       printint(ipconfig.ipaddr[3]);printstr("\n");
+#endif
       }
       return;
     case XTCP_IFDOWN:
