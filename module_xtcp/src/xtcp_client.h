@@ -268,6 +268,7 @@ typedef struct xtcp_connection_t {
  *
  * \param ipaddr The result ipaddr
  * \param i      An 32-bit integer containing the ip address (network order)
+ * \note         Not available for IPv6
  */
 void xtcp_uint_to_ipaddr(xtcp_ipaddr_t ipaddr, unsigned int i);
 

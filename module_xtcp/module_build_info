@@ -1,6 +1,6 @@
 DEPENDENT_MODULES = module_ethernet module_otp_board_info
 
-ifeq ($(XTCP_IPV6),1)
+ifeq ($(CONFIG),IPV6)
 XTCP_SOURCE_DIRS = src src/xtcp_uip6/*
 EXCLUDE_FILES += uip_arp.c autoip.c dhcp.c igmp.c rpl.c rpl-dag.c rpl-ext-header.c \
                  rpl-icmp6.c rpl-mrhof.c rpl-of0.c rpl-timers.c

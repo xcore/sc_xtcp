@@ -116,11 +116,12 @@ Importing the Simple webserver demo application:
 * This will also automatically import dependencies for this application.
 * The application is called as *app_simple_webserver* in the *Project Explorer* window.
 
-Selecting between IPv4 and IPv6 addressing
+Selecting between IPv4 and IPv6 addressing:
 
-* Open the application makefile from app_simple_webserver//Makefile
-* To use IPv4 addressing, set the *XTCP_IPV6* variable to '0'
-* To use IPv6 addressing, set the *XTCP_IPV6* variable to '1'
+* Click on the small (downward) arrow next to the Build icon (indicated by a 'Hammer' picture).
+* This will show a list of build configurations. Currently: IPV4 and IPV6.
+* To use IPv4 addressing, select IPV4.
+* To use IPv6 addressing, select IPV6.
 
 Building the Simple webserver demo application:
 
@@ -133,8 +134,11 @@ Run the application
 
 To run the application using xTIMEcomposer studio:
 
-* In the *Project Explorer* window, locate the *app_simple_webserver.xe* in the (app_simple_webserver -> Binaries).
-* Right click on *app_simple_webserver.xe* and click on (Run As -> xCORE Application).
+* In the *Project Explorer* window, locate the *app_simple_webserver_IPVn.xe* in the (app_simple_webserver -> Binaries).
+
+  .. note:: where n in *app_simple_webserver_IPVn.xe* is 4 for IPv4 and 6 for IPV6 addressing.
+  
+* Right click on *app_simple_webserver_IPVn.xe* and click on (Run As -> xCORE Application).
 * A *Select Device* window appears.
 * Select *XMOS XTAG-2 connected to L1* and click OK.
 
