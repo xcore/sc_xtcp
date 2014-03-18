@@ -1,6 +1,10 @@
 sc_xtcp Change Log
 ==================
 
+3.2.0
+-----
+  * Add IPv6 support
+
 3.1.5
 -----
   * Fixed channel protocol bug that caused crash when xCONNECT is
