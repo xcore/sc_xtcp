@@ -564,7 +564,7 @@ void xtcp_join_multicast_group(chanend c_xtcp,
  * \param addr        The address of the multicast group to leave. It is
  *                    assumed that this is a multicast IP address which
  *                    has previously been joined.
- * \note              Not available for IPv6 
+ * \note              Not available for IPv6
  */
 void xtcp_leave_multicast_group(chanend c_xtcp,
                                xtcp_ipaddr_t addr);
@@ -605,7 +605,7 @@ void xtcp_pause(chanend c_xtcp,
  *
  *  \param c_xtcp	chanend connected to the xtcp server
  *  \param conn		tcp connection structure
- *  \note         This functionality is considered experimental for when using IPv6. 
+ *  \note         This functionality is considered experimental for when using IPv6.
  */
 void xtcp_unpause(chanend c_xtcp,
                   REFERENCE_PARAM(xtcp_connection_t,conn));

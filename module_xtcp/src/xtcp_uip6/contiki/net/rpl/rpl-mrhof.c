@@ -37,7 +37,7 @@
  * \file
  *         The Minimum Rank with Hysteresis Objective Function (MRHOF)
  *
- *         This implementation uses the estimated number of 
+ *         This implementation uses the estimated number of
  *         transmissions (ETX) as the additive routing metric,
  *         and also provides stubs for the energy metric.
  *

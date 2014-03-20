@@ -117,13 +117,13 @@ void *
 list_tail(list_t list)
 {
   struct list *l;
-  
+
   if(*list == NULL) {
     return NULL;
   }
-  
+
   for(l = *list; l->next != NULL; l = l->next);
-  
+
   return l;
 }
 /*---------------------------------------------------------------------------*/
@@ -147,7 +147,7 @@ list_add(list_t list, void *item)
   list_remove(list, item);
 
   ((struct list *)item)->next = NULL;
-  
+
   l = list_tail(list);
 
   if(l == NULL) {
@@ -185,7 +185,7 @@ void *
 list_chop(list_t list)
 {
   struct list *l, *r;
-  
+
   if(*list == NULL) {
     return NULL;
   }
@@ -194,12 +194,12 @@ list_chop(list_t list)
     *list = NULL;
     return l;
   }
-  
+
   for(l = *list; l->next->next != NULL; l = l->next);
 
   r = l->next;
   l->next = NULL;
-  
+
   return r;
 }
 /*---------------------------------------------------------------------------*/
@@ -239,11 +239,11 @@ void
 list_remove(list_t list, void *item)
 {
   struct list *l, *r;
-  
+
   if(*list == NULL) {
     return;
   }
-  
+
   r = NULL;
   for(l = *list; l != NULL; l = l->next) {
     if(l == item) {
@@ -304,7 +304,7 @@ list_insert(list_t list, void *previtem, void *newitem)
   if(previtem == NULL) {
     list_push(list, newitem);
   } else {
-  
+
     ((struct list *)newitem)->next = ((struct list *)previtem)->next;
     ((struct list *)previtem)->next = newitem;
   }

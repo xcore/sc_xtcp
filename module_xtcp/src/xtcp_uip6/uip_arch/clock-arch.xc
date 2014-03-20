@@ -69,8 +69,8 @@ clock_time(void)
   }
   else {
     unsigned diff = (signed) t - (signed) prev_timestamp;
-    time += diff/100000;    
-  }    
+    time += diff/100000;
+  }
 
   prev_timestamp = t;
   return time;

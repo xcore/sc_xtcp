@@ -93,7 +93,7 @@ void uip_log(char *msg);
 /** \name Pointers to the header structures.
  *  All pointers except UIP_IP_BUF depend on uip_ext_len, which at
  *  packet reception, is the total length of the extension headers.
- *  
+ *
  *  The pointer to ND6 options header also depends on nd6_opt_offset,
  *  which we set in each function.
  *
@@ -129,7 +129,7 @@ static uip_ds6_addr_t *addr; /**  Pointer to an interface address */
 
 
 /*------------------------------------------------------------------*/
-/* create a llao */ 
+/* create a llao */
 static void
 create_llao(uint8_t *llao, uint8_t type) {
   llao[UIP_ND6_OPT_TYPE_OFFSET] = type;
@@ -348,7 +348,7 @@ uip_nd6_ns_output(uip_ipaddr_t * src, uip_ipaddr_t * dest, uip_ipaddr_t * tgt)
   UIP_IP_BUF->len[0] = 0;       /* length will not be more than 255 */
   /*
    * check if we add a SLLAO option: for DAD, MUST NOT, for NUD, MAY
-   * (here yes), for Address resolution , MUST 
+   * (here yes), for Address resolution , MUST
    */
   if(!(uip_ds6_is_my_addr(tgt))) {
     if(src != NULL) {
@@ -409,9 +409,9 @@ uip_nd6_na_input(void)
   PRINTF("\n");
   UIP_STAT(++uip_stat.nd6.recv);
 
-  /* 
+  /*
    * booleans. the three last one are not 0 or 1 but 0 or 0x80, 0x40, 0x20
-   * but it works. Be careful though, do not use tests such as is_router == 1 
+   * but it works. Be careful though, do not use tests such as is_router == 1
    */
   is_llchange = 0;
   is_router = ((UIP_ND6_NA_BUF->flagsreserved & UIP_ND6_NA_FLAG_ROUTER));
@@ -536,7 +536,7 @@ uip_nd6_na_input(void)
     uip_packetqueue_free(&nbr->packethandle);
     return;
   }
-  
+
 #endif /*UIP_CONF_IPV6_QUEUE_PKT */
 
 discard:
@@ -562,7 +562,7 @@ uip_nd6_rs_input(void)
 
 #if UIP_CONF_IPV6_CHECKS
   /*
-   * Check hop limit / icmp code 
+   * Check hop limit / icmp code
    * target address must not be multicast
    * if the NA is solicited, dest must not be multicast
    */
@@ -881,7 +881,7 @@ uip_nd6_ra_input(void)
         if((nd6_opt_prefix_info->flagsreserved1 & UIP_ND6_RA_FLAG_AUTONOMOUS)
            && (nd6_opt_prefix_info->validlt != 0)
            && (nd6_opt_prefix_info->preflen == UIP_DEFAULT_PREFIX_LEN)) {
-	  
+
           uip_ipaddr_copy(&ipaddr, &nd6_opt_prefix_info->prefix);
           uip_ds6_set_addr_iid(&ipaddr, &uip_lladdr);
           addr = uip_ds6_addr_lookup(&ipaddr);

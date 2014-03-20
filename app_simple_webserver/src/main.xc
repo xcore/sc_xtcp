@@ -24,7 +24,7 @@ xtcp_ipconfig_t ipconfig = {
   {{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
   {{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
 };
-#else     
+#else
 // IP Config - change this to suit your network.  Leave with all
 // 0 values to use DHCP
 xtcp_ipconfig_t ipconfig = {

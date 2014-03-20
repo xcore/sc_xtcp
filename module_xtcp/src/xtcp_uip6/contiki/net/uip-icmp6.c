@@ -6,7 +6,7 @@
 /**
  * \file
  *         ICMPv6 echo request and error messages (RFC 4443)
- * \author Julien Abeille <jabeille@cisco.com> 
+ * \author Julien Abeille <jabeille@cisco.com>
  * \author Mathilde Durvy <mdurvy@cisco.com>
  */
 

@@ -243,14 +243,14 @@ struct uip_conn *
 tcp_connect(uip_ipaddr_t *ripaddr, uint16_t port, void *appstate)
 {
   struct uip_conn *c;
-  
+
   c = uip_connect(ripaddr, port);
   if(c == NULL) {
     return NULL;
   }
   c->appstate.p = PROCESS_CURRENT();
   c->appstate.state = appstate;
-  
+
   tcpip_poll_tcp(c);
   return c;
 }
@@ -323,7 +323,7 @@ udp_new(const uip_ipaddr_t *ripaddr, uint16_t port, void *appstate)
 {
   struct uip_udp_conn *c;
   uip_udp_appstate_t *s;
-  
+
   c = uip_udp_new(ripaddr, port);
   if(c == NULL) {
     return NULL;
@@ -470,7 +470,7 @@ eventhandler(process_event_t ev, process_data_t data)
           uip_fw_periodic();
 #endif /* UIP_CONF_IP_FORWARD */
         }
-        
+
 #if UIP_CONF_IPV6
 #if UIP_CONF_IPV6_REASSEMBLY
         /*
@@ -858,7 +858,7 @@ PROCESS_THREAD(tcpip_process, ev, data)
 		PROCESS_YIELD();
   		eventhandler(ev, data);
 	}
-  
+
 	PROCESS_END();
 }
 #endif /* NO_XMOS_PROJECT */

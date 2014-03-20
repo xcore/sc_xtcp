@@ -6,7 +6,7 @@
 /**
  * \file
  *         ICMPv6 echo request and error messages (RFC 4443)
- * \author Julien Abeille <jabeille@cisco.com> 
+ * \author Julien Abeille <jabeille@cisco.com>
  * \author Mathilde Durvy <mdurvy@cisco.com>
  */
 
@@ -105,9 +105,9 @@ typedef struct uip_icmp6_error{
 /** \name ICMPv6 RFC4443 Message processing and sending */
 /** @{ */
 /** \
- * brief Process an echo request 
+ * brief Process an echo request
  *
- * Perform a few checks, then send an Echo reply. The reply is 
+ * Perform a few checks, then send an Echo reply. The reply is
  * built here.
   */
 void
@@ -117,10 +117,10 @@ uip_icmp6_echo_request_input(void);
  * \brief Send an icmpv6 error message
  * \param type type of the error message
  * \param code of the error message
- * \param type 32 bit parameter of the error message, semantic depends on error 
+ * \param type 32 bit parameter of the error message, semantic depends on error
  */
 void
-uip_icmp6_error_output(uint8_t type, uint8_t code, uint32_t param); 
+uip_icmp6_error_output(uint8_t type, uint8_t code, uint32_t param);
 
 /**
  * \brief Send an icmpv6 message
