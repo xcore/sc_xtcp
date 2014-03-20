@@ -9,7 +9,7 @@
 *
 * Project:			XMOS and 6LoWPAN
 * Target:			XMOS sliceKIT with RFSlice extension
-* Compiler:        
+* Compiler:
 *
 * -----------------------------------------------------------------------------
 *

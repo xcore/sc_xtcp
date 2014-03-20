@@ -14,7 +14,7 @@
  *  \param mac_tx           Tx channel connected to ethernet server
  *  \param xtcp             Client channel array
  *  \param num_xtcp_clients The number of clients connected to the server
- *  \param ipconfig         An data structure representing the IP config 
+ *  \param ipconfig         An data structure representing the IP config
  *                          (ip address, netmask and gateway) of the device.
  *                          Leave NULL for automatic address allocation.
  *
@@ -26,9 +26,9 @@
  *  parameter is NULL then an automatic IP address is found (using dhcp or
  *  ipv4 link local addressing if no dhcp server is present). Otherwise
  *  it uses the ipconfig structure to allocate a static ip address.
- * 
- *  The clients can communicate with the server using the API found 
- *  in xtcp_client.h 
+ *
+ *  The clients can communicate with the server using the API found
+ *  in xtcp_client.h
  *
  *  \sa  xtcp_event()
  **/

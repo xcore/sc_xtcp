@@ -113,7 +113,7 @@ static void register_listener(struct listener_info_t listeners[],
     for (i=0;i<n;i++)
       if (!listeners[i].active)
         break;
-    
+
     if (i==n) {
       // Error: max number of listeners reached
     }
@@ -283,17 +283,17 @@ void xtcpd_bind_local(int linknum, int conn_id, int port_number)
 {
   xtcpd_state_t *s = lookup_xtcpd_state(conn_id);
   s->conn.local_port = port_number;
-  if (s->conn.protocol == XTCP_PROTOCOL_UDP) 
-    ((struct uip_udp_conn *) s->s.uip_conn)->lport = HTONS(port_number);    
-  else 
-    ((struct uip_conn *) s->s.uip_conn)->lport = HTONS(port_number);    
+  if (s->conn.protocol == XTCP_PROTOCOL_UDP)
+    ((struct uip_udp_conn *) s->s.uip_conn)->lport = HTONS(port_number);
+  else
+    ((struct uip_conn *) s->s.uip_conn)->lport = HTONS(port_number);
 }
 
 /* -----------------------------------------------------------------------------
  *
  * -------------------------------------------------------------------------- */
-void xtcpd_bind_remote(int linknum, 
-                       int conn_id, 
+void xtcpd_bind_remote(int linknum,
+                       int conn_id,
                        xtcp_ipaddr_t addr,
                        int port_number)
 {
@@ -301,18 +301,18 @@ void xtcpd_bind_remote(int linknum,
   if (s->conn.protocol == XTCP_PROTOCOL_UDP) {
     struct uip_udp_conn *conn = (struct uip_udp_conn *) s->s.uip_conn;
     s->conn.remote_port = port_number;
-    conn->rport = HTONS(port_number);    
+    conn->rport = HTONS(port_number);
     XTCP_IPADDR_CPY(s->conn.remote_addr.u8, addr.u8);
     XTCP_IPADDR_CPY(conn->ripaddr.u8, addr.u8);
 //    conn->ripaddr.u16[0] = (addr[1] << 8) | addr[0];
 //    conn->ripaddr.u16[1] = (addr[3] << 8) | addr[2];
-  }            
+  }
 }
 
 /* -----------------------------------------------------------------------------
  *
  * -------------------------------------------------------------------------- */
-void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr, 
+void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr,
                    xtcp_protocol_t p) {
   uip_ipaddr_t uipaddr;
 #if UIP_CONF_IPV4
@@ -322,11 +322,11 @@ void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr,
 		                addr.u16[4], addr.u16[5], addr.u16[6], addr.u16[7]);
 #endif /* UIP_CONF_IPVx */
   if (p == XTCP_PROTOCOL_TCP) {
-    struct uip_conn *conn = uip_connect(&uipaddr, HTONS(port_number)); 
+    struct uip_conn *conn = uip_connect(&uipaddr, HTONS(port_number));
     if (conn != NULL) {
          xtcpd_state_t *s = (xtcpd_state_t *) &(conn->appstate);
          s->linknum = linknum;
-         s->s.connect_request = 1;      
+         s->s.connect_request = 1;
          s->conn.connection_type = XTCP_CLIENT_CONNECTION;
        }
   }
@@ -336,7 +336,7 @@ void xtcpd_connect(int linknum, int port_number, xtcp_ipaddr_t addr,
     if (conn != NULL) {
       xtcpd_state_t *s = (xtcpd_state_t *) &(conn->appstate);
       s->linknum = linknum;
-      s->s.connect_request = 1;      
+      s->s.connect_request = 1;
       s->conn.connection_type = XTCP_CLIENT_CONNECTION;
     }
   }
@@ -465,7 +465,7 @@ static void uip_xtcpd_handle_poll(xtcpd_state_t *s)
     /* ----------------------------------- */
     if (uip_udpconnection()) {
       uip_udp_conn->lport = 0;
-      xtcpd_event(XTCP_CLOSED, s);    
+      xtcpd_event(XTCP_CLOSED, s);
     } else {
       uip_abort();
     }
@@ -474,7 +474,7 @@ static void uip_xtcpd_handle_poll(xtcpd_state_t *s)
     /* ----------------------------------- */
     if (uip_udpconnection()) {
       uip_udp_conn->lport = 0;
-      xtcpd_event(XTCP_CLOSED, s);    
+      xtcpd_event(XTCP_CLOSED, s);
     }
     else
       uip_close();
@@ -497,7 +497,7 @@ static void uip_xtcpd_handle_poll(xtcpd_state_t *s)
     if (s->linknum != -1) {
       len = do_xtcpd_send(xtcp_cons.links[s->linknum],
                        XTCP_REQUEST_DATA,
-                       s, 
+                       s,
                        uip_appdata,
                        uip_udpconnection() ? XTCP_CLIENT_BUF_SIZE : uip_mss());
       uip_send(uip_appdata, len);
@@ -518,7 +518,7 @@ static void uip_xtcpd_handle_poll(xtcpd_state_t *s)
  * this function is called, when a package comes in for an upper layer
  * application.
  * -------------------------------------------------------------------------- */
-void 
+void
 xtcpd_appcall(void)
 {
   xtcpd_state_t *s;
@@ -564,7 +564,7 @@ xtcpd_appcall(void)
                        *((xtcp_ipaddr_t *) (&uip_udp_conn->ripaddr)),
                        uip_udp_conn->lport,
                        uip_udp_conn->rport,
-                       uip_udp_conn);   
+                       uip_udp_conn);
       xtcpd_event(XTCP_NEW_CONNECTION, s);
     }
   }
@@ -574,8 +574,8 @@ xtcpd_appcall(void)
     if (s->linknum != -1) {
       xtcpd_service_clients_until_ready(s->linknum, xtcp_cons.links, xtcp_cons.nr);
       xtcpd_recv(xtcp_cons.links, s->linknum, xtcp_cons.nr,
-                 s, 
-                 uip_appdata, 
+                 s,
+                 uip_appdata,
                  uip_datalen());
       if (!uip_udpconnection() && s->s.ack_recv_mode) {
         uip_stop();
@@ -602,7 +602,7 @@ xtcpd_appcall(void)
 
       uip_send(uip_appdata, len);
     }
-  }  
+  }
 
   /* -------------- retransmit the last package  -------------- */
   if (uip_rexmit()) {
@@ -613,19 +613,19 @@ xtcpd_appcall(void)
       s->conn.outstanding = 0;
 #endif
       len = xtcpd_send(xtcp_cons.links[s->linknum],
-                       XTCP_RESEND_DATA, 
-                       s, 
+                       XTCP_RESEND_DATA,
+                       s,
                        uip_appdata,
                        uip_udpconnection() ? XTCP_CLIENT_BUF_SIZE : uip_mss());
       if (len != 0)
         uip_send(uip_appdata, len);
-    }    
+    }
   }
 
   /* --------------- poll a connection --------------- */
   if (uip_poll()) {
     uip_xtcpd_handle_poll(s);
-  }  
+  }
 
 #if XTCP_ENABLE_PUSH_FLAG_NOTIFICATION
   if (uip_tcp_push()) {
@@ -676,7 +676,7 @@ xtcpd_icmp6_call(uint8_t type){
  * General stack information (set/get) functions
  * -------------------------------------------------------------------------- */
 static int uip_ifstate = 0;
-void xtcpd_get_ipconfig(xtcp_ipconfig_t *ipconfig) 
+void xtcpd_get_ipconfig(xtcp_ipconfig_t *ipconfig)
 {
 #if UIP_CONF_IPV4
   ipconfig->v = 4;
@@ -756,7 +756,7 @@ void uip_xtcp_down(void) {
   uip_ifstate = 0;
 }
 
-int uip_xtcp_get_ifstate() 
+int uip_xtcp_get_ifstate()
 {
   return uip_ifstate;
 }

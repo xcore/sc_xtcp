@@ -34,7 +34,7 @@ xcoredev_read(chanend rx, int n)
 {
   unsigned int len = 0;
   unsigned int src_port;
-  select 
+  select
     {
     case safe_mac_rx(rx, (uip_buf32, unsigned char[]), len, src_port, n):
       if (len == STATUS_PACKET_LEN) {
@@ -47,7 +47,7 @@ xcoredev_read(chanend rx, int n)
         return 0;
       }
       break;
-    default:      
+    default:
       break;
     }
   return len <= n ? len : 0;
@@ -60,8 +60,8 @@ xcoredev_send(chanend tx)
   int len = uip_len;
   if (len != 0) {
     if (len < 64)  {
-      for (int i=len;i<64;i++) 
-        (uip_buf32, unsigned char[])[i] = 0;      
+      for (int i=len;i<64;i++)
+        (uip_buf32, unsigned char[])[i] = 0;
       len=64;
     }
 

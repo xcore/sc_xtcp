@@ -13,13 +13,13 @@
  * \addtogroup uiparp
  * @{
  */
- 
+
 /**
  * \file
  * Macros and definitions for the ARP module.
  * \author Adam Dunkels <adam@dunkels.com>
  */
-  
+
 
 /*
  * Copyright (c) 2001-2003, Adam Dunkels.
@@ -106,11 +106,11 @@ void uip_arp_arpin(void);
    such table entry is found, the IP packet is overwritten with an ARP
    request and we rely on TCP to retransmit the packet that was
    overwritten. In any case, the uip_len variable holds the length of
-   the Ethernet frame that should be transmitted. 
+   the Ethernet frame that should be transmitted.
 
-   The function takes one argument which is an optional pointer to a 
+   The function takes one argument which is an optional pointer to a
    udp connection. If supplied, and the arp packet overwrites the
-   existing packet then the PENDING_ARP flag is set in that udp 
+   existing packet then the PENDING_ARP flag is set in that udp
    connection so that when an arp reply comes back the application layer
    is asked to retransmit the udp packet.
 */

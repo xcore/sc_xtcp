@@ -182,8 +182,8 @@
 #endif
 
 /*
- * The ETX in the metric container is expressed as a fixed-point value 
- * whose integer part can be obtained by dividing the value by 
+ * The ETX in the metric container is expressed as a fixed-point value
+ * whose integer part can be obtained by dividing the value by
  * RPL_DAG_MC_ETX_DIVISOR.
  */
 #define RPL_DAG_MC_ETX_DIVISOR		128
@@ -257,7 +257,7 @@ extern rpl_stats_t rpl_stats;
 /* RPL macros. */
 
 #if RPL_CONF_STATS
-#define RPL_STAT(code)	(code) 
+#define RPL_STAT(code)	(code)
 #else
 #define RPL_STAT(code)
 #endif /* RPL_CONF_STATS */

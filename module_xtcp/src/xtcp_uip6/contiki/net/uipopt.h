@@ -479,14 +479,14 @@
 /**
  * If we use IPHC compression, how many address contexts do we support
  */
-#ifndef SICSLOWPAN_CONF_MAX_ADDR_CONTEXTS 
+#ifndef SICSLOWPAN_CONF_MAX_ADDR_CONTEXTS
 #define SICSLOWPAN_CONF_MAX_ADDR_CONTEXTS 1
 #endif
 
 /**
  * Do we support 6lowpan fragmentation
  */
-#ifndef SICSLOWPAN_CONF_FRAG  
+#ifndef SICSLOWPAN_CONF_FRAG
 #define SICSLOWPAN_CONF_FRAG  0
 #endif
 

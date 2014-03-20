@@ -143,7 +143,7 @@ packetbuf_copyto(void *to)
     int i;
     char buffer[1000];
     char *bufferptr = buffer;
-    
+
     bufferptr[0] = 0;
     for(i = hdrptr; i < PACKETBUF_HDR_SIZE; ++i) {
       bufferptr += sprintf(bufferptr, "0x%02x, ", packetbuf[i]);
