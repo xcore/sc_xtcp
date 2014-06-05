@@ -4,6 +4,13 @@ sc_xtcp Change Log
 3.2.1
 -----
 
+  * Changes to dependencies:
+
+    - sc_ethernet: 2.2.7rc1 -> 2.3.1rc0
+
+      + Fix invalid inter-frame gaps.
+      + Adds AVB-DC support to sc_ethernet
+
 3.2.0
 -----
   * Added IPv6 support
