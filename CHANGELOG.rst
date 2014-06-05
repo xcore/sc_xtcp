@@ -1,6 +1,9 @@
 sc_xtcp Change Log
 ==================
 
+3.2.1
+-----
+
 3.2.0
 -----
   * Added IPv6 support
