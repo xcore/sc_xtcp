@@ -2,22 +2,22 @@
 <xpd>
     <components>
         <component description = "A demo of the TCP/IP stack that provides a simple webserver" type = "demoCode" scope = "Example" path = "app_simple_webserver" local = "false" id = "app_simple_webserver" name = "Simple HTTP Demo">
-            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.1">module_ethernet</componentDependency>
-            <componentDependency repo = "git://github.com/xcore/sc_otp" version = "1.0.0">module_otp_board_info</componentDependency>
-            <componentDependency repo = "git://github.com/davelxmos/sc_xtcp" version = "3.2.0">module_xtcp</componentDependency>
-            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.1">module_ethernet_board_support</componentDependency>
-            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.1">module_ethernet_smi</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.2">module_ethernet_smi</componentDependency>
+            <componentDependency repo = "git://github.com/davelxmos/sc_xtcp" version = "3.2.1">module_xtcp</componentDependency>
             <componentDependency repo = "git://github.com/xcore/sc_util" version = "1.0.4">module_locks</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.2">module_ethernet_board_support</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.2">module_ethernet</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_otp" version = "1.0.0">module_otp_board_info</componentDependency>
             <keyword>ethernet</keyword>
             <keyword>tcp/ip</keyword>
             <keyword>webserver</keyword>
             <keyword>http</keyword>
         </component>
         <component name = "Ethernet/TCP Module" type = "component" buildresults_path = "module_xtcp/.module_xtcp.buildinfo" scope = "General Use" path = "module_xtcp" metainfo_path = "module_xtcp/module_xtcp.metainfo" local = "false" id = "module_xtcp" description = "An ethernet stack with TCP/IP">
-            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.1">module_ethernet</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.2">module_ethernet_smi</componentDependency>
             <componentDependency repo = "git://github.com/xcore/sc_util" version = "1.0.4">module_locks</componentDependency>
+            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.2">module_ethernet</componentDependency>
             <componentDependency repo = "git://github.com/xcore/sc_otp" version = "1.0.0">module_otp_board_info</componentDependency>
-            <componentDependency repo = "git://github.com/xcore/sc_ethernet.git" version = "2.3.1">module_ethernet_smi</componentDependency>
             <keyword>ethernet</keyword>
             <keyword>TCP/IP</keyword>
             <keyword>mac</keyword>
@@ -29,11 +29,13 @@
         </component>
     </components>
     <dependency repo = "sc_ethernet">
-        <githash>dc3e178da0c676f502fcbfe9538cade86bc1b240</githash>
+        <gitbranch>master</gitbranch>
+        <githash>28bf300515766c9fa2c033531a0a0d587608360e</githash>
         <uri>git@github.com:xcore/sc_ethernet.git</uri>
-        <version>2.3.1rc0</version>
+        <version>2.3.2rc0</version>
     </dependency>
     <dependency repo = "sc_otp">
+        <gitbranch>(no branch)</gitbranch>
         <githash>062aa923a78bc603b254b2a99b78593ab3a816ec</githash>
         <uri>git@github.com:xcore/sc_otp</uri>
         <version>1.0.0rc0</version>
@@ -76,7 +78,8 @@
     <release parenthash = "47e6fd38de88a2100e9b97a59c6a271a1430e662" version = "3.1.5rc0" githash = "ac3c173aaaa1fe3d406006f11c0b367949508287"></release>
     <release parenthash = "256d723d92b54bbaac9ed6f30b666749e9eb1356" version = "3.1.5rc1" githash = "1382ce64c874bec0ef85acd4c46afde5d1d144f8"></release>
     <release parenthash = "065d0170c784dbf6398cc1326f88d7cf3118dee6" version = "3.2.0rc0" githash = "d649fbce19657f58d030f8d42fcd42d7c46337d0"></release>
-    <release parenthash = "ba122a01c9537922854c43eaf1b0406155e09f8b" version = "3.2.1rc0"></release>
+    <release parenthash = "ba122a01c9537922854c43eaf1b0406155e09f8b" version = "3.2.1rc0" githash = "7f6b2029954a52a9a2349150530bb3470a76f4c3"></release>
+    <release parenthash = "7f6b2029954a52a9a2349150530bb3470a76f4c3" version = "3.2.1rc1"></release>
     <subpartnumber>XM-001955-SM</subpartnumber>
     <vendor>XMOS</vendor>
     <version_defines></version_defines>
