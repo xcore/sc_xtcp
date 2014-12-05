@@ -57,6 +57,7 @@ struct mdns_table_entry {
   char name[MDNS_MAX_NAME_LENGTH];
   char name_prefix[MDNS_MAX_NAME_LENGTH];
   char name_postfix[MDNS_MAX_NAME_LENGTH];
+  char txt_record[MDNS_MAX_TXT_LENGTH];
   int srv_port;
   xtcp_ipaddr_t ipaddr;
   int counter;
@@ -1055,15 +1056,19 @@ static char *mdns_send_txt_response(char *dptr,
 {
   int nnamelen;
   struct mdns_answer *ans;
-  int len;
+  int len, ans_txt_len;
+  char *ans_txt;
   nnamelen = mdns_encode_name(dptr, e->name);
   ans = (struct mdns_answer *) (dptr + nnamelen);
   ans->type = HTONS(MDNS_RRTYPE_TXT);
   ans->class = HTONS(MDNS_RRCLASS_IN);
   ans->ttl = HTONL(255);
-  ans->len = HTONS(0);
+  ans_txt = (char *) (dptr + nnamelen+sizeof(struct mdns_answer));
+  ans_txt_len = mdns_encode_name(ans_txt, e->txt_record);
 
-  len = nnamelen+sizeof(struct mdns_answer);
+  ans->len = HTONS(ans_txt_len);
+
+  len = nnamelen+sizeof(struct mdns_answer) + ans_txt_len;
   return (dptr + len);
 }
 
@@ -1401,6 +1406,7 @@ mdns_event mdns_handle_event(chanend tcp_svr,
 
 static void mdns_add_entry(char name_prefix[],
                     char name_postfix[],
+                    char txt[],
                     xtcp_ipaddr_t ipaddr,
                     int srv_port,
                     mdns_entry_type_t entry_type)
@@ -1427,6 +1433,7 @@ static void mdns_add_entry(char name_prefix[],
   strcpy(mdns_table[i].name_postfix, name_postfix);
   if (entry_type == MDNS_SRV_ENTRY) {
     strcpy(mdns_table[i].name_postfix + strlen(name_postfix),".local");
+    strcpy(mdns_table[i].txt_record, txt);
   }
   mdns_table[i].counter = 0;
   update_name(&mdns_table[i]);
@@ -1439,16 +1446,16 @@ static void mdns_add_entry(char name_prefix[],
 
 void mdns_register_canonical_name(char name[])
 {
-  mdns_add_entry(name,"local",NULL,0,MDNS_CANONICAL_NAME_ENTRY);
+  mdns_add_entry(name,"local",NULL,NULL,0,MDNS_CANONICAL_NAME_ENTRY);
 }
 
 void mdns_register_name(char name[])
 {
-  mdns_add_entry(name,"local",NULL,0,MDNS_NAME_ENTRY);
+  mdns_add_entry(name,"local",NULL,NULL,0,MDNS_NAME_ENTRY);
 }
 
 void mdns_register_service(char name[], char srv_type[],
                            int srv_port, char txt[])
 {
-  mdns_add_entry(name,srv_type,NULL,srv_port, MDNS_SRV_ENTRY);
+  mdns_add_entry(name,srv_type,txt,NULL,srv_port, MDNS_SRV_ENTRY);
 }

@@ -12,6 +12,10 @@
 #define MDNS_MAX_NAME_LENGTH             100
 #endif
 
+#ifndef MDNS_MAX_TXT_LENGTH
+#define MDNS_MAX_TXT_LENGTH              100
+#endif
+
 #ifndef MDNS_NUM_TABLE_ENTRIES
 #define MDNS_NUM_TABLE_ENTRIES            5
 #endif
