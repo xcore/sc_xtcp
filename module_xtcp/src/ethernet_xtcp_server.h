@@ -15,6 +15,6 @@ typedef struct ethernet_xtcp_ports_s {
 void ethernet_xtcp_server(REFERENCE_PARAM(ethernet_xtcp_ports_t, ports),
                           REFERENCE_PARAM(xtcp_ipconfig_t, ipconfig),
                           chanend xtcp[],
-                          int n);
+                          int num_clients);
 
 #endif // __ethernet_xtcp_server_h__
