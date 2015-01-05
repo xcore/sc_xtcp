@@ -1,6 +1,6 @@
 TARGET ?= SLICEKIT-L2
 APP_NAME =
-XCC_FLAGS = -g -O3 -lxscope
+XCC_FLAGS = -g -O3 -fxscope
 USED_MODULES = module_xtcp module_ethernet_board_support
 
 ifeq ($(notdir $(abspath ..)),tests)
